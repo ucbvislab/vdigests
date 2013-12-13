@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Summary Interface</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+      .container {
+        height: 900px;
+      }
+      
+      #video {
+        /*margin-top: -22px;*/
+      }
+
+      
+      #center {
+        float: left;
+        margin-left: 10px;
+        width: 1000px;
+        height: 900px;
+        background-color: blue;
+        overflow: hidden;
+      }
+
+      #center #scrolling {
+        width: 1010px;
+        height: inherit;
+        background-color: yellow;
+        overflow: scroll;
+      }
+
+      #transcript {
+        float: left;
+        width: 500px;
+        background-color: white;
+        margin-right: 10px;
+      }
+
+      #summary {
+        float: left;
+        width: 490px;
+        height: 900px;
+        background-color: pink;
+      }
+
+
+      #timeline {
+        float: left;
+        height:900px;
+        background-color: pink;
+      }
+
+    </style>
+    <script src="resources/js/canvas2image.js"></script>
+  </head>
+  <body>
+    <div id="timeline">
+      <img id="tl" src="resources/timeline.png" height="900px">
+    </div>
+    <div id="center">
+      <div id="scrolling">
+        <div id="transcript"></div>
+        <div id="summary"></div>
+      </div>
+    </div>
+      <video id="video" 
+        controls preload="auto" width="335px" height="auto"
+        poster="resources/HansRosling.png"
+        data-setup='{"example_option":true}'>
+        <source src="resources/HansRosling.mp4" type='video/mp4' />
+      </video>
+      <button id="getSelectedSpans">meowmeowmeow</button>
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="resources/js/d3.js"></script>
+    
+    <script src="interface.js"></script>
+  </body>
+</html>
