@@ -11,10 +11,15 @@ var settings = {
     nHeight: 900,
     nWidth: 88
   },
-  videorResolution: {width: 200, height: 150},
+  videoResolution: {width: 200, height: 150},
   video: document.getElementById('video'),
+  $video: $(document.getElementById('video')),
   createdParagraphDiv: false,
   thumbnails: null,
+  thumbRes: {
+    width: 100,
+    height: 75
+  },
   thumbnailTimeInd: 0,
   thumbnailImgType: 'png',
   timelineTop: 0,
@@ -30,6 +35,18 @@ var settings = {
     "width": "500px"
   }
 }
+
+$('#exported').hide()
+
+$('#export').on("click", function(){
+  var k = []; 
+  var k = []; $('.sumDiv').each(function(){
+   k.push({start: $(this).data('start'), img: $(this).find('img').attr('src'), text: $(this).text()})
+  })
+
+  $('#exported').text(JSON.stringify(k));
+  $('#exported').show();
+});
 
 // =============== START FOR SPAN HIGHLIGHTING ==============
 var getAllBetween = function (firstEl,lastEl) {
@@ -74,25 +91,56 @@ function getURIformcanvas() {
 
   return Canvas2Image.convertToImage(
       canvasFromVideo, 
-      settings.resolution.width, 
-      settings.resolution.height,
+      settings.thumbRes.width, 
+      settings.thumbRes.height,
       settings.thumbnailImgType);
 }
 
-function capture() {
-  var video = settings.video;
+// optionally pass a div to paste the picture to
+function capture($div) {
+  if ($div === undefined) {
+    var video = settings.video;
+    var canvasDraw = document.getElementById('imageView');
+    var w = canvasDraw.width;
+    var h = canvasDraw.height;
+    var ctxDraw = canvasDraw.getContext('2d');
 
-  var canvasDraw = document.getElementById('imageView');
-  var w = canvasDraw.width;
-  var h = canvasDraw.height;
-  var ctxDraw = canvasDraw.getContext('2d');
+    ctxDraw.clearRect(0, 0, w, h);
 
-  ctxDraw.clearRect(0, 0, w, h);
+    ctxDraw.drawImage(video, 0, 0, w, h);
+    ctxDraw.save();
+    return getURIformcanvas();  
 
-  ctxDraw.drawImage(video, 0, 0, w, h);
-  ctxDraw.save();
-  return getURIformcanvas();   
+  } else {
+    var video = settings.video;
+    var canvasDraw = document.getElementById('imageView');
+    var w = canvasDraw.width;
+    var h = canvasDraw.height;
+    var ctxDraw = canvasDraw.getContext('2d');
+
+    ctxDraw.clearRect(0, 0, w, h);
+
+    ctxDraw.drawImage(video, 0, 0, w, h);
+    ctxDraw.save();
+    $div.append(getURIformcanvas());   
+
+  }
 }
+
+$(document).on("keypress", function(e){
+  if (e.keyCode === 99) {
+    // if the key code is capture, you will capture
+    // an image at the current time set one time listener
+    var img = capture();
+
+    $('.myThumb').on("click", function(){
+      // unbind the click
+      $('.myThumb').unbind("click");
+      $(this).find('img').replaceWith(img);
+
+    });
+  }
+});
 // =============== END FOR GETTING CAPTURES ===============
 
 // This takes in transcript json and gives back something
@@ -184,8 +232,35 @@ var positionSummary = function(spanIds) {
     + (selectionHeight)/2;
   position.top = selectionTop;
   position.bottom = selectionBottom;
+  position.start = $first.data('start');
+  position.end = $last.data('end');
   return position;
 };
+
+var saveSummary = function($summaryDiv) {
+  $summaryDiv.find('textarea').on("keypress", function(e){
+    if (e.keyCode === 13) {
+      // get text from text area
+      var taText = $(this).val();
+      // transfer style to paragraph
+      var taStyle = $(this).attr('style');
+      // delete text area 
+      $(this).remove();
+      // replace with paragraph
+      var $summary = $(document.createElement('p'))
+        .attr('style', taStyle)
+        .css('height', 'auto')
+        .css('width', 490-115-2)
+        .text(taText);
+
+      $summaryDiv.append($summary);
+      $summaryDiv.on("click", function(){
+        settings.video.currentTime = $(this).data('start');
+        settings.video.play();
+      });
+    }
+  }); 
+}
 
 var createSummary = function(spanIds) {
   var summaryPosition = positionSummary(spanIds);
@@ -193,16 +268,62 @@ var createSummary = function(spanIds) {
 
   var sHeight = summaryPosition.bottom - summaryPosition.top;
 
-  var $div = $(document.createElement('div')).css({
+  var $summaryDiv = $(document.createElement('div')).css({
+      position: 'relative',
+      top: (summaryPosition.top - settings.totalSummaryHeight) + 'px',
+      left: 0,
+      height: sHeight + 'px',
+      width: '100%',
+      'background-color': ''
+    })
+    .data(summaryPosition)
+    .attr('class', 'sumDiv');
+  // needs to exactly equal the normal height
+  var $barDiv = $(document.createElement('div')).css({
     position: 'relative',
-    top: (summaryPosition.top - settings.totalSummaryHeight) + 'px',
-    left: 0,
-    height: sHeight + 'px',
-    width: '100%',
+    top:'0px',
+    left:'0px',
+    height: '100%',
+    width: '5px',
+    'background-color': '#0c5111'
+  }).attr('class', 'myBar');
+
+  var $imgDiv = $(document.createElement('div')).css({
+    position: 'relative',
+    top: -sHeight+'px',
+    left:'10px',
+    height: '75px',
+    width: '100px',
     'background-color': 'black'
-  });
+  }).attr('class', 'myThumb');
+
+  var $textDiv = $(document.createElement('textarea')).css({
+    position: 'relative',
+    top: -(sHeight + 75)+'px',
+    left:'115px',
+    height: '75px',
+    width: 490-115,
+    'font-size': '13px',
+    'background-color': '#deebde'
+  }).attr('class', 'myEntry');
+
+  $summaryDiv.append($barDiv);
+  $summaryDiv.append($imgDiv);
+  $summaryDiv.append($textDiv);
+
   settings.totalSummaryHeight += sHeight;
-  settings.$summaryContainer.append($div);
+  settings.$summaryContainer.append($summaryDiv);
+
+  saveSummary($summaryDiv);
+
+  settings.video.currentTime = (summaryPosition.end 
+      - summaryPosition.start)/2 
+    + summaryPosition.start;
+  
+  $(settings.video).one("seeked", function(){
+    capture($imgDiv);
+  });
+  
 };
 
 var bindSummaryKeypress = function(){
@@ -224,8 +345,6 @@ var bindSummaryKeypress = function(){
         console.log("Trigger Create Summary");
 
         createSummary(spanIds);
-      } else {
-        console.log(e.keyCode);
       }
     });
 };

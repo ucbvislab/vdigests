@@ -27,7 +27,7 @@
       #center #scrolling {
         width: 1010px;
         height: inherit;
-        background-color: yellow;
+        background-color: white;
         overflow: scroll;
       }
 
@@ -35,21 +35,21 @@
         float: left;
         width: 500px;
         background-color: white;
-        margin-right: 10px;
+        margin-right: 5px;
       }
 
       #summary {
         float: left;
         width: 490px;
         height: 900px;
-        background-color: pink;
+        background-color: #deebde;
       }
 
 
       #timeline {
         float: left;
         height:900px;
-        background-color: pink;
+        background-color: white;
       }
 
     </style>
@@ -66,12 +66,15 @@
       </div>
     </div>
       <video id="video" 
-        controls preload="auto" width="335px" height="auto"
+        controls preload="auto" width="340px" height="auto"
         poster="resources/HansRosling.png"
         data-setup='{"example_option":true}'>
         <source src="resources/HansRosling.mp4" type='video/mp4' />
       </video>
-      <button id="getSelectedSpans">meowmeowmeow</button>
+      <button id="export" class="btn" style="width:340px">Export</button>
+      <textarea id="exported" class="form-control" style="width:340px"></textarea>
+    <canvas id="imageView" style="display:none; left: 0; top: 0; z-index: 0;border:none" width="100" height="75"> </canvas>
+
     <script src="https://code.jquery.com/jquery.js"></script>
     <script src="resources/js/d3.js"></script>
     

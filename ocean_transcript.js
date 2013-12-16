@@ -108,7 +108,8 @@ var selectPicTimes = function(paragraphs, fades) {
 
     var currentFades = [];
     for (var j = 0; j < fades.length; j++) {
-      if (fades[j].value >= start && fades[j].value <= end) {
+      if (fades[j].value >= start 
+          && fades[j].value <= end) {
 
         currentFades.push(fades[j]);
       }
@@ -134,16 +135,36 @@ var layoutSummary = function(paragraphs, picTimes) {
 
   if (!thumbnailsGenerated) {
     var pics = [];
+    var lastPicTime = 0;
     for (var i = 0; i < picTimes.length; i++) {
       for (var j = 0; j < picTimes[i].length; j++) {
         // make a picture at the video time
-        var pic = {
-          paragraph: i, 
-          index: j, 
-          time: picTimes[i][j].value, 
-          fade: picTimes[i][j].type
-        };
-        pics.push(pic);
+
+        if (picTimes[i][j].type == "IN") {
+          var pic = {
+            paragraph: i, 
+            index: j, 
+            time: picTimes[i][j].value + .1, 
+            fade: picTimes[i][j].type
+          };
+
+        } else {
+          var pic = {
+            paragraph: i, 
+            index: j, 
+            time: picTimes[i][j].value - .5, 
+            fade: picTimes[i][j].type
+          };
+        }
+
+        
+
+        //pics.push(pic);
+
+        if (pic.time >= lastPicTime + .1) {
+          pics.push(pic);
+          lastPicTime = pic.time;
+        }
       }
     };
 

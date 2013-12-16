@@ -233,7 +233,7 @@ var layoutTimeline = function(transcript){
     for (var i = 0; i < positions.paragraphs.length; i++) {
       var $paragraph = $(document.createElement('div'))
         .css({
-          position: 'relative',
+          position: 'absolute',
           top: positions.paragraphs[i].y,
           left: positions.paragraphs[i].x
         })
