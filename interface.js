@@ -17,8 +17,8 @@ var settings = {
   createdParagraphDiv: false,
   thumbnails: null,
   thumbRes: {
-    width: 100,
-    height: 75
+    width: 200,
+    height: 150
   },
   thumbnailTimeInd: 0,
   thumbnailImgType: 'png',
@@ -316,9 +316,11 @@ var createSummary = function(spanIds) {
 
   saveSummary($summaryDiv);
 
-  settings.video.currentTime = (summaryPosition.end 
-      - summaryPosition.start)/2 
-    + summaryPosition.start;
+  settings.video.currentTime = summaryPosition.start;
+
+  // settings.video.currentTime = (summaryPosition.end 
+  //     - summaryPosition.start)/2 
+  //   + summaryPosition.start;
   
   $(settings.video).one("seeked", function(){
     capture($imgDiv);

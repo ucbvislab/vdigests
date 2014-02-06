@@ -19,6 +19,7 @@
 
 import sys
 import cv2
+import time
 
 def main():
     if len(sys.argv) < 2:
@@ -49,12 +50,15 @@ def main():
     last_mean = 0       # Mean pixel intensity of the *last* frame we processed
     frames = []
 
+    times = []
+    count = 0
+
     while True:
         (rv, im) = cap.read()   # im is a valid image if and only if rv is true
+
         if not rv:
             break
-        if cap.get(cv2.cv.CV_CAP_PROP_POS_FRAMES) % 20 == 0 \
-        and cap.get(cv2.cv.CV_CAP_PROP_POS_FRAMES) not in frames:
+        if cap.get(cv2.cv.CV_CAP_PROP_POS_FRAMES) not in frames:
             frame_mean = im.mean()
 
             # Detect fade in from black.
