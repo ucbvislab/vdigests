@@ -2,36 +2,13 @@
 
 sts = {
   docHeight: 900,
-  timelineFile: 'resources/timeline.png',
-  transcriptFile: 'resources/HansRosling_aligned.json',
-  yppSec: 6.033352629754772,
-  timelineDim: {
-    oHeight: 7200,
-    oWidth: 700,
-    nHeight: 900,
-    nWidth: 88
-  },
-  videoResolution: {width: 200, height: 150},
+  transcriptFile: 'resources/BretVictorShort_aligned.json',
   video: undefined,
   $video: undefined,
-  createdParagraphDiv: false,
-  thumbnails: null,
-  thumbRes: {
-    width: 100,
-    height: 75
-  },
-  thumbnailTimeInd: 0,
-  thumbnailImgType: 'png',
-  timelineTop: 0,
-  timelineLeft: 0,
-  $transcriptContainer: $('#transcript'),
-  $timelineImage: $('#tl'),
-  $timelineContainer: $('#timeline'),
   $scrolling: $('#scrolling'),
-  $summaryContainer: $('#outputSummary'),
-  totalSummaryHeight: 0,
-  paragraphCSS: {
-    'font-size': '13px'
+  thumbRes: {
+    width: 65,
+    height: 43
   },
   // data structure: 
   // {<id>: text: "text here", group: <group_number>, 
@@ -45,15 +22,11 @@ sts = {
   summaryIdIndex: 0,
   summaryIdPrefix: "sumDiv",
   groupIndex: 0,
-  currentGroup: {},
-  capture_list: [],
   // id: group number
   groups: {},
   lastGroup: "",
   lastSelection:[],
 }
-
-
 
 //============== INTERFACE CONTROLS ==================
 
@@ -93,18 +66,23 @@ var makeGroupRow = function(groupNumber){
   sts.groups[gid] = groupNumber;
   var $videoCol = $('<div>').attr('class', 'col-md-6 videoCol');
   //TODO: fix this awfulness
-  var $video = $('<video id="video" controls preload="auto" width="415px" height="231px" poster="resources/HansRosling_poster.png"> <source src="resources/HansRosling.mp4" type="video/mp4" /> </video>');
+  var $video = $('<video id="video" controls preload="auto" width="415px" height="231px" poster="resources/BretVictor_poster.png"> <source src="resources/BretVictor.mp4" type="video/mp4" /> </video>');
   var $summaryCol = $('<div>').attr('class', 'col-md-6 summaryCol');
   $videoCol.append($video);
   $groupRowDiv.append($videoCol);
   $groupRowDiv.append($summaryCol);
 
-  sts.video = $video[0];
-  sts.$video = $video;
+  //TODO: add group-wise video back in
+  if (sts.video === undefined) {
+    sts.video = $video[0];
+    sts.$video = $video;
+  }
+  
   return $groupRowDiv;
 }
 
 var makeNewGroupAndAppend = function(){
+  console.log("Making new group.");
   var $groupRowDiv = makeGroupRow(sts.groupIndex);
   $('#outputSummary').append($groupRowDiv);
 
@@ -126,10 +104,9 @@ initialize();
 // seek and capture at time
 
 var seekThenCaptureImgTimes = function(time_list, cap_list, i, callback) {
-  var vid = $($('.groupRow')[sts.groups[sts.lastGroup]]).find('video')[0];
-  if (vid === undefined) {
-    vid = sts.video;
-  }
+
+  var vid = sts.video;
+
   if (i < time_list.length) {
     // set current time to timelist
     vid.currentTime = time_list[i];
@@ -147,17 +124,6 @@ var seekThenCaptureImgTimes = function(time_list, cap_list, i, callback) {
       // add them to a global list
       cap_list.push(cap);
 
-      //TODO: add click capabilities
-      // $('.img-thumbnail').on("click", function(){
-      //   // unbind the click
-      //   $('.img-thumbnail').unbind("click");
-      //   // $(this).replaceWith(img);
-      //   var sdid = $(this).parent().parent().parent().attr('id');
-      //   sts.summaries[sdid].state = 3;
-      //   // refresh with current capture
-      //   refreshSummary(sdid);
-      // });
-
       // do it again
       seekThenCaptureImgTimes(time_list, cap_list, i+1, callback);
     });
@@ -165,7 +131,6 @@ var seekThenCaptureImgTimes = function(time_list, cap_list, i, callback) {
     console.log("Done capturing images.");
     callback(cap_list);
   }
-  
 };
 
 //TODO: update summary list
@@ -177,19 +142,21 @@ var captureAndBindThumbClick = function(){
     sts.capture.image_id = randomId();
 
     var $img = $(img)
-      .attr('class', 'img-thumbnail')
+      .attr('class', 'img-myThumbnail')
       .attr('id', sts.capture.image_id);
 
     sts.capture.$image = $img;
 
-    $('.img-thumbnail').on("click", function(){
+    $('.summaryRow').on("click", function(){
+      console.log("Thumbnail clicked.");
       // unbind the click
-      $('.img-thumbnail').unbind("click");
+      $('.summaryRow').unbind("click");
       // $(this).replaceWith(img);
-      var sdid = $(this).parent().parent().parent().attr('id');
+      // var sdid = $(this).parent().parent().parent().attr('id');
+      var sdid = $(this).attr('id');
       sts.summaries[sdid].state = 3;
       // refresh with current capture
-      refreshSummary(sdid);
+      $(this).replaceWith(addCompleteSummary(sdid, sts.capture));
     });
 };
 
@@ -251,6 +218,9 @@ var bindDragHandle = function($el){
 
 
 var addCompleteSummary = function(sdid, capture) {
+  console.log("Adding summary with: ");
+  console.log("sdid: " + sdid);
+  console.log(capture);
   var $div = makeSummaryDiv(sdid);
   bindDragHandle($div);
   //highlight summarized text
@@ -264,15 +234,15 @@ var addCompleteSummary = function(sdid, capture) {
     makeNewGroupAndAppend();
   }
   $($('.groupRow')[group]).find('.summaryCol').append($div);
-  // bind click to play
-  $div.on("click", function(){
-      var id = $(this).attr('id');
-      var group = sts.summaries[id].group;
-      var video = $($('.groupRow')[group]).find('video')[0];
-      video.currentTime = 
-        sts.summaries[sdid].start_time;
-      video.play();
-    });
+  // TODO bind click to play
+  // $div.on("click", function(){
+  //     var id = $(this).attr('id');
+  //     var group = sts.summaries[id].group;
+  //     var video = $($('.groupRow')[group]).find('video')[0];
+  //     video.currentTime = 
+  //       sts.summaries[sdid].start_time;
+  //     video.play();
+  //   });
 
   if (sts.summaries[sdid].text === ""){
     // add text area to enter summary
@@ -283,11 +253,18 @@ var addCompleteSummary = function(sdid, capture) {
     // bind enter to updating the summary
     $div.find('textarea').on("keypress", function(e){
       if (e.keyCode === 13) {
+        // get sdid 
+        var sdid = $($('textarea')[0]).parent().parent().attr('id');
         //record text
         sts.summaries[sdid].text = $(this).val();
         //update summary
         sts.summaries[sdid].text_change = false;
-        $div.replaceWith(addCompleteSummary(sdid, capture));
+        var cap = {}
+        cap.$image = $($('textarea')[0]).parent().parent().find('img');
+        cap.image_id = $($('textarea')[0]).parent().parent().find('img').attr('id');
+        cap.image_time = sts.summaries[sdid].image_time;
+
+        $div.replaceWith(addCompleteSummary(sdid, cap));
       }
     });
 
@@ -304,11 +281,18 @@ var addCompleteSummary = function(sdid, capture) {
 
     $div.find('textarea').on("keypress", function(e){
       if (e.keyCode === 13) {
+        // get sdid 
+        var sdid = $($('textarea')[0]).parent().parent().attr('id');
         //record text
         sts.summaries[sdid].text = $(this).val();
         //update summary
         sts.summaries[sdid].text_change = false;
-        $div.replaceWith(addCompleteSummary(sdid, capture));
+        var cap = {}
+        cap.$image = $($('textarea')[0]).parent().parent().find('img');
+        cap.image_id = $($('textarea')[0]).parent().parent().find('img').attr('id');
+        cap.image_time = sts.summaries[sdid].image_time;
+
+        $div.replaceWith(addCompleteSummary(sdid, cap));
       }
     });
   } else {
@@ -322,7 +306,14 @@ var showControlsBindClicks = function() {
   $('#controls').show();
   $('#addControl').hide();
   $('#exportBtn').on("click", function(){
+    console.log(sts.summaries);
     var k = sts.summaries;
+    var keys = Object.keys(k);
+    for (var i = 0; i < keys.length; i++) {
+      if (k[keys[i]].text === "") {
+        delete k[keys[i]];
+      };
+    };
     $('#addControl').show();
     $('#addControl').append('<textarea>');
     $('#addControl').find('textarea').val(JSON.stringify(k));
@@ -350,7 +341,7 @@ var showControlsBindClicks = function() {
             addCompleteSummary(key, captures[i]);
           };
         });
-        
+        $('#controls').hide();
       }
     });
   });
@@ -469,6 +460,7 @@ var createSummaryEntryReturnId = function(spanIds, over){
   }
 
   sts.summaries[summaryId] = entry;
+  console.log("Created summary entry with ID: " + summaryId);
   return summaryId;
 };
 
@@ -509,20 +501,6 @@ var makeAndAppendTextarea = function(sdid, $summaryDiv) {
   var $textarea = $('<textarea>').attr('class', 'blendTextarea');
   $summaryDiv.find('.textCol').append($textarea);
   return $textarea;
-};
-
-var appendSummaryDivNoText = function(sdid) {
-  var group = sts.summaries[sdid].group;
-  var $group = $($('.groupRow')[group]);
-
-  var $summaryDiv= makeSummaryDiv(sdid);
-
-  makeAndAppendTextarea(sdid, $summaryDiv);
-  makeAndAppendFirstKeyframe(sdid, $summaryDiv);
-
-  $group.find('.summaryCol').append($summaryDiv);
-
-  bindSummarySave($summaryDiv);
 };
 
 var switchKeyframeUpdateModel = function(sdid) {
@@ -744,6 +722,7 @@ var loadTranscript = function(){
     async: false,
     dataType: 'json',
     success: function (response) {
+      console.log('Loaded transcript');
       sts.transcript = response;
       var transcriptPDict = pDictFromTranscript(response, 85, 'main');
       var timelinePDict = pDictFromTranscript(response, 85, 'sub');
@@ -752,12 +731,16 @@ var loadTranscript = function(){
       var $scrollbox = createScrollBox('timeline', 'transcript');
       attachScrollEvents('timeline', 'transcript', 'scrolling', $scrollbox);
       bindKeypressin();
+    },
+    error: function(e){
+      console.log('Error occured when loading transcript');
+      console.log(e);
     }
   });
 };
 
 video.addEventListener("loadedmetadata", function(){
   // need the meta data to do anything else
-
+  console.log("Video meta data loaded.")
   loadTranscript();
 });

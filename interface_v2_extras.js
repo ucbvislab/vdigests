@@ -81,11 +81,12 @@ function getURIformcanvas() {
 
 // optionally pass a div to paste the picture to
 function capture($div) {
-  var video = $($('.groupRow')[sts.groups[sts.lastGroup]]).find('video')[0];
-  if (video === undefined) {
-    video = sts.video;
-  }
+  // var video = $($('.groupRow')[sts.groups[sts.lastGroup]]).find('video')[0];
+  // if (video === undefined) {
+  //   video = sts.video;
+  // }
 
+  var video = sts.video;
   if ($div === undefined) {
     
     var canvasDraw = document.getElementById('imageView');
