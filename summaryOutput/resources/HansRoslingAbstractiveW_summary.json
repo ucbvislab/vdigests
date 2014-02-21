@@ -1,0 +1,130 @@
+{
+	"sumDiv0":{
+      "image_time":19.725124,
+      "start_time":8.7725,
+      "end_time":61.1525,
+      "text":"After teaching in Africa for 20 years, I began teaching Swedish undergrads at the Karolinska Institute. Not knowing where they were, I offered them a pre-test.",
+      "span_ids":[
+
+      ],
+      "group":0,
+      "text_change":false,
+      "image_id":"LGD2x",
+      "image_change":false
+   },
+   "sumDiv1":{
+      "image_time":78.7525,
+      "start_time":62.1825,
+      "end_time":95.3225,
+      "text":"Using a narrow confidence interval, I found high child mortality rates in Turkey, Poland, Russia, pakistan, and South Africa.",
+      "span_ids":[
+
+      ],
+      "group":0,
+      "text_change":false
+   },
+   "sumDiv2":{
+      "image_time":119.674779,
+      "start_time":95.3225,
+      "end_time":120.9425,
+      "text":"Chimps could score better than the best of Swedish students.",
+      "span_ids":[
+
+      ],
+      "group":0,
+      "text_change":false,
+      "image_id":"KngWE",
+      "image_change":false
+   },
+    "sumDiv3":{
+      "image_time":131.41318,
+      "start_time":127.1325,
+      "end_time":149.9625,
+      "text":"I studied the professors of the Karolinska Institute. They need to communicate the data of what's happening in the world and the health of children in every country.",
+      "span_ids":[
+
+      ],
+      "group":0,
+      "text_change":false,
+      "image_id":"v8k9D",
+      "image_change":false
+   },
+   "sumDiv4":{
+      "image_time":153.255014,
+      "start_time":150.2925,
+      "end_time":192.4225,
+      "text":"There is a large differences seen by students who notice the western world has long lives and small families while the Third World has short lives and large families.",
+      "span_ids":[
+
+      ],
+      "group":0,
+      "text_change":false,
+      "image_id":"l0WdT",
+      "image_change":false
+   },
+   "sumDiv5":{
+      "image_time":226.089925,
+      "start_time":193.3125,
+      "end_time":241.8925,
+      "text":"Since 1962 there is very good data surrounding family size. Developed countries tend to have small families and long lives, while developing countries have larger families and shorter lives.",
+      "span_ids":[
+
+      ],
+      "group":1,
+      "text_change":false,
+      "image_id":"Mh2To",
+      "image_change":false
+   },
+   "sumDiv6":{
+      "image_time":286.014298,
+      "start_time":242.0425,
+      "end_time":306.0125,
+      "text":"Several countries have differing trends regarding family size and life expectancy. HIV had an especially large impact in Africa.",
+      "span_ids":[
+
+      ],
+      "group":1,
+      "text_change":false,
+      "image_id":"y4Xus",
+      "image_change":false
+   },
+   "sumDiv7":{
+      "image_time":356.809523,
+      "start_time":306.0125,
+      "end_time":368.6425,
+      "text":"In Vietnam, social change occurred before economical change. Vietnam went from having large families and short lives prior to the Vietnam war to having smaller families and longer lives today.",
+      "span_ids":[
+
+      ],
+      "group":1,
+      "text_change":false,
+      "image_id":"oM8y4",
+      "image_change":false
+   },
+   "sumDiv8":{
+      "image_time":414.227603,
+      "start_time":369.0925,
+      "end_time":429.3825,
+      "text":"The gap between rich and poor is a myth these days. 74% of the world's income goes to the richest 20% of the world's population. The poorest 20% gets only 2%. The middle , where most people are ,gets 24% of the worlds income",
+      "span_ids":[
+
+      ],
+      "group":1,
+      "text_change":false,
+      "image_id":"y4DZ0",
+      "image_change":false
+   },
+   "sumDiv9":{
+      "image_time":498.175145,
+      "start_time":429.7225,
+      "end_time":501.4825,
+      "text":"Unlike in the past, when as the population of the world grew the number of people living poverty grew, we now have people who are becoming less poor and more poor. There is no division between rich and poor any more. Most people lie in the middle,between rich and poor.",
+      "span_ids":[
+
+      ],
+      "group":1,
+      "text_change":false,
+      "image_id":"hUAKO",
+      "image_change":false
+   }
+}
