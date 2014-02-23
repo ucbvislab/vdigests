@@ -2,7 +2,7 @@
 
 sts = {
   docHeight: 900,
-  transcriptFile: 'resources/BretVictorShort_aligned.json',
+  transcriptFile: 'resources/HansRosling_aligned.json',
   video: undefined,
   $video: undefined,
   $scrolling: $('#scrolling'),
@@ -66,7 +66,7 @@ var makeGroupRow = function(groupNumber){
   sts.groups[gid] = groupNumber;
   var $videoCol = $('<div>').attr('class', 'col-md-6 videoCol');
   //TODO: fix this awfulness
-  var $video = $('<video id="video" controls preload="auto" width="415px" height="231px" poster="resources/BretVictor_poster.png"> <source src="resources/BretVictor.mp4" type="video/mp4" /> </video>');
+  var $video = $('<video id="video" controls preload="auto" width="415px" height="231px" poster="resources/HansRosling_poster.png"> <source src="resources/HansRosling.mp4" type="video/mp4" /> </video>');
   var $summaryCol = $('<div>').attr('class', 'col-md-6 summaryCol');
   $videoCol.append($video);
   $groupRowDiv.append($videoCol);
@@ -136,30 +136,44 @@ var seekThenCaptureImgTimes = function(time_list, cap_list, i, callback) {
 //TODO: update summary list
 var captureAndBindThumbClick = function(){
     var time = sts.video.currentTime;
-    var img = capture();
-
     sts.capture.image_time = time;
     sts.capture.image_id = randomId();
 
-    var $img = $(img)
-      .attr('class', 'img-myThumbnail')
-      .attr('id', sts.capture.image_id);
-
-    sts.capture.$image = $img;
-
-    $('.summaryRow').on("click", function(){
-      console.log("Thumbnail clicked.");
-      // unbind the click
-      $('.summaryRow').unbind("click");
-      // $(this).replaceWith(img);
-      // var sdid = $(this).parent().parent().parent().attr('id');
-      var sdid = $(this).attr('id');
-      sts.summaries[sdid].state = 3;
-      // refresh with current capture
-      $(this).replaceWith(addCompleteSummary(sdid, sts.capture));
+    seekThenCaptureImgTimes([time], [], 0, function (captures) {
+      sts.capture.$image = captures[0].$image;
+      $('.summaryRow').on("click", function(event){
+        event.stopPropagation();
+        if (event.target.classList[0] === "img-myThumbnail") {
+          console.log("Thumbnail clicked.");
+          // unbind the click
+          $('.summaryRow').unbind("click");
+          // $(this).replaceWith(img);
+          // var sdid = $(this).parent().parent().parent().attr('id');
+          var sdid = $(this).attr('id');
+          sts.summaries[sdid].image_time = sts.capture.image_time;
+          sts.summaries[sdid].image_id = sts.capture.image_id;
+          sts.summaries[sdid].image_change = true;
+          // refresh with current capture
+          $(this).replaceWith(addCompleteSummary(sdid, sts.capture));
+        }
+        
+      });
     });
+    // var img = capture();
+
+    
+
+    // var $img = $(img)
+    //   .attr('class', 'img-myThumbnail')
+    //   .attr('id', sts.capture.image_id);
+
+    // sts.capture.$image = $img;
+
+    
 };
 
+// when the element is dropped
+// change start time, end time, and image time then 
 var eDroppedOnEl = function(e, $el){
   var data = e.originalEvent.dataTransfer.getData('text/html');
   var ids = [];
@@ -180,7 +194,7 @@ var eDroppedOnEl = function(e, $el){
   //update relevant information
   sts.summaries[sumId].start_time = st;
   sts.summaries[sumId].end_time = et;
-  sts.summaries[sumId].image_time = st+(st+et)/2;
+  sts.summaries[sumId].image_time = st+(et-st)/2;
   sts.summaries[sumId].text = $(data).text();
   sts.summaries[sumId].text_change = true;
 
@@ -217,23 +231,24 @@ var bindDragHandle = function($el){
 }
 
 
+
 var addCompleteSummary = function(sdid, capture) {
   console.log("Adding summary with: ");
   console.log("sdid: " + sdid);
   console.log(capture);
+
   var $div = makeSummaryDiv(sdid);
   bindDragHandle($div);
-  //highlight summarized text
-  //highlightSummarizedText(sdid);
-
-  // append the capture
-  $div.find('.keyframeCol').append(capture.$image);
 
   var group = sts.summaries[sdid].group;
   while (group > $('.groupRow').length - 1) {
     makeNewGroupAndAppend();
   }
   $($('.groupRow')[group]).find('.summaryCol').append($div);
+
+  // append the capture
+  $div.find('.keyframeCol').append(capture.$image);
+
   // TODO bind click to play
   // $div.on("click", function(){
   //     var id = $(this).attr('id');
@@ -244,7 +259,7 @@ var addCompleteSummary = function(sdid, capture) {
   //     video.play();
   //   });
 
-  if (sts.summaries[sdid].text === ""){
+  if (sts.summaries[sdid].text === "" && !sts.summaries[sdid].image_change){
     // add text area to enter summary
     $div.find('.textCol')
       .append('<textarea>')
@@ -298,6 +313,9 @@ var addCompleteSummary = function(sdid, capture) {
   } else {
     $div.find('.textCol').append($('<p>'))
       .html($('<p>').html(sts.summaries[sdid].text));
+  }
+  if (sts.summaries[sdid].image_change) {
+    sts.summaries[sdid].image_change = false;
   }
   return $div;
 }
@@ -502,16 +520,6 @@ var makeAndAppendTextarea = function(sdid, $summaryDiv) {
   $summaryDiv.find('.textCol').append($textarea);
   return $textarea;
 };
-
-var switchKeyframeUpdateModel = function(sdid) {
-  var cap = sts.capture;
-  sts.summaries[sdid].image_time = cap.image_time;
-  sts.summaries[sdid].image_id = cap.image_id;
-  $('#'+sdid).find('img').replaceWith(cap.$image);
-
-  // delete capture
-  sts.capture = {};
-}
 
 var getSpanIds = function(){
   userSelection = window.getSelection();

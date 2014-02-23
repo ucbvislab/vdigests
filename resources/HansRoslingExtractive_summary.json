@@ -1,0 +1,130 @@
+{
+	"sumDiv0":{
+      "image_time":19.725124,
+      "start_time":8.7725,
+      "end_time":61.1525,
+      "text":"About 10 years ago, I took on the task to teach global development to Swedish undergraduate students. And one of the questions from which I learned a lot was this one: \"Which country has the highest child mortality of these five pairs?\"",
+      "span_ids":[
+
+      ],
+      "group":0,
+      "text_change":false,
+      "image_id":"LGD2x",
+      "image_change":false
+   },
+   "sumDiv1":{
+      "image_time":78.7525,
+      "start_time":62.1825,
+      "end_time":95.3225,
+      "text":"I put them together, so that in each pair of country, one has twice the child mortality of the other. And these were the results of the Swedish students.",
+      "span_ids":[
+
+      ],
+      "group":0,
+      "text_change":false
+   },
+   "sumDiv2":{
+      "image_time":119.674779,
+      "start_time":95.3225,
+      "end_time":120.9425,
+      "text":"I have shown that Swedish top students know statistically significantly less about the world than the chimpanzees. Because the chimpanzee would score half right if I gave them two bananas with Sri Lanka and Turkey. ",
+      "span_ids":[
+
+      ],
+      "group":0,
+      "text_change":false,
+      "image_id":"KngWE",
+      "image_change":false
+   },
+    "sumDiv3":{
+      "image_time":131.41318,
+      "start_time":127.1325,
+      "end_time":149.9625,
+      "text":"I did also an unethical study of the professors of the Karolinska Institute -- that hands out the Nobel Prize in Medicine, and they are on par with the chimpanzee there.{LG} This is where I realized that there was really a need to communicate, because the data of what's happening in the world and the child health of every country is very well aware.",
+      "span_ids":[
+
+      ],
+      "group":0,
+      "text_change":false,
+      "image_id":"v8k9D",
+      "image_change":false
+   },
+   "sumDiv4":{
+      "image_time":153.255014,
+      "start_time":150.2925,
+      "end_time":192.4225,
+      "text":"\"What do you really think about the world?\" \"The world is still 'we' and 'them.'\" \"Well, that's long life and small family, and Third World is short life and large family.\"",
+      "span_ids":[
+
+      ],
+      "group":0,
+      "text_change":false,
+      "image_id":"l0WdT",
+      "image_change":false
+   },
+   "sumDiv5":{
+      "image_time":226.089925,
+      "start_time":193.3125,
+      "end_time":241.8925,
+      "text":"1962, there was really a group of countries here that was industrialized countries, and they had small families and long lives.",
+      "span_ids":[
+
+      ],
+      "group":1,
+      "text_change":false,
+      "image_id":"Mh2To",
+      "image_change":false
+   },
+   "sumDiv6":{
+      "image_time":286.014298,
+      "start_time":242.0425,
+      "end_time":306.0125,
+      "text":"It's a miracle that happens in the '80s: the imams start to promote family planning. And in '90s, we have the terrible HIV epidemic that takes down the life expectancy of the African countries and all the rest of them move up into the corner, where we have long lives and small family, and we have a completely new world.",
+      "span_ids":[
+
+      ],
+      "group":1,
+      "text_change":false,
+      "image_id":"y4Xus",
+      "image_change":false
+   },
+   "sumDiv7":{
+      "image_time":356.809523,
+      "start_time":306.0125,
+      "end_time":368.6425,
+      "text":"And today, we have in Vietnam the same life expectancy and the same family size here in Vietnam, 2003, as in United States, 1974, by the end of the war. I think we all -- if we don't look in the data -- we underestimate the tremendous change in Asia, which was in social change before we saw the economical change.",
+      "span_ids":[
+
+      ],
+      "group":1,
+      "text_change":false,
+      "image_id":"oM8y4",
+      "image_change":false
+   },
+   "sumDiv8":{
+      "image_time":414.227603,
+      "start_time":369.0925,
+      "end_time":429.3825,
+      "text":"But in the middle, we have most the world population, and they have now 24 percent of the income.",
+      "span_ids":[
+
+      ],
+      "group":1,
+      "text_change":false,
+      "image_id":"y4DZ0",
+      "image_change":false
+   },
+   "sumDiv9":{
+      "image_time":498.175145,
+      "start_time":429.7225,
+      "end_time":501.4825,
+      "text":"You will see that while population increase, there are hundreds of millions in Asia getting out of poverty and some others getting into poverty, and this is the pattern we have today. And the best projection from the World Bank is that this will happen, and we will not have a divided world.",
+      "span_ids":[
+
+      ],
+      "group":1,
+      "text_change":false,
+      "image_id":"hUAKO",
+      "image_change":false
+   }
+}

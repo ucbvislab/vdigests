@@ -21,7 +21,7 @@ var getVidFile = function(){
 var makeGroupRow = function(callback){
   var $gr = $('<div>').attr('class', 'row groupRow');
   var $gc = $('<div>').attr('class', 'col-md-12 groupContent');
-  var $video = $('<video class="video" controls preload="auto" width="566px" height="312px" poster="'+sts.posterFile+'"> <source src="'+getVidFile()+'" type="video/mp4" /> </video>');
+  var $video = $('<video id="video'+sts.videoFileI+'" class="video" controls preload="auto" width="566px" height="312px" poster="'+sts.posterFile+'"> <source src="'+getVidFile()+'" type="video/mp4" /> </video>');
   $gr.append($gc);
   $gc.append($video);
   
@@ -81,6 +81,17 @@ var bindEnter = function(){
   })
 };
 
+var seekVideosToFirst = function(){
+  $('.groupRow').each(function(){
+    var time = $(this).find('.section').first().data('time');
+    var vid = $(this).find('video')[0];
+    vid.addEventListener("loadedmetadata", function(){
+      vid.currentTime = time;
+    });
+  });
+  $('.groupRow').first().find('video')[0].currentTime = 0;
+}
+
 var startSummaryLayout = function(summaries){
   console.log("Loading video & group row");
   sts.summaries = summaries;
@@ -120,6 +131,15 @@ var startSummaryLayout = function(summaries){
         $('.groupRow').before(function(i){
             var h = $('<h3>').text("Section " + (i + 1));
             return $('<div>').attr('class', 'groupHead row').append(h);
+        });
+        seekVideosToFirst();
+        $('video').on('play', function(){
+          var vID = $(this).attr('id');
+          $('video').each(function(){
+            if ($(this).attr('id') != vID) {
+              this.pause();
+            }
+          });
         });
         // $('.keyframe').hover(function(){
         //   var dat = $(this).find('img').first().attr('src');
