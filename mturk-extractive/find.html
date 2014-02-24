@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Summary Task</title>
+  <link type="text/css" rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css" />
+</head>
+<body>
+
+<div class="container">
+	<div class="well">
+		<h4>Instructions</h4>
+		<ol>
+  			<li> Using your cursor, highlight an area that can be shortened without changing the meaning of the paragraph. </li>
+  			<li>Click <em>Record Area</em> to record the area of text you selected. This will highlight your text in yellow.</li>
+  			<li>Repeat steps 1 and 2 until there are no more areas to shorten.</li>
+  			<li>When you are finished, click <em>Submit</em>. This will open the <em>Output Textbox</em>.</li>
+  			<li>Copy the text in <em>Output Textbox</em> and paste it into the <em>Output Textbox</em> area on the mechanical turk submission form.</li>
+		</ol>
+		<p><small>NOTE: If you make a mistake, you may clear your work by pressing "Clear All" at any time. Ignore special character symbols such as {LG}. </small></p>
+	</div>
+
+	<div class="row">
+		<div class="col-md-12">
+			<h4>Paragraph</h4>
+			<div id="paragraph"></div>
+			
+		</div>
+		<div class="col-md-12">
+			<button id="registerSelection" class="btn btn-default">Record Area</button>
+			<button id="clear" class="btn btn-default">Clear All</button>
+			<button id="submit" class="btn btn-primary">Submit</button>
+			<br></br>
+			<p><a id="textsource" href="http://www.ted.com/talks/hans_rosling_shows_the_best_stats_you_ve_ever_seen.html">Text Source</a></p>
+
+			<br>
+		</div>
+		<div class="col-md-12" id="outputSection">
+			<h4>Output Textbox</h4>
+			<textarea id="output" class="form-control">Recorded</textarea>
+		</div>
+	</div>
+
+	<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+	<script src="util.js"></script>
+	<script src="find.js"></script>
+</div>
+</body>
+</html>
