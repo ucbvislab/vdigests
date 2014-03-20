@@ -12,10 +12,16 @@ param = {
 	transFile: "resources/HansRosling_transcript.json",
 	$textsource: $('#textsource'),
 	example: 'resources/example.html',
+	words: 0,
+	paragraphs: 0,
 };
 
 function getTransFile(name) {
 	return 'resources/' + name + '_transcript.json';
+}
+
+function replaceAll(find, replace, str) {
+  return str.replace(new RegExp(find, 'g'), replace);
 }
 
 function alertSelection() {
@@ -37,12 +43,20 @@ $(document).ready(function(){
 	});
 
 	var layoutParagraph = function(trans){
+		param.paragraphs++;
 		var text = param.transcript[param.number].line;
 		var words = text.split(' ');
-
-		var $p = $(document.createElement('p')).text(text);
-
-		$('#' + param.divId).append($p);
+		console.log(words.length);
+		param.words += words.length;
+		if (param.words < 200 || (param.words >= 200 && param.paragraphs == 1)) {
+			var $p = $(document.createElement('p')).text(text);
+			$('#' + param.divId).append($p);
+		}
+		
+		if (param.words < 100) {
+			param.number+=1;
+			layoutParagraph(trans);
+		}
 	};
     
     var setupHandlers = function(){
@@ -85,12 +99,14 @@ $(document).ready(function(){
 		  url: param.example,
 		  data: "hi",
 		  success: function(response){
-		  	console.log(response);
-		  	$('#example').html("");
-		  	$('#example').html(response);
+		  	$('#example').html("<h4>Example Text <small>The user has selected one phrase in this short example. The phrase is contained within one sentence.</small></h4>" + response);
+		  	$('#example').hide();
+		  	$('#showexample').click(function(){
+		  		$(this).hide();
+		  		$('#example').show();
+		  	});
 		  },
 		  error: function(e){
-		  	console.log("ERROR")
 		  	console.log(e);
 		  }
 		});

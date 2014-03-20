@@ -26,10 +26,13 @@ sts = {
   groups: {},
   lastGroup: "",
   lastSelection:[],
+  vn: 0,
 }
 
 //============== INTERFACE CONTROLS ==================
-
+var addTitle = function() {
+  console.log("Adding title to group: " + sts.lastGroup);
+}
 
 var createSummaryPlaceholder = function(groupId) {
   var imgid = randomId();
@@ -50,6 +53,7 @@ var createSummaryPlaceholder = function(groupId) {
 
 var bindGroupSummaryPlaceholder = function($groupRowDiv) {
   var $ctrldiv = $('<div>').attr('class', 'groupCtrl');
+  $ctrldiv.append($('<textarea>'));
   $ctrldiv.on('click',function(){
     sts.lastGroup = $groupRowDiv.attr('id');
     console.log("Last group is now: " + sts.groups[sts.lastGroup]);
@@ -66,8 +70,9 @@ var makeGroupRow = function(groupNumber){
   sts.groups[gid] = groupNumber;
   var $videoCol = $('<div>').attr('class', 'col-md-6 videoCol');
   //TODO: fix this awfulness
-  var $video = $('<video id="video" controls preload="auto" width="415px" height="231px" poster="resources/HansRosling_poster.png"> <source src="resources/HansRosling.mp4" type="video/mp4" /> </video>');
+  var $video = $('<video id="video" controls preload="auto" width="415px" height="231px" poster="resources/HansRosling_poster.png"> <source src="resources/HansRosling'+sts.vn+'.mp4" type="video/mp4" /> </video>');
   var $summaryCol = $('<div>').attr('class', 'col-md-6 summaryCol');
+  sts.vn++;
   $videoCol.append($video);
   $groupRowDiv.append($videoCol);
   $groupRowDiv.append($summaryCol);
@@ -107,6 +112,8 @@ var seekThenCaptureImgTimes = function(time_list, cap_list, i, callback) {
 
   var vid = sts.video;
 
+  console.log("seekThen", cap_list);
+
   if (i < time_list.length) {
     // set current time to timelist
     vid.currentTime = time_list[i];
@@ -117,7 +124,9 @@ var seekThenCaptureImgTimes = function(time_list, cap_list, i, callback) {
       cap.image_time = time_list[i];
       cap.image_id = randomId();
 
-      cap.$image = $(capture())
+      var uri = capture();
+      console.log(uri);
+      cap.$image = $(uri)
         .attr('class', 'img-myThumbnail')
         .attr('id', cap.image_id);
       
@@ -138,6 +147,7 @@ var captureAndBindThumbClick = function(){
     var time = sts.video.currentTime;
     sts.capture.image_time = time;
     sts.capture.image_id = randomId();
+    $('.summaryRow').unbind("click");
 
     seekThenCaptureImgTimes([time], [], 0, function (captures) {
       sts.capture.$image = captures[0].$image;
@@ -269,14 +279,14 @@ var addCompleteSummary = function(sdid, capture) {
     $div.find('textarea').on("keypress", function(e){
       if (e.keyCode === 13) {
         // get sdid 
-        var sdid = $($('textarea')[0]).parent().parent().attr('id');
+        var sdid = $(this).parent().parent().attr('id');
         //record text
         sts.summaries[sdid].text = $(this).val();
         //update summary
         sts.summaries[sdid].text_change = false;
         var cap = {}
-        cap.$image = $($('textarea')[0]).parent().parent().find('img');
-        cap.image_id = $($('textarea')[0]).parent().parent().find('img').attr('id');
+        cap.$image = $(this).parent().parent().find('img');
+        cap.image_id = $(this).parent().parent().find('img').attr('id');
         cap.image_time = sts.summaries[sdid].image_time;
 
         $div.replaceWith(addCompleteSummary(sdid, cap));
@@ -297,14 +307,14 @@ var addCompleteSummary = function(sdid, capture) {
     $div.find('textarea').on("keypress", function(e){
       if (e.keyCode === 13) {
         // get sdid 
-        var sdid = $($('textarea')[0]).parent().parent().attr('id');
+        var sdid = $(this).parent().parent().attr('id');
         //record text
         sts.summaries[sdid].text = $(this).val();
         //update summary
         sts.summaries[sdid].text_change = false;
         var cap = {}
-        cap.$image = $($('textarea')[0]).parent().parent().find('img');
-        cap.image_id = $($('textarea')[0]).parent().parent().find('img').attr('id');
+        cap.$image = $(this).parent().parent().find('img');
+        cap.image_id = $(this).parent().parent().find('img').attr('id');
         cap.image_time = sts.summaries[sdid].image_time;
 
         $div.replaceWith(addCompleteSummary(sdid, cap));
@@ -588,6 +598,8 @@ var bindKeypressin = function(){
       if(e.keyCode == 92){
         console.log("Calling makeSelectionDraggable");
         makeSelectionDraggable();
+      } else if (e.keyCode === 93) {
+        addTitle();
       } else if (e.keyCode === 99) {
         console.log("Calling captureAndBindThumbClick");
         captureAndBindThumbClick();

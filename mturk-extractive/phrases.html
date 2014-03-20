@@ -4,34 +4,42 @@
 <head>
   <meta charset="utf-8">
   <title>Summary Task</title>
-  <link type="text/css" rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  <style type="text/css">
+  	.yourtext {
+  		border: #428bca 3px solid;
+  		padding: 5px;
+  		margin-bottom: 5px;
+  	}
+  </style>
 </head>
 <body>
 
 <div class="container">
 	<div class="well">
 		<h4>Instructions</h4>
-		<p><u>You will select one or more phrases that best summarize the paragraph under "Your Paragraph" below</u>. Each phrase you select must be an entire sentence, or a shorter phrase contained within one sentence. An example is provided below.</p>
+		<p><u>You will select one or more phrases that best summarize the key ideas of the text that appears under "Your Text"</u>. Each phrase you select must be an entire sentence, or a shorter phrase contained within a sentence. Instructions and an example are below.</p>
 		<ol>
-  			<li>Using your cursor, highlight one phrase that best summarizes the paragraph.</li>
+  			<li>Using your cursor, highlight one phrase that best summarizes the text.</li>
   			<li>Click <em>Record Phrase</em> to record the phrase you selected. This will highlight the phrase in yellow.</li>
-  			<li>Optionally, repeat steps 1 and 2 to select more phrases that best summarize the paragraph.</li>
+  			<li>Optionally, repeat steps 1 and 2 to select more phrases that best summarize the text.</li>
   			<li>Click <em>Submit</em>. This will open the <em>Output Textbox</em>.</li>
   			<li>Copy the text in <em>Output Textbox</em> and paste it into the <em>Output Textbox</em> area on the mechanical turk submission form.</li>
 		</ol>
 		<p><small>NOTE: If you make a mistake, you may clear your work by pressing "Clear All" at any time. Ignore special character symbols such as {LG}. </small></p>
 	</div>
 	<div class="well">
-		<h4>Example Paragraph <small>The user has selected one phrase in this short example. The phrase is contained within one sentence.</small></h4>
+		<div id="showexample" style="cursor: pointer">Optional: <a>Click here to view an example.</a></div>
 		<div id="example"></div>
 	</div>
 
 	<div class="row">
 		<div class="col-md-12">
-			<h4>Your Paragraph</h4>
-			<div id="paragraph"></div>
+			<h4>Your Text</h4>
+			<div id="paragraph" class="yourtext"></div>
 			
 		</div>
+		<br>
 		<div class="col-md-12">
 			<button id="registerSelection" class="btn btn-default">Record Phrase</button>
 			<button id="clear" class="btn btn-default">Clear All</button>

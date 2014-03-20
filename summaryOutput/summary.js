@@ -9,7 +9,8 @@ sts = {
   thumbRes: {
     width: 87,
     height: 58,
-  }
+  },
+  prep: 0,
 }
 
 var getVidFile = function(){
@@ -92,9 +93,9 @@ var seekVideosToFirst = function(){
   $('.groupRow').first().find('video')[0].currentTime = 0;
 }
 
-var startSummaryLayout = function(summaries){
+var startSummaryLayout = function(){
   console.log("Loading video & group row");
-  sts.summaries = summaries;
+  summaries = sts.summaries;
   makeGroupRow(function ($gr, $gc, $video) {
     $('body').append($gr);
     $video.on("loadedmetadata", function(){  
@@ -129,7 +130,7 @@ var startSummaryLayout = function(summaries){
           $(this).parent().parent().find('video')[0].play();
         });
         $('.groupRow').before(function(i){
-            var h = $('<h3>').text("Section " + (i + 1));
+            var h = $('<h3>').text(sts.titles[i]);
             return $('<div>').attr('class', 'groupHead row').append(h);
         });
         seekVideosToFirst();
@@ -163,10 +164,30 @@ var loadSummaries = function(){
     dataType: 'json',
     success: function (response) {
       console.log(response);
-      startSummaryLayout(response);
+      sts.summaries = response;
+      sts.prep++;
+      if (sts.prep == 2) {startSummaryLayout()};
     },
     error: function(e){
       console.log('Error occured when loading transcript');
+      console.log(e);
+    }
+  });
+};
+
+var loadTitles = function () {
+  $.ajax({
+    url: 'resources/' + sts.args[1] + '_titles.json',
+    async: false,
+    dataType: 'json',
+    success: function (response) {
+      console.log(response);
+      sts.titles=response;
+      sts.prep++;
+      if (sts.prep == 2) {startSummaryLayout()};
+    },
+    error: function(e){
+      console.log('Error occured when loading titles');
       console.log(e);
     }
   });
@@ -178,3 +199,4 @@ sts.summaryFile = 'resources/' + sts.args[0] + '_summary.json';
 sts.videoFile = sts.args[1];
 sts.posterFile = 'resources/' + sts.args[2] + '_poster.png';
 loadSummaries();
+loadTitles();
