@@ -32,6 +32,7 @@ sts = {
 //============== INTERFACE CONTROLS ==================
 var addTitle = function() {
   console.log("Adding title to group: " + sts.lastGroup);
+  $('#'+sts.lastGroup)
 }
 
 var createSummaryPlaceholder = function(groupId) {
@@ -52,12 +53,25 @@ var createSummaryPlaceholder = function(groupId) {
 };
 
 var bindGroupSummaryPlaceholder = function($groupRowDiv) {
+  sts.lastGroup = $groupRowDiv.attr('id');
   var $ctrldiv = $('<div>').attr('class', 'groupCtrl');
-  $ctrldiv.append($('<textarea>'));
+  $ctrldiv.append($('<textarea>').attr('placeholder', 'Subtitle Here'));
   $ctrldiv.on('click',function(){
     sts.lastGroup = $groupRowDiv.attr('id');
     console.log("Last group is now: " + sts.groups[sts.lastGroup]);
-  })
+  }); 
+  var $buttonAdd = $('<button>')
+    .html('<span class="glyphicon glyphicon-plus"></span>')
+    .attr('class', 'add-section btn btn-sm')
+    .click(function(){
+      sts.lastGroup = $groupRowDiv.attr('id');
+      console.log("Last group is now: " + sts.groups[sts.lastGroup]);
+      findGroupSummaryPlaceholder();
+    });
+  var $buttonSubtract = $('<button>')
+    .html('<span class="glyphicon glyphicon-minus"></span>')
+    .attr('class', 'subtract-section btn btn-sm');
+  $ctrldiv.append($buttonSubtract); $ctrldiv.append($buttonAdd);
   console.log("Made group control.");
   $groupRowDiv.append($ctrldiv);
 };
@@ -93,16 +107,8 @@ var makeNewGroupAndAppend = function(){
 
   bindGroupSummaryPlaceholder($groupRowDiv);
   sts.groupIndex++;
+  return sts.groupIndex - 1;
 };
-
-var initialize = function(){
-  $('#export').hide();
-  $('#controls').hide();
-  $('#exported').hide();
-  makeNewGroupAndAppend();
-}
-
-initialize();
 
 //================= CONTROLLER =======================
 
@@ -297,12 +303,24 @@ var addCompleteSummary = function(sdid, capture) {
     var rid = randomId();
 
     // update to have text instead of textarea
+
+    // old code: puts text in textarea when you drag and drop
+    // $div.find('.textCol')
+    //   .append('<textarea>')
+    //   .attr('rid', rid)
+    //   .attr('class', 'blendTextarea')
+    // $div.find('textarea')
+    //   .html(replaceAll(' {p}','',sts.summaries[sdid].text));
+
+    //new code: puts text as placeholder in textarea when you drag and drop
+    var $ta = $('<textarea>')
+      .attr('placeholder', replaceAll(' {p}','',sts.summaries[sdid].text));
+
     $div.find('.textCol')
-      .append('<textarea>')
+      .append($ta)
       .attr('rid', rid)
       .attr('class', 'blendTextarea')
-    $div.find('textarea')
-      .html(replaceAll('{p}','',sts.summaries[sdid].text));
+    // end new code
 
     $div.find('textarea').on("keypress", function(e){
       if (e.keyCode === 13) {
@@ -320,6 +338,7 @@ var addCompleteSummary = function(sdid, capture) {
         $div.replaceWith(addCompleteSummary(sdid, cap));
       }
     });
+
   } else {
     $div.find('.textCol').append($('<p>'))
       .html($('<p>').html(sts.summaries[sdid].text));
@@ -593,6 +612,21 @@ var makeSelectionDraggable = function(){
   $draggableSpan.on('dragstart', handleDragStart);
 }; 
 
+var findGroupSummaryPlaceholder = function() {
+  var lastGroup= {key: "", value: -1}
+  if (sts.lastGroup) {
+    lastGroup.key = sts.lastGroup;
+  } else {
+    for (var i = 0; i < Object.keys(sts.groups).length; i++) {
+      var key = Object.keys(sts.groups)[i];
+      if (sts.groups[key] > lastGroup.value) {
+        lastGroup.key = key; lastGroup.value = sts.groups[key];
+      }
+    };
+  }
+  createSummaryPlaceholder(lastGroup.key);
+}
+
 var bindKeypressin = function(){
     $(document).on("keypress", function(e){
       if(e.keyCode == 92){
@@ -606,22 +640,25 @@ var bindKeypressin = function(){
       } else if (e.keyCode === 49) {
         console.log("Calling makeNewGroupAndAppend");
         makeNewGroupAndAppend(); 
+        // CODE to add seperating bar
+        // var $b = $('<div>').attr('class', 'boundary');
+        // var sh = $('#scrolling').scrollTop();
+        // var th = $('#transcript').height();
+        // $b.css('top', - (th - sh - 100) + 'px');
+        // $b.draggable();
+        // $('#transcript').append($b);
+        console.log('appended seperation bar');
+
+        //TODO make better way to do this
+        for (var i = 0; i < 3; i++) {
+          findGroupSummaryPlaceholder();
+        };
+
       } else if (e.keyCode === 48) {
         console.log("Calling showControlsBindClicks");
         showControlsBindClicks();
       } else if (e.keyCode === 50) {
-        var lastGroup= {key: "", value: -1}
-        if (sts.lastGroup) {
-          lastGroup.key = sts.lastGroup;
-        } else {
-          for (var i = 0; i < Object.keys(sts.groups).length; i++) {
-            var key = Object.keys(sts.groups)[i];
-            if (sts.groups[key] > lastGroup.value) {
-              lastGroup.key = key; lastGroup.value = sts.groups[key];
-            }
-          };
-        }
-        createSummaryPlaceholder(lastGroup.key);
+        findGroupSummaryPlaceholder();
         console.log("Pressed 2 on Document");
       } 
     }); 
@@ -758,6 +795,19 @@ var loadTranscript = function(){
     }
   });
 };
+
+var initialize = function(){
+  $('#export').hide();
+  $('#controls').hide();
+  $('#exported').hide();
+  makeNewGroupAndAppend();
+  // TODO get better way to do this
+  for (var i = 0; i < 3; i++) {
+    findGroupSummaryPlaceholder();
+  };
+}
+
+initialize();
 
 video.addEventListener("loadedmetadata", function(){
   // need the meta data to do anything else
