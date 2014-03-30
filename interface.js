@@ -39,7 +39,7 @@ var settings = {
 $('#exported').hide()
 
 $('#export').on("click", function(){
-  var k = []; 
+  var k = [];
   var k = []; $('.sumDiv').each(function(){
    k.push({start: $(this).data('start'), img: $(this).find('img').attr('src'), text: $(this).text()})
   })
@@ -62,7 +62,7 @@ var getAllBetween = function (firstEl,lastEl) {
                 collection.push(lastElement.attr('id')); // Add Last Element to Collection
                 return false; // Break Loop
             }
-        });         
+        });
         return collection; // Return Collection
 };
 
@@ -90,8 +90,8 @@ function getURIformcanvas() {
   var imgs = document.getElementById("imgs");
 
   return Canvas2Image.convertToImage(
-      canvasFromVideo, 
-      settings.thumbRes.width, 
+      canvasFromVideo,
+      settings.thumbRes.width,
       settings.thumbRes.height,
       settings.thumbnailImgType);
 }
@@ -109,20 +109,19 @@ function capture($div) {
 
     ctxDraw.drawImage(video, 0, 0, w, h);
     ctxDraw.save();
-    return getURIformcanvas();  
+    return getURIformcanvas();
 
   } else {
-    var video = settings.video;
-    var canvasDraw = document.getElementById('imageView');
-    var w = canvasDraw.width;
-    var h = canvasDraw.height;
-    var ctxDraw = canvasDraw.getContext('2d');
-
+    video = settings.video;
+    canvasDraw = document.getElementById('imageView');
+    w = canvasDraw.width;
+    h = canvasDraw.height;
+    ctxDraw = canvasDraw.getContext('2d');
     ctxDraw.clearRect(0, 0, w, h);
 
     ctxDraw.drawImage(video, 0, 0, w, h);
     ctxDraw.save();
-    $div.append(getURIformcanvas());   
+    $div.append(getURIformcanvas());
 
   }
 }
@@ -209,7 +208,7 @@ var makeThumbnail = function(seconds) {
 
 var positionSummary = function(spanIds) {
   var position = {};
-  var $first = $('#'+spanIds[0]), 
+  var $first = $('#'+spanIds[0]),
       $last = $('#'+spanIds[spanIds.length-1]);
 
   // this is apparently relative to scroll top
@@ -228,7 +227,7 @@ var positionSummary = function(spanIds) {
   var selectionHeight = selectionBottom - selectionTop;
 
   // naively position summary
-  position.middle = selectionTop 
+  position.middle = selectionTop
     + (selectionHeight)/2;
   position.top = selectionTop;
   position.bottom = selectionBottom;
@@ -244,7 +243,7 @@ var saveSummary = function($summaryDiv) {
       var taText = $(this).val();
       // transfer style to paragraph
       var taStyle = $(this).attr('style');
-      // delete text area 
+      // delete text area
       $(this).remove();
       // replace with paragraph
       var $summary = $(document.createElement('p'))
@@ -259,7 +258,7 @@ var saveSummary = function($summaryDiv) {
         settings.video.play();
       });
     }
-  }); 
+  });
 }
 
 var createSummary = function(spanIds) {
@@ -318,14 +317,14 @@ var createSummary = function(spanIds) {
 
   settings.video.currentTime = summaryPosition.start;
 
-  // settings.video.currentTime = (summaryPosition.end 
-  //     - summaryPosition.start)/2 
+  // settings.video.currentTime = (summaryPosition.end
+  //     - summaryPosition.start)/2
   //   + summaryPosition.start;
-  
+
   $(settings.video).one("seeked", function(){
     capture($imgDiv);
   });
-  
+
 };
 
 var bindSummaryKeypress = function(){
@@ -439,13 +438,13 @@ var layoutTimeline = function(transcript){
     transcript = settings.transcript;
   }
     var paragraphs = transcriptParagraphs(transcript);
-    console.log("Number of Paragraphs in Transcript: " 
+    console.log("Number of Paragraphs in Transcript: "
       + paragraphs.length);
 
     var positions = {};
     var yPxPerSec = settings.yppSec;
 
-    console.log("Y Pixels in a Second: " 
+    console.log("Y Pixels in a Second: "
       + yPxPerSec);
 
     positions.paragraphs = paragraphPositions(

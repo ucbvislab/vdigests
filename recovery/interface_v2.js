@@ -33,9 +33,9 @@ sts = {
   paragraphCSS: {
     'font-size': '13px'
   },
-  // data structure: 
-  // {<id>: text: "text here", group: <group_number>, 
-  //   span_ids: [span_ids], start_time: <start_time>, 
+  // data structure:
+  // {<id>: text: "text here", group: <group_number>,
+  //   span_ids: [span_ids], start_time: <start_time>,
   //   image_time: <image time>,
   //   image_id: <image id>
   //  state: <0: no changes, 1: created, 2: text save, 3: capture update>}
@@ -143,7 +143,7 @@ var seekThenCaptureImgTimes = function(time_list, cap_list, i, callback) {
       cap.$image = $(capture())
         .attr('class', 'img-myThumbnail')
         .attr('id', cap.image_id);
-      
+
       // add them to a global list
       cap_list.push(cap);
 
@@ -165,7 +165,7 @@ var seekThenCaptureImgTimes = function(time_list, cap_list, i, callback) {
     console.log("Done capturing images.");
     callback(cap_list);
   }
-  
+
 };
 
 //TODO: update summary list
@@ -269,7 +269,7 @@ var addCompleteSummary = function(sdid, capture) {
       var id = $(this).attr('id');
       var group = sts.summaries[id].group;
       var video = $($('.groupRow')[group]).find('video')[0];
-      video.currentTime = 
+      video.currentTime =
         sts.summaries[sdid].start_time;
       video.play();
     });
@@ -350,7 +350,7 @@ var showControlsBindClicks = function() {
             addCompleteSummary(key, captures[i]);
           };
         });
-        
+
       }
     });
   });
@@ -433,7 +433,7 @@ var bindSummarySave = function($summaryDiv) {
     if (e.keyCode === 13) {
       saveSummary(this, $summaryDiv);
     }
-  }); 
+  });
 };
 
 var getImageTime = function(start, end) {
@@ -450,7 +450,7 @@ var createSummaryEntryReturnId = function(spanIds, over){
     var start_time = $('#'+spanIds[0]).data('start');
     var end_time = $('#' + spanIds[spanIds.length - 1]).data('end');
     entry = {
-      image_time: getImageTime(start_time, end_time), 
+      image_time: getImageTime(start_time, end_time),
       start_time: start_time,
       end_time: end_time,
       text: "",
@@ -459,7 +459,7 @@ var createSummaryEntryReturnId = function(spanIds, over){
     };
   } else {
     entry = {
-      image_time: over.image_time === undefined ? 0.0 : over.image_time, 
+      image_time: over.image_time === undefined ? 0.0 : over.image_time,
       start_time: over.start_time === undefined ? 0.0 : over.start_time,
       end_time: over.end_time === undefined ? 0.0 : over.end_time,
       text: over.text === undefined ? "" : over.text,
@@ -480,7 +480,7 @@ var makeSummaryDiv = function(sdid) {
       var $spanIds = sts.lastSelection;
       var sdid = createSummaryEntryReturnId($spanIds);
 
-      //sts.summaries[sdid].group = 
+      //sts.summaries[sdid].group =
 
     });
   var $keyframeCol = $('<div>').attr('class', 'col-md-3 keyframeCol');
@@ -556,8 +556,8 @@ var getSpanIdsCreateSummary = function(){
 
   // make the new entry
   var sdid = createSummaryEntryReturnId(spanIds);
-  seekThenCaptureImgTimes([sts.summaries[sdid].image_time], 
-    [], 0, 
+  seekThenCaptureImgTimes([sts.summaries[sdid].image_time],
+    [], 0,
     function(cap_list){
       addCompleteSummary(sdid, cap_list[0]);
   });
@@ -595,7 +595,7 @@ var makeSelectionDraggable = function(){
   $(beforeSel).before($draggableSpan);
 
   $draggableSpan.on('dragstart', handleDragStart);
-}; 
+};
 
 var bindKeypressin = function(){
     $(document).on("keypress", function(e){
@@ -607,7 +607,7 @@ var bindKeypressin = function(){
         captureAndBindThumbClick();
       } else if (e.keyCode === 49) {
         console.log("Calling makeNewGroupAndAppend");
-        makeNewGroupAndAppend(); 
+        makeNewGroupAndAppend();
       } else if (e.keyCode === 48) {
         console.log("Calling showControlsBindClicks");
         showControlsBindClicks();
@@ -625,8 +625,8 @@ var bindKeypressin = function(){
         }
         createSummaryPlaceholder(lastGroup.key);
         console.log("Pressed 2 on Document");
-      } 
-    }); 
+      }
+    });
 };
 
 // attach scrollbox to timeline, then bind scroll events
