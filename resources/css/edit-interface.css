@@ -1,5 +1,7 @@
 body {
     font-size: 13px;
+    /* FIXME */
+    min-width: 1430px;
 }
 
 .textCol p {
