@@ -2,3 +2,8 @@
 *.avi
 *.mp4
 *.wav
+
+*~
+.tern-port
+# Mac
+.DS_Store
