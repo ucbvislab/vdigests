@@ -3,46 +3,42 @@
   <head>
     <title>Summary Interface</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap -->
     <link href="resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="resources/css/edit-interface.css" rel="stylesheet">
     <script src="resources/js/canvas2image.js"></script>
   </head>
   <body>
-    <div id="timeline">
-    </div>
-    <div id="center">
-      <div id="scrolling">
-        <div id="transcript"></div>
-        <!-- <div id="summary"></div> -->
-      </div>
-    </div>
-    <div id="right">
-      <div id="outputSummary">
-        <div class="row summaryRow" id="controls">
-          <button class="btn btn-default" id="captureBtn">
-            <span class="glyphicon glyphicon-camera"></span>
-          </button>
-          <button class="btn btn-default" id="newGroupBtn">
-            <span class="glyphicon glyphicon-asterisk"></span>
-          </button>
-          <button class="btn btn-default" id="createSummaryBtn">
-            <span class="glyphicon glyphicon-pencil"></span>
-          </button>
-          <button class="btn btn-default" id="importBtn">
-            <span class="glyphicon glyphicon-import"></span>
-          </button>
-          <button class="btn btn-default" id="exportBtn">
-            <span class="glyphicon glyphicon-export"></span>
-          </button>
-          <div id="addControl">
-          </div>
+    <!-- <div id="timeline"> -->
+    <!-- </div> -->
+
+    <div id="outputSummary">
+      <div class="row summaryRow" id="controls">
+        <button class="btn btn-default" id="captureBtn">
+          <span class="glyphicon glyphicon-camera"></span>
+        </button>
+        <button class="btn btn-default" id="newGroupBtn">
+          <span class="glyphicon glyphicon-asterisk"></span>
+        </button>
+        <button class="btn btn-default" id="createSummaryBtn">
+          <span class="glyphicon glyphicon-pencil"></span>
+        </button>
+        <button class="btn btn-default" id="importBtn">
+          <span class="glyphicon glyphicon-import"></span>
+        </button>
+        <button class="btn btn-default" id="exportBtn">
+          <span class="glyphicon glyphicon-export"></span>
+        </button>
+        <div id="addControl">
         </div>
       </div>
     </div>
 
-      <button id="export" class="btn" style="width:340px">Export</button>
-      <textarea id="exported" class="form-control" style="height:231px"></textarea>
+    <div id="transcript-wrap">
+      <div id="transcript"></div>
+    </div>
+
+    <button id="export" class="btn" style="width:340px">Export</button>
+    <textarea id="exported" class="form-control" style="height:231px"></textarea>
     <canvas id="imageView" style="display:none; left: 0; top: 0; z-index: 0;border:none" width="100" height="75"> </canvas>
 
     <script src="https://code.jquery.com/jquery.js"></script>

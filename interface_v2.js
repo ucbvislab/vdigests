@@ -4,7 +4,14 @@ document.ready = (function ($, IUtils) {
   // consts: don't change
   var consts = {
     docHeight: 900,
-    summaryIdPrefix: "sumDiv"
+    timelineFontSize: 2,
+    transFontSize: 13,
+    summaryIdPrefix: "sumDiv",
+    transWrapId: "transcript-wrap",
+    transId: "transcript",
+    timelineId: "timeline",
+    thumbClass: "img-myThumbnail",
+    ssImgPath: "resources/img/camera-icon.png"
   };
 
   // state: changes
@@ -12,7 +19,6 @@ document.ready = (function ($, IUtils) {
     transcriptFile: 'resources/HansRosling_aligned.json',
     video: undefined,
     $video: undefined,
-    $scrolling: $('#scrolling'),
     summaries: {},
     capture: {},
     summaryIdIndex: 0,
@@ -24,6 +30,19 @@ document.ready = (function ($, IUtils) {
     vn: 0
   };
 
+  // Global listeners
+  var $body = $(document.body);
+  var setBodyHeight = function (inHeight) {
+    $body.height(inHeight);
+  };
+
+  var $window = $(window);
+  $window.resize(function () {
+    setBodyHeight($window.height());
+  });
+  // init
+  setBodyHeight($window.height());
+
 
   //============== INTERFACE CONTROLS ==================
   var addTitle = function() {
@@ -34,9 +53,9 @@ document.ready = (function ($, IUtils) {
   var createSummaryPlaceholder = function(groupId) {
     var imgid = IUtils.randomId();
     var $img = $('<img>')
-          .attr('class', 'img-myThumbnail')
+          .attr('class', consts.thumbClass)
           .attr('id', imgid)
-          .css('background-color', 'lightgrey');
+          .attr('src', consts.ssImgPath);
 
     var cap = {
       $image: $img,
@@ -52,7 +71,7 @@ document.ready = (function ($, IUtils) {
   var bindGroupSummaryPlaceholder = function($groupRowDiv) {
     sts.lastGroup = $groupRowDiv.attr('id');
     var $ctrldiv = $('<div>').attr('class', 'groupCtrl');
-    $ctrldiv.append($('<textarea>').attr('placeholder', 'Subtitle Here'));
+    $ctrldiv.append($('<input>').attr('placeholder', 'Subtitle Here'));
     $ctrldiv.on('click',function(){
       sts.lastGroup = $groupRowDiv.attr('id');
       console.log("Last group is now: " + sts.groups[sts.lastGroup]);
@@ -70,7 +89,7 @@ document.ready = (function ($, IUtils) {
           .attr('class', 'subtract-section btn btn-sm');
     $ctrldiv.append($buttonSubtract); $ctrldiv.append($buttonAdd);
     console.log("Made group control.");
-    $groupRowDiv.append($ctrldiv);
+    $groupRowDiv.prepend($ctrldiv);
   };
 
   var makeGroupRow = function(groupNumber){
@@ -79,10 +98,10 @@ document.ready = (function ($, IUtils) {
           .attr('class', 'row groupRow')
           .attr('id', gid);
     sts.groups[gid] = groupNumber;
-    var $videoCol = $('<div>').attr('class', 'col-md-6 videoCol');
+    var $videoCol = $('<div>').attr('class', 'col-xs-6 videoCol');
     //TODO: fix this awfulness
-    var $video = $('<video id="video" controls preload="auto" width="415px" height="231px" poster="resources/HansRosling_poster.png"> <source src="resources/HansRosling'+sts.vn+'.mp4" type="video/mp4" /> </video>');
-    var $summaryCol = $('<div>').attr('class', 'col-md-6 summaryCol');
+    var $video = $('<video controls preload="auto" width="350px" height="231px" poster="resources/HansRosling_poster.png"> <source src="resources/HansRosling'+sts.vn+'.mp4" type="video/mp4" /> </video>');
+    var $summaryCol = $('<div>').attr('class', 'col-xs-6 summaryCol');
     sts.vn++;
     $videoCol.append($video);
     $groupRowDiv.append($videoCol);
@@ -100,9 +119,8 @@ document.ready = (function ($, IUtils) {
   var makeNewGroupAndAppend = function(){
     console.log("Making new group.");
     var $groupRowDiv = makeGroupRow(sts.groupIndex);
-    $('#outputSummary').append($groupRowDiv);
-
     bindGroupSummaryPlaceholder($groupRowDiv);
+    $('#outputSummary').append($groupRowDiv);
     sts.groupIndex++;
     return sts.groupIndex - 1;
   };
@@ -229,7 +247,7 @@ document.ready = (function ($, IUtils) {
       }
       $(this).css('opacity', '1');
       eDroppedOnEl(e, $(this));
-    })
+    });
   };
 
   var addCompleteSummary = function(sdid, capture) {
@@ -509,8 +527,8 @@ document.ready = (function ($, IUtils) {
             //sts.summaries[sdid].group =
 
           });
-    var $keyframeCol = $('<div>').attr('class', 'col-md-3 keyframeCol');
-    var $textCol = $('<div>').attr('class', 'col-md-9 textCol');
+    var $keyframeCol = $('<div>').attr('class', 'col-xs-3 keyframeCol');
+    var $textCol = $('<div>').attr('class', 'col-xs-9 textCol');
 
     $mainDiv.append($keyframeCol);
     $mainDiv.append($textCol);
@@ -650,36 +668,36 @@ document.ready = (function ($, IUtils) {
     });
   };
 
-  // attach scrollbox to timeline, then bind scroll events
-  var createScrollBox = function(timelineId, transcriptId){
+  // // attach scrollbox to timeline, then bind scroll events
+  // var createScrollBox = function(timelineId, transcriptId){
 
-    var $timeline = $('#' + timelineId);
-    var $transcript = $('#' + transcriptId);
-    var timeHeight = $timeline[0].scrollHeight;
-    var timeWidth = IUtils.getIntFromPx($timeline.css("width"));
+  //   var $timeline = $('#' + timelineId);
+  //   var $transcript = $('#' + transcriptId);
+  //   var timeHeight = $timeline[0].scrollHeight;
+  //   var timeWidth = IUtils.getIntFromPx($timeline.css("width"));
 
-    // how much of the timeline is in the transcript view?
-    console.log("Constructing Scroll Box");
-    var docHeight = consts.docHeight;
-    var transHeight = $transcript[0].scrollHeight;
-    var scrollBoxHeight = timeHeight*(docHeight/transHeight);
+  //   // how much of the timeline is in the transcript view?
+  //   console.log("Constructing Scroll Box");
+  //   var docHeight = consts.docHeight;
+  //   var transHeight = $transcript[0].scrollHeight;
+  //   var scrollBoxHeight = timeHeight*(docHeight/transHeight);
 
-    var $scrollBox = $('<div>')
-          .attr('id', 'scrollView')
-          .css({
-            position: 'absolute',
-            top: '0px',
-            left: '0px',
-            opacity: .1,
-            'background-color': 'black',
-            width: timeWidth,
-            height: scrollBoxHeight + 8
-          });
+  //   var $scrollBox = $('<div>')
+  //         .attr('id', 'scrollView')
+  //         .css({
+  //           position: 'absolute',
+  //           top: '0px',
+  //           left: '0px',
+  //           opacity: .1,
+  //           'background-color': 'black',
+  //           width: timeWidth,
+  //           height: scrollBoxHeight + 8
+  //         });
 
-    $timeline.append($scrollBox);
+  //   $timeline.append($scrollBox);
 
-    return $scrollBox;
-  };
+  //   return $scrollBox;
+  // };
 
   // input looks like {<paragraph number>: [{
   //     paragraph: <paragraph number>,
@@ -700,27 +718,23 @@ document.ready = (function ($, IUtils) {
         $el.append($span);
       }
       $('#' + id).append($el);
-      $el.css('font-size', fontSize);
       var a = $el.css('line-height');
       var newPx = IUtils.getIntFromPx(a)*4;
-      $el.css('padding-bottom', newPx+"px");
     }
   };
 
 
   // just for attaching scroll events
-  var attachScrollEvents = function(timelineId, transcriptId, scrollingId, $scrollBox) {
-    var $scrolling = $('#' + scrollingId);
-    var $timeline = $('#' + timelineId);
-    var $transcript = $('#' + transcriptId);
+  var attachScrollEvents = function(timelineId, transcriptId, transWrapId) {
+    var $transWrap  = $('#' + transWrapId),
+        $timeline = $('#' + timelineId),
+        $transcript = $('#' + transcriptId);
 
-    console.log("Attaching Scroll Events");
-
-    // need scaling functions
+    // TODO need scaling functions
     var trToTlHeight = function(n) {
-      var tlHeight = 462;
-      var tsHeight = IUtils.getIntFromPx($transcript.css('height'));
-      return n * (tlHeight/tsHeight);
+      var tlHeight = 462,
+          tsHeight = IUtils.getIntFromPx($transcript.css('height'));
+          return n * (tlHeight/tsHeight);
     };
 
     var tlToTrHeight = function(n) {
@@ -731,11 +745,11 @@ document.ready = (function ($, IUtils) {
 
     // if you scroll the tl/summary scroll box
     // then the timeline view will update
-    $scrolling.on('scroll', function(){
-      var newBoxPosition = trToTlHeight(this.scrollTop);
-      $scrollBox.css({
-        top: newBoxPosition + 'px'
-      });
+    $transWrap.on('scroll', function(){
+      // var newBoxPosition = trToTlHeight(this.scrollTop);
+      // $scrollBox.css({
+      //   top: newBoxPosition + 'px'
+      // });
     });
 
     // if you click anywhere on the timeline image
@@ -745,15 +759,15 @@ document.ready = (function ($, IUtils) {
       var x = e.pageX - e.target.offsetLeft,
           y = e.pageY - e.target.offsetTop;
 
-      // move the scrollbox to click position
-      $scrollBox.css('top', y);
+      // // move the scrollbox to click position
+      // $scrollBox.css('top', y);
 
       var newCPos = tlToTrHeight(y)
             - (consts.docHeight/2);
       if (newCPos < 0)  { newCPos = 0; }
 
       // move timeline to equivalent position centered
-      $scrolling.scrollTop(newCPos);
+      $transWrap.scrollTop(newCPos);
     });
   };
 
@@ -765,12 +779,13 @@ document.ready = (function ($, IUtils) {
       success: function (response) {
         console.log('Loaded transcript');
         sts.transcript = response;
-        var transcriptPDict = IUtils.pDictFromTranscript(response, 85, 'main');
-        var timelinePDict = IUtils.pDictFromTranscript(response, 85, 'sub');
-        layoutAndAppendParagraphs(transcriptPDict, 'transcript', '13px');
-        layoutAndAppendParagraphs(timelinePDict, 'timeline', '2px');
-        var $scrollbox = createScrollBox('timeline', 'transcript');
-        attachScrollEvents('timeline', 'transcript', 'scrolling', $scrollbox);
+        var transcriptPDict = IUtils.pDictFromTranscript(response, 85, 'main'),
+            timelinePDict = IUtils.pDictFromTranscript(response, 85, 'sub');
+            //$scrollbox = createScrollBox(consts.timelineId, consts.transId);
+
+        layoutAndAppendParagraphs(transcriptPDict, consts.transId, consts.transFontSize + 'px');
+        layoutAndAppendParagraphs(timelinePDict, consts.timelineId, consts.timelineFontSize + 'px');
+        attachScrollEvents(consts.timelineId, consts.transId, consts.transWrapId); //, $scrollbox);
         bindKeypressin();
       },
       error: function(e){

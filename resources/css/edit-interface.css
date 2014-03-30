@@ -1,7 +1,45 @@
+* {
+    box-sizing: border-box;
+    color: #3C3C3C;
+}
+
 body {
     font-size: 13px;
-    /* FIXME */
-    min-width: 1430px;
+    height: 500px;
+    width: 100%;
+    min-width: 1250px;
+    overflow-y: hidden;
+}
+
+#outputSummary {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    float: left;
+    width: 700px;
+    height: inherit;
+    background-color: ghostwhite;
+    padding-left: 10px;
+}
+
+#transcript-wrap {
+    width: 515px;
+    margin-left: 700px;
+    line-height: 2em;
+    height: inherit;
+    background-color: white;
+    overflow: scroll;
+}
+
+#transcript {
+    float: left;
+    width: 500px;
+    background-color: white;
+    margin: 0 7px;
+}
+
+#transcript p {
+    font-size: 10pt;
+    margin-bottom: 1.5em;
 }
 
 .textCol p {
@@ -14,66 +52,27 @@ body {
     height: 900px;
 }
 
-#video {
-/*margin-top: -22px;*/
-}
-
-#right {
-    float: left;
-    width: 840px;
-    height: 900px;
-    background-color: rgb(215, 226, 0);
-    overflow: hidden;
-}
-
-#right #outputSummary {
-    overflow: scroll;
-    float: left;
-    width: 855px;
-    height: 900px;
-    background-color: lavender;
-}
-
-#center {
-    float: left;
-    margin-left: 10px;
-    width: 500px;
-    height: 900px;
-    background-color: blue;
-    overflow: hidden;
-}
-
 .blendTextarea textarea{
-    width: 280px;
+    width: 250px;
     border: none;
-    background-color: lightgrey;
-    height: 43px;
+    height: 50px;
     box-shadow: 1px 1px 8px -1px #333333;
     margin-left: -15px;
     font-size: 10px;
 }
 
+.keyframeCol {
+    width: 27%;
+}
+
 .summaryRow {
-    padding-bottom: 4px;
+    padding-bottom: 8px;
 }
 
 .selected {
     background-color: lightgrey;
 }
 
-#center #scrolling {
-    width: 515px;
-    height: inherit;
-    background-color: white;
-    overflow: scroll;
-}
-
-#transcript {
-    float: left;
-    width: 500px;
-    background-color: white;
-    margin-right: 5px;
-}
 
 #summary {
     float: left;
@@ -103,37 +102,33 @@ body {
     background-color: aliceblue;
 }
 .img-myThumbnail {
-    width: 65px;
-    height: 43px;
+    width: 60px;
+    height: 50px;
     box-shadow: 1px 1px 8px -1px #333333;
+    background-color: white;
 }
 video {
     box-shadow: 1px 1px 8px -1px #333333;
 }
 
-.groupRow {
-    padding: 40px 0px 10px 0px;
-    border-top: 1px solid lightgrey;
-}
 .groupCtrl:hover {
     opacity: 1;
 }
 
 .groupCtrl {
-    margin-left: 20px;
-    position: relative;
-    top: -30px;
     background-color: none;
     height: 30px;
     opacity: 1;
-    text-align: right;
-    padding-right: 30px;
+    text-align: left;
+    position: relative;
+    width: 100%;
 }
 
 .add-section {
-    left: 762px;
+    right: 55px;
     position: absolute;
-    top: 0px;
+    bottom: 0px;
+    margin-bottom: 4px;
     padding: 2px 6px 2px 6px;
     font-size: .9em;
     border-radius: 0px;
@@ -142,9 +137,10 @@ video {
 }
 
 .subtract-section {
-    left: 730px;
+    right: 25px;
     position: absolute;
-    top: 0px;
+    bottom: 0px;
+    margin-bottom: 4px;
     padding: 2px 6px 2px 6px;
     font-size: .9em;
     border-radius: 0px;
@@ -152,16 +148,14 @@ video {
     border: 1px #aaaaaa solid;
 }
 
-.groupCtrl textarea {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    height: 30px;
-    width: 410px;
+.groupCtrl input {
+    outline: none;
+    width: 80%;
     font-size: 20px;
     border: none;
     overflow: hidden;
     background-color: inherit;
+    margin-left: 1em;
 /*opacity: 0;*/
 }
 
