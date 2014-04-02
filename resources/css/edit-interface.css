@@ -9,6 +9,13 @@
     color: #3C3C3C;
 }
 
+::selection {
+	background: #DBEDFF;
+	}
+::-moz-selection {
+	background: #DBEDFF;
+}
+
 body {
     font-size: 13px;
     height: 500px;
@@ -17,11 +24,29 @@ body {
     overflow-y: hidden;
 }
 
+#maintitle {
+    font-size: 24px;
+    color: #645C6F;
+    font-weight: normal;
+    display: inline-block;
+    position: relative;
+    padding: 0;
+    text-align: center;
+    width: 100%;
+    margin: 0;
+    margin-top: 12px;
+}
+
+#maintitle:focus {
+    outline: 0;
+    text-decoration: underline;
+}
+
 #outputSummary {
     overflow-y: scroll;
     overflow-x: hidden;
     float: left;
-    width: 700px;
+    width: 720px;
     height: inherit;
     padding-left: 10px;
     background: rgba(255,255,255,1);
@@ -36,9 +61,8 @@ body {
 }
 
 #transcript-wrap {
-    width: 515px;
-    margin-left: 700px;
-    line-height: 2em;
+    padding-top: 5px;
+    line-height: 16px;
     height: inherit;
     background-color: white;
     overflow: scroll;
@@ -46,8 +70,9 @@ body {
 
 #transcript {
     float: left;
-    width: 500px;
     background-color: white;
+    padding-right: 1em;
+    max-width: 650px;
     margin: 0 7px;
 }
 
@@ -67,17 +92,18 @@ body {
 }
 
 .blendTextarea textarea{
-    width: 275px;
+    width: 300px;
     border: none;
     height: 43px;
     border-radius: 4px;
     box-shadow: 1px 1px 5px -1px #333333;
     margin-left: -15px;
+    resize: none;
     font-size: 10px;
 }
 
 .keyframeCol {
-    width: 27%;
+    width: 24%;
 }
 
 .summaryRow {
@@ -88,10 +114,12 @@ body {
 .summaryCol {
     position: relative;
     padding-bottom: 30px;
+    width: 53%;
 }
 
-.selected {
-    background-color: lightgrey;
+.cur-sel-trans-text {
+    background-color: #DBEDFF;
+    padding-top: 1px;
 }
 
 
@@ -152,9 +180,28 @@ video {
     width: 100%;
 }
 
-.add-section {
-    left: 152px;
+.groupRow {
+    position: relative;
+    margin-bottom: 50px;
+}
+
+.add-group-icon {
+    position: absolute;
+    bottom: -26px;
+    left: 17px;
+    color: #797878;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+.add-group-icon:hover {
+    text-decoration: underline;
+}
+
+.add-segment {
+    left: 150px;
     width: 96px;
+    color: #685D5D;
     position: absolute;
     bottom: 0px;
     margin-bottom: 4px;
@@ -175,9 +222,9 @@ video {
 }
 
 .subtract-icon {
-    right: 0px;
+    right: 8px;
     position: absolute;
-    top: -11px;
+    top: -13px;
     color: #7A7575;
     font-size: 19px;
     cursor: pointer;
@@ -196,8 +243,9 @@ video {
     border: none;
     overflow: hidden;
     background-color: inherit;
-    margin-left: 24px;
-/*opacity: 0;*/
+    margin-left: 20px;
+    position: relative;
+    bottom: 3px;
 }
 
 .groupCtrl textarea:active {

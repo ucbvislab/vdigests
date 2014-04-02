@@ -8,9 +8,11 @@ document.ready = (function ($, IUtils) {
     transFontSize: 13,
     summaryIdPrefix: "sumDiv",
     transWrapId: "transcript-wrap",
+    curSelTransTextClass: "cur-sel-trans-text",
     transId: "transcript",
     timelineId: "timeline",
     thumbClass: "img-myThumbnail",
+    numInitSegs: 3,
     ssImgPath: "resources/img/camera-icon.png"
   };
 
@@ -71,7 +73,7 @@ document.ready = (function ($, IUtils) {
   var bindGroupSummaryPlaceholder = function($groupRowDiv) {
     sts.lastGroup = $groupRowDiv.attr('id');
     var $ctrldiv = $('<div>').attr('class', 'groupCtrl');
-    $ctrldiv.append($('<input>').attr('placeholder', 'Subtitle Here'));
+    $ctrldiv.append($('<input>').attr('placeholder', 'Subtitle'));
     $ctrldiv.on('click',function(){
       sts.lastGroup = $groupRowDiv.attr('id');
       console.log("Last group is now: " + sts.groups[sts.lastGroup]);
@@ -84,6 +86,7 @@ document.ready = (function ($, IUtils) {
     var $groupRowDiv = $('<div>')
           .attr('class', 'row groupRow')
           .attr('id', gid);
+
     sts.groups[gid] = groupNumber;
     var $videoCol = $('<div>').attr('class', 'col-xs-6 videoCol');
     //TODO: fix this awfulness
@@ -91,6 +94,14 @@ document.ready = (function ($, IUtils) {
     var $summaryCol = $('<div>').attr('class', 'col-xs-6 summaryCol');
     sts.vn++;
     $videoCol.append($video);
+
+    var $groupIcon = $('<div>').attr('class', 'add-group-icon');
+    $groupIcon.text("+ add group");
+    $groupIcon.on("click", function () {
+      makeNewGroupAndAppend();
+    });
+    $videoCol.append($groupIcon);
+
     $groupRowDiv.append($videoCol);
     $groupRowDiv.append($summaryCol);
 
@@ -102,7 +113,7 @@ document.ready = (function ($, IUtils) {
 
     var $buttonAdd = $('<button>')
           .html('<span class="">+ add segment</span>')
-          .attr('class', 'add-section btn btn-sm')
+          .attr('class', 'add-segment btn btn-sm')
           .click(function(){
             sts.lastGroup = $groupRowDiv.attr('id');
             findGroupSummaryPlaceholder();
@@ -118,10 +129,64 @@ document.ready = (function ($, IUtils) {
     bindGroupSummaryPlaceholder($groupRowDiv);
     $('#outputSummary').append($groupRowDiv);
     sts.groupIndex++;
+    for (var i = 0; i < consts.numInitSegs; i++) {
+      findGroupSummaryPlaceholder();
+    };
     return sts.groupIndex - 1;
   };
 
   //================= CONTROLLER =======================
+
+  var bindGlobalListeners = function () {
+    var $doc = $(document),
+        $trans = $("#" + consts.transId);
+
+    $trans.on("mousedown", function (evt) {
+      // if not inside a selected element, remove the previous selected range
+      // TODO check if shift is pressed
+    });
+    $trans.on("mouseup", function (evt) {
+      // TODO breaks I.E. (use HTML5 shim)
+      var sel = document.getSelection();
+      console.log(sel.type);
+      if (sel.type === "Range") {
+        // TODO if shift is pressed and have a current selection, adjust current
+        // the selected region should behave like standard highlighted text
+        // TODO how to handle overlapping selections?
+        makeSelectionDraggable();
+      }
+    });
+
+    $doc.on("mousedown", function (event) {
+      // deselect selected transcript text if we're not clicking on that text
+      var $tar = $(event.target),
+          curSelTransTextClass = consts.curSelTransTextClass;
+      if (sts.lastSelection.length && !$tar.hasClass(curSelTransTextClass)) {
+        sts.lastSelection.each(function (i, sel) {
+          $(sel).removeClass(curSelTransTextClass)
+            .attr("draggable", false);
+
+        });
+        sts.lastSelection = [];
+      }
+    });
+
+    $doc.on("keypress", function(e){
+      if (e.keyCode === 99) {
+        console.log("Calling captureAndBindThumbClick");
+        captureAndBindThumbClick();
+      } else if (e.keyCode === 49) {
+        console.log("Calling makeNewGroupAndAppend");
+        makeNewGroupAndAppend();
+      } else if (e.keyCode === 48) {
+        console.log("Calling showControlsBindClicks");
+        showControlsBindClicks();
+      } else if (e.keyCode === 50) {
+        findGroupSummaryPlaceholder();
+        console.log("Pressed 2 on Document");
+      }
+    });
+  };
 
   // seek and capture at time
 
@@ -183,7 +248,6 @@ document.ready = (function ($, IUtils) {
           // refresh with current capture
           $(this).replaceWith(addCompleteSummary(sdid, sts.capture));
         }
-
       });
     });
   };
@@ -408,11 +472,12 @@ document.ready = (function ($, IUtils) {
   //     idSuffix: obvious
   // }
   var createTranscriptWordInnerHTML =function(word) {
-    if (word.lineBreak) {
-      return word.word + "<br>";
-    } else {
-      return word.word + " ";
-    }
+    return word.word + " ";
+    // if (word.lineBreak) {
+    //   return word.word + "<br>";
+    // } else {
+    //   return word.word + " ";
+    // }
   };
 
   var createTranscriptWordSpan = function(word) {
@@ -437,7 +502,6 @@ document.ready = (function ($, IUtils) {
   };
 
   //================ END GENERATING TRANSCRIPT VIEW=================
-
 
 
   var makeThumbnail = function(seconds) {
@@ -480,20 +544,21 @@ document.ready = (function ($, IUtils) {
   };
 
   // creates entry in summary dictionary
-  var createSummaryEntryReturnId = function(spanIds, over){
-    var summaryId = consts.summaryIdPrefix + sts.summaryIdIndex;
+  var createSummaryEntryReturnId = function(spanEls, over){
+    var summaryId = consts.summaryIdPrefix + sts.summaryIdIndex,
+        entry;
     sts.summaryIdIndex++;
-    var entry;
+
     // if it isn't blank, then fill in with defaults
     if (!over) {
-      var start_time = $('#'+spanIds[0]).data('start');
-      var end_time = $('#' + spanIds[spanIds.length - 1]).data('end');
+      var start_time = spanEls.eq(0).data('start');
+      var end_time = spanEls.eq(spanEls.length - 1).data('end');
       entry = {
         image_time: getImageTime(start_time, end_time),
         start_time: start_time,
         end_time: end_time,
         text: "",
-        span_ids: $.makeArray(spanIds),
+        span_els: spanEls,
         group: sts.groupIndex
       };
     } else {
@@ -502,7 +567,7 @@ document.ready = (function ($, IUtils) {
         start_time: over.start_time === undefined ? 0.0 : over.start_time,
         end_time: over.end_time === undefined ? 0.0 : over.end_time,
         text: over.text === undefined ? "" : over.text,
-        span_ids: over.span_ids === undefined ? [] : over.span_ids,
+        span_els: over.span_els === undefined ? [] : over.span_ids,
         group: over.group === undefined ? sts.groupIndex : over.group
       };
     }
@@ -521,8 +586,9 @@ document.ready = (function ($, IUtils) {
           .attr('id', sdid)
           .attr('class', ' row summaryRow')
           .on('mouseup', function(){
-            var $spanIds = sts.lastSelection;
-            var sdid = createSummaryEntryReturnId($spanIds);
+            // mouseup on main div TODO move to controller section
+            var $spanEls = sts.lastSelection;
+            var sdid = createSummaryEntryReturnId($spanEls);
           })
           .on('mouseenter', function (evt) {
               $removeEl.show();
@@ -563,33 +629,35 @@ document.ready = (function ($, IUtils) {
     return $textarea;
   };
 
-  var getSpanIds = function(){
+  /**
+   * Return an array of jquery objects corresponding to the currently highlighted span elements
+   */
+  var getSelSpanEls = function(){
     var userSelection = window.getSelection(),
         rangeObject = userSelection.getRangeAt(0);
 
-    var spanIds = null;
+    var $spanEls = null;
     if (rangeObject.startContainer == rangeObject.endContainer) {
-      spanIds = [rangeObject.startContainer.parentNode.id];
+      $spanEls = $(rangeObject.startContainer.parentNode);
     } else {
-      var $sel = IUtils.getAllBetween(
+      $spanEls = IUtils.getAllBetween(
         rangeObject.startContainer.parentNode,
         rangeObject.endContainer.parentNode);
-      spanIds = $sel.map(function(){return $(this).attr('id');});
     }
-    return spanIds;
+    return $spanEls;
   };
 
-  var getSpanIdsCreateSummary = function(){
-    var spanIds = getSpanIds();
+  // var getSpanIdsCreateSummary = function(){
+  //   var spanIds = getSelSpanIds();
 
-    // make the new entry
-    var sdid = createSummaryEntryReturnId(spanIds);
-    seekThenCaptureImgTimes([sts.summaries[sdid].image_time],
-                            [], 0,
-                            function(cap_list){
-                              addCompleteSummary(sdid, cap_list[0]);
-                            });
-  };
+  //   // make the new entry
+  //   var sdid = createSummaryEntryReturnId(spanIds);
+  //   seekThenCaptureImgTimes([sts.summaries[sdid].image_time],
+  //                           [], 0,
+  //                           function(cap_list){
+  //                             addCompleteSummary(sdid, cap_list[0]);
+  //                           });
+  // };
 
   function handleDragStart(e) {
     var ids = $(e.currentTarget.children).map(function(d, item){
@@ -602,27 +670,13 @@ document.ready = (function ($, IUtils) {
 
   }
 
+  /**
+   * Add the appropriate class and draggable property to the current selection of span elements
+   */
   var makeSelectionDraggable = function(){
-    var $spanids = getSpanIds();
-    sts.lastSelection = $spanids;
-    var ids = $.makeArray($spanids);
-    var subids = $(ids)
-          .map(function(){
-            if (this) { return this.split('main')[0] + 'sub';}
-          });
-    subids = $.makeArray(subids);
-    var $subset = $('#'+subids.join(',#')).attr('class', 'selected');
-    var $sel = $('#'+ids.join(',#')).attr('class', 'selected');
-    // find id to append before
-    var detached = $sel.detach();
-    var afterLastId = parseInt(ids[ids.length-1].split('main')[0])+1;
-    var beforeSel = '#' + afterLastId + 'main';
-    var $draggableSpan = $('<span>')
-          .append(detached)
-          .attr('draggable', 'true');
-    $(beforeSel).before($draggableSpan);
-
-    $draggableSpan.on('dragstart', handleDragStart);
+    var $spanels = getSelSpanEls();
+    sts.lastSelection = $spanels;
+    $spanels.addClass(consts.curSelTransTextClass).attr("draggable", true);
   };
 
   var findGroupSummaryPlaceholder = function() {
@@ -640,42 +694,6 @@ document.ready = (function ($, IUtils) {
     createSummaryPlaceholder(lastGroup.key);
   };
 
-  var bindKeypressin = function(){
-    $(document).on("keypress", function(e){
-      if(e.keyCode == 92){
-        console.log("Calling makeSelectionDraggable");
-        makeSelectionDraggable();
-      } else if (e.keyCode === 93) {
-        addTitle();
-      } else if (e.keyCode === 99) {
-        console.log("Calling captureAndBindThumbClick");
-        captureAndBindThumbClick();
-      } else if (e.keyCode === 49) {
-        console.log("Calling makeNewGroupAndAppend");
-        makeNewGroupAndAppend();
-        // CODE to add seperating bar
-        // var $b = $('<div>').attr('class', 'boundary');
-        // var sh = $('#scrolling').scrollTop();
-        // var th = $('#transcript').height();
-        // $b.css('top', - (th - sh - 100) + 'px');
-        // $b.draggable();
-        // $('#transcript').append($b);
-        console.log('appended seperation bar');
-
-        //TODO make better way to do this
-        for (var i = 0; i < 3; i++) {
-          findGroupSummaryPlaceholder();
-        };
-
-      } else if (e.keyCode === 48) {
-        console.log("Calling showControlsBindClicks");
-        showControlsBindClicks();
-      } else if (e.keyCode === 50) {
-        findGroupSummaryPlaceholder();
-        console.log("Pressed 2 on Document");
-      }
-    });
-  };
 
   // // attach scrollbox to timeline, then bind scroll events
   // var createScrollBox = function(timelineId, transcriptId){
@@ -795,7 +813,7 @@ document.ready = (function ($, IUtils) {
         layoutAndAppendParagraphs(transcriptPDict, consts.transId, consts.transFontSize + 'px');
         layoutAndAppendParagraphs(timelinePDict, consts.timelineId, consts.timelineFontSize + 'px');
         attachScrollEvents(consts.timelineId, consts.transId, consts.transWrapId); //, $scrollbox);
-        bindKeypressin();
+        bindGlobalListeners();
       },
       error: function(e){
         console.log('Error occured when loading transcript');
@@ -810,9 +828,7 @@ document.ready = (function ($, IUtils) {
     $('#exported').hide();
     makeNewGroupAndAppend();
     // TODO get better way to do this
-    for (var i = 0; i < 3; i++) {
-      findGroupSummaryPlaceholder();
-    };
+
   };
 
   initialize();
@@ -823,4 +839,6 @@ document.ready = (function ($, IUtils) {
     loadTranscript();
   });
 
+  // REMOVE ME -- TODO FIXME DEVELOPMENT
+$("video").prop('muted', true); //mute: Colorado's tired of hearing Han go on about Swedish students and chimpanzees
 })(window.jQuery, window.IUtils);

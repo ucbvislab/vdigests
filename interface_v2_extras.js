@@ -162,9 +162,10 @@ window.onload = (function($, Canvas2Image) {
   };
 
   IUtils.pDictFromTranscript = function (transcript, characterWidth, idSuffix) {
-    var p = {};
-    var latestSpeaker = 0;
-    for (var i = 0; i < transcript.words.length; i++) {
+    var p = {},
+        latestSpeaker = 0,
+        i;
+    for (i = 0; i < transcript.words.length; i++) {
       var word = transcript.words[i];
       var entry= {
         start: word.start,
@@ -191,7 +192,7 @@ window.onload = (function($, Canvas2Image) {
       p[entry.paragraph].push(entry);
     }
     // now go through and put in the breaks for each paragraph
-    for (var i = 0; i < Object.keys(p).length; i++) {
+    for (i = 0; i < Object.keys(p).length; i++) {
       var key = parseInt(Object.keys(p)[i]);
       var map = Array.prototype.map;
       var strwords = map.call(p[key], function(x) { return x.word; });
