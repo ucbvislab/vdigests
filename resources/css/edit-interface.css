@@ -1,3 +1,9 @@
+@import url(http://weloveiconfonts.com/api/?family=iconicfill);
+/* iconicfill */
+[class*="iconicfill-"]:before {
+  font-family: 'IconicFill', sans-serif;
+}
+
 * {
     box-sizing: border-box;
     color: #3C3C3C;
@@ -17,8 +23,16 @@ body {
     float: left;
     width: 700px;
     height: inherit;
-    background-color: ghostwhite;
     padding-left: 10px;
+    background: rgba(255,255,255,1);
+    border-right: 1px solid #E0E0E0;
+    background: -moz-linear-gradient(left, rgba(255,255,255,1) 0%, rgba(247, 248, 255,1) 100%);
+    background: -webkit-gradient(left top, right top, color-stop(0%, rgba(255,255,255,1)), color-stop(100%, rgba(247, 248, 255,1)));
+    background: -webkit-linear-gradient(left, rgba(255,255,255,1) 0%, rgba(247, 248, 255,1) 100%);
+    background: -o-linear-gradient(left, rgba(255,255,255,1) 0%, rgba(247, 248, 255,1) 100%);
+    background: -ms-linear-gradient(left, rgba(255,255,255,1) 0%, rgba(247, 248, 255,1) 100%);
+    background: linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(247, 248, 255,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f5f6ff', GradientType=1 );
 }
 
 #transcript-wrap {
@@ -53,10 +67,11 @@ body {
 }
 
 .blendTextarea textarea{
-    width: 250px;
+    width: 275px;
     border: none;
-    height: 50px;
-    box-shadow: 1px 1px 8px -1px #333333;
+    height: 43px;
+    border-radius: 4px;
+    box-shadow: 1px 1px 5px -1px #333333;
     margin-left: -15px;
     font-size: 10px;
 }
@@ -67,6 +82,12 @@ body {
 
 .summaryRow {
     padding-bottom: 8px;
+    position: relative;
+}
+
+.summaryCol {
+    position: relative;
+    padding-bottom: 30px;
 }
 
 .selected {
@@ -102,13 +123,20 @@ body {
     background-color: aliceblue;
 }
 .img-myThumbnail {
-    width: 60px;
-    height: 50px;
-    box-shadow: 1px 1px 8px -1px #333333;
+    width: 59px;
+    height: 43px;
+    border-radius: 4px;
+    box-shadow: 1px 1px 5px -1px #575656;
     background-color: white;
 }
 video {
-    box-shadow: 1px 1px 8px -1px #333333;
+    box-shadow: 1px 1px 18px -1px #333333;
+}
+
+.videoCol {
+    width: 306px;
+    margin-left: 5px;
+    margin-right: 21px;
 }
 
 .groupCtrl:hover {
@@ -125,37 +153,50 @@ video {
 }
 
 .add-section {
-    right: 55px;
+    left: 152px;
+    width: 96px;
     position: absolute;
     bottom: 0px;
     margin-bottom: 4px;
     padding: 2px 6px 2px 6px;
-    font-size: .9em;
+    font-size: 11px;
     border-radius: 0px;
-    background: lightgrey;
+    background: white;
+    border-radius: 3px;
     border: 1px #aaaaaa solid;
 }
 
-.subtract-section {
-    right: 25px;
+.add-section:hover {
+    border-color: rgb(114, 114, 182);
+}
+
+.add-section:focus, .subtract-icon:focus {
+    outline: 0;
+}
+
+.subtract-icon {
+    right: 0px;
     position: absolute;
-    bottom: 0px;
-    margin-bottom: 4px;
-    padding: 2px 6px 2px 6px;
-    font-size: .9em;
-    border-radius: 0px;
-    background: lightgrey;
-    border: 1px #aaaaaa solid;
+    top: -11px;
+    color: #7A7575;
+    font-size: 19px;
+    cursor: pointer;
+    display: none;
+    font-weight: bold;
+}
+
+.subtract-icon:hover {
+    color: rgb(189, 1, 1);
 }
 
 .groupCtrl input {
     outline: none;
-    width: 80%;
+    width: 50%;
     font-size: 20px;
     border: none;
     overflow: hidden;
     background-color: inherit;
-    margin-left: 1em;
+    margin-left: 24px;
 /*opacity: 0;*/
 }
 

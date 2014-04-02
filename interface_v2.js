@@ -55,7 +55,7 @@ document.ready = (function ($, IUtils) {
     var $img = $('<img>')
           .attr('class', consts.thumbClass)
           .attr('id', imgid)
-          .attr('src', consts.ssImgPath);
+          .attr("src", consts.ssImgPath);
 
     var cap = {
       $image: $img,
@@ -76,19 +76,6 @@ document.ready = (function ($, IUtils) {
       sts.lastGroup = $groupRowDiv.attr('id');
       console.log("Last group is now: " + sts.groups[sts.lastGroup]);
     });
-    var $buttonAdd = $('<button>')
-          .html('<span class="glyphicon glyphicon-plus"></span>')
-          .attr('class', 'add-section btn btn-sm')
-          .click(function(){
-            sts.lastGroup = $groupRowDiv.attr('id');
-            console.log("Last group is now: " + sts.groups[sts.lastGroup]);
-            findGroupSummaryPlaceholder();
-          });
-    var $buttonSubtract = $('<button>')
-          .html('<span class="glyphicon glyphicon-minus"></span>')
-          .attr('class', 'subtract-section btn btn-sm');
-    $ctrldiv.append($buttonSubtract); $ctrldiv.append($buttonAdd);
-    console.log("Made group control.");
     $groupRowDiv.prepend($ctrldiv);
   };
 
@@ -100,7 +87,7 @@ document.ready = (function ($, IUtils) {
     sts.groups[gid] = groupNumber;
     var $videoCol = $('<div>').attr('class', 'col-xs-6 videoCol');
     //TODO: fix this awfulness
-    var $video = $('<video controls preload="auto" width="350px" height="231px" poster="resources/HansRosling_poster.png"> <source src="resources/HansRosling'+sts.vn+'.mp4" type="video/mp4" /> </video>');
+    var $video = $('<video controls preload="auto" width="315px" height="236px" poster="resources/HansRosling_poster.png"> <source src="resources/HansRosling'+sts.vn+'.mp4" type="video/mp4" /> </video>');
     var $summaryCol = $('<div>').attr('class', 'col-xs-6 summaryCol');
     sts.vn++;
     $videoCol.append($video);
@@ -112,6 +99,15 @@ document.ready = (function ($, IUtils) {
       sts.video = $video[0];
       sts.$video = $video;
     }
+
+    var $buttonAdd = $('<button>')
+          .html('<span class="">+ add segment</span>')
+          .attr('class', 'add-section btn btn-sm')
+          .click(function(){
+            sts.lastGroup = $groupRowDiv.attr('id');
+            findGroupSummaryPlaceholder();
+          });
+    $summaryCol.append($buttonAdd);
 
     return $groupRowDiv;
   };
@@ -517,21 +513,34 @@ document.ready = (function ($, IUtils) {
   };
 
   var makeSummaryDiv = function(sdid) {
+    var $keyframeCol = $('<div>').attr('class', 'col-xs-3 keyframeCol');
+    var $textCol = $('<div>').attr('class', 'col-xs-9 textCol');
+    var $removeEl = $('<div>').attr('class', 'subtract-icon iconicfill-x-alt');
+
     var $mainDiv = $('<div>')
           .attr('id', sdid)
           .attr('class', ' row summaryRow')
           .on('mouseup', function(){
             var $spanIds = sts.lastSelection;
             var sdid = createSummaryEntryReturnId($spanIds);
-
-            //sts.summaries[sdid].group =
-
+          })
+          .on('mouseenter', function (evt) {
+              $removeEl.show();
+          })
+          .on('mouseleave', function (evt) {
+              $removeEl.hide();
           });
-    var $keyframeCol = $('<div>').attr('class', 'col-xs-3 keyframeCol');
-    var $textCol = $('<div>').attr('class', 'col-xs-9 textCol');
 
     $mainDiv.append($keyframeCol);
     $mainDiv.append($textCol);
+    $mainDiv.append($removeEl);
+
+    $removeEl.on('click', function () {
+      if (confirm("Do you want to delete this segment (this can't be undone)?")) {
+        $mainDiv.remove();
+      }
+    });
+
     return $mainDiv;
   };
 
