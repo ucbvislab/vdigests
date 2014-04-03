@@ -20,8 +20,8 @@ document.ready = (function ($, IUtils) {
     assocClass: "summary-associated-text",
     absSummaryClass: "abs-summary",
     transSegClass: "trans-seg",
-    numInitSegs: 3,
-    ssImgPath: "resources/img/camera-icon.png",
+    numInitSegs: 1,
+    ssImgPath: "resources/img/camera-icon-2.png",
     endSegmentClass: "end-segment-word",
     RETURN_KEY_CODE: 13
   };
@@ -104,13 +104,13 @@ document.ready = (function ($, IUtils) {
 
   var createSummaryPlaceholder = function(groupId) {
     var imgid = IUtils.randomId();
-    var $img = $('<img>')
-          .attr('class', consts.thumbClass)
-          .attr('id', imgid)
-          .attr("src", consts.ssImgPath);
+    // var $img = $('<img>')
+    //       .attr('class', consts.thumbClass)
+    //       .attr('id', imgid)
+    //       .attr("src", consts.ssImgPath);
 
     var cap = {
-      $image: $img,
+      $image: null,
       image_id: imgid,
       image_time: 0.0
     };
@@ -239,16 +239,14 @@ document.ready = (function ($, IUtils) {
       }
     });
 
-    $doc.on("keypress", function(e){
+    $doc.on("keydown", function(e){
       // TODO be careful about context (e.g. while a input element isn't focused)
       if (e.keyCode === consts.RETURN_KEY_CODE) {
         e.target.blur();
+        e.stopPropagation();
+        e.preventDefault();
       } else if (e.keyCode === 99) {
         captureAndBindThumbClick();
-      } else if (e.keyCode === 49) {
-        makeNewGroupAndAppend();
-      // } // else if (e.keyCode === 48) {
-        // showControlsBindClicks();
       } else if (e.keyCode === 50) {
         findGroupSummaryPlaceholder();
       }
@@ -397,6 +395,7 @@ document.ready = (function ($, IUtils) {
 
     var $textA = $("<div>").addClass(consts.absSummaryClass);
     $textA.attr("contenteditable", true);
+    $textA.attr("data-ph", "select and drag text from the transcript here");
     $div.find('.textCol')
       .append($textA)
       .attr('class', 'blendTextarea');

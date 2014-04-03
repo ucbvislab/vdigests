@@ -6,7 +6,7 @@
 
 [contentEditable=true]:empty:before{
   content: attr(data-ph);
-  color: grey;
+  color: #888;
   font-style: italic;
 }
 
@@ -31,6 +31,10 @@ body {
     overflow-y: hidden;
 }
 
+#title-wrap {
+    text-align: center;
+}
+
 #maintitle {
     font-size: 24px;
     color: #645C6F;
@@ -39,14 +43,13 @@ body {
     position: relative;
     padding: 0;
     text-align: center;
-    width: 100%;
+    min-width: 200px;
     margin: 0;
     margin-top: 12px;
 }
 
 #maintitle:focus {
     outline: 0;
-    text-decoration: underline;
 }
 
 #outputSummary {
@@ -98,27 +101,42 @@ body {
     height: 900px;
 }
 
-.blendTextarea .abs-summary{
-    padding: 3px 4px;
-    background: white;
+.blendTextarea .abs-summary {
     width: 300px;
     border: none;
-    height: 43px;
     border-radius: 4px;
-    box-shadow: 1px 1px 5px -1px #333333;
     margin-left: 80px;
-    resize: none;
     font-size: 10px;
+    min-height: 43px;
+
+}
+
+.blendTextarea .abs-summary:empty, .blendTextarea .abs-summary:focus {
+    border: 1px dashed #A3A1A1;
+}
+
+.blendTextarea .abs-summary:empty {
+    padding: 3px 4px;
 }
 
 .blendTextarea .abs-summary.linked-summary-focus:focus{
     outline-color: rgb(253, 255, 195);
 }
 
-
-
 .keyframeCol {
-    width: 24%;
+    width: 59px;
+    height: 43px;
+    margin-left: 15px;
+    border-radius: 3px;
+    border: none;
+}
+
+.keyframeCol:empty {
+    border: 1px dashed #A3A1A1;
+    background-image: url('../img/camera-icon-2.png');
+    background-size: 59px 43px;
+    background-repeat: no-repeat;
+    background-position: -1px -1px;
 }
 
 .summaryRow {
@@ -172,13 +190,14 @@ body {
 #addControl {
     background-color: aliceblue;
 }
+
 .img-myThumbnail {
-    width: 59px;
+    position: relative;
+    border: 1px solid #555555;
+    right: 20px;
     height: 43px;
-    border-radius: 3px;
-    box-shadow: 1px 1px 5px -1px #575656;
-    background-color: white;
 }
+
 video {
     box-shadow: 1px 1px 18px -1px #333333;
 }
@@ -222,23 +241,27 @@ video {
 .add-segment {
     left: 150px;
     width: 96px;
-    color: #685D5D;
+    color: #C5C3C3;
     position: absolute;
-    bottom: 0px;
+    bottom: -7px;
     margin-bottom: 4px;
     padding: 2px 6px 2px 6px;
     font-size: 11px;
-    border-radius: 0px;
-    background: white;
+    background: transparent;
     border-radius: 3px;
     border: 1px #aaaaaa solid;
 }
 
-.add-section:hover {
-    border-color: rgb(114, 114, 182);
+.add-segment span {
+    color: #868686;
 }
 
-.add-section:focus, .subtract-icon:focus {
+.add-segment:hover {
+    border-color: #333;
+    color: #333;
+}
+
+.add-segment:focus, .subtract-icon:focus {
     outline: 0;
 }
 
