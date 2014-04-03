@@ -18,6 +18,7 @@ document.ready = (function ($, IUtils) {
     timelineId: "timeline",
     thumbClass: "img-myThumbnail",
     assocClass: "summary-associated-text",
+    absSummaryClass: "abs-summary",
     transSegClass: "trans-seg",
     numInitSegs: 3,
     ssImgPath: "resources/img/camera-icon.png",
@@ -216,7 +217,7 @@ document.ready = (function ($, IUtils) {
               },
               function () {
                 console.log("scroll complete");
-                $sumEl.find("textarea").focus();
+                $sumEl.find("." + consts.absSummaryClass).focus();
               }
             );
           }
@@ -228,7 +229,7 @@ document.ready = (function ($, IUtils) {
       // deselect selected transcript text if we're not clicking on that text
       var $tar = $(event.target),
           curSelTransTextClass = consts.curSelTransTextClass;
-      if (sts.lastSelection.length && !$tar.hasClass(curSelTransTextClass) && document.activeElement.nodeName !== "TEXTAREA") {
+      if (sts.lastSelection.length && !$tar.hasClass(curSelTransTextClass) && !$(document.activeElement).hasClass(consts.absSummaryClass)) {
         sts.lastSelection.each(function (i, sel) {
           $(sel).removeClass(curSelTransTextClass)
             .attr("draggable", false);
@@ -370,9 +371,9 @@ document.ready = (function ($, IUtils) {
       }
       $(this).css('opacity', '1');
       eDroppedOnEl(evt, $(this));
-      var $ftextarea = $($el.find('textarea'));
+      var $ftextarea = $($el.find('.' + consts.absSummaryClass));
       $ftextarea.focus();
-      $ftextarea.attr("placeholder", "provide a brief summary of the highlighted text");
+      $ftextarea.attr("data-ph", "provide a brief summary of the highlighted text");
       $ftextarea.addClass(consts.linkedFocusTextAreaClass);
       // don't fill the textarea with text
       evt.preventDefault();
@@ -394,10 +395,11 @@ document.ready = (function ($, IUtils) {
     // COLO TODO this shouldn't go here
     $($('.groupRow')[group]).find('.summaryCol').append($div);
 
+    var $textA = $("<div>").addClass(consts.absSummaryClass);
+    $textA.attr("contenteditable", true);
     $div.find('.textCol')
-      .append('<textarea>')
+      .append($textA)
       .attr('class', 'blendTextarea');
-    var $textA = $div.find('textarea');
     $textA.on("blur", handleSummaryChange);
     $textA.on("focus", function (evt) {
       var curTar = evt.currentTarget,
@@ -435,50 +437,6 @@ document.ready = (function ($, IUtils) {
     }
     return $div;
   };
-
-  // var showControlsBindClicks = function() {
-  //   $('#controls').show();
-  //   $('#addControl').hide();
-  //   $('#exportBtn').on("click", function(){
-  //     var k = sts.summaries;
-  //     var keys = Object.keys(k);
-  //     for (var i = 0; i < keys.length; i++) {
-  //       if (k[keys[i]].text === "") {
-  //         delete k[keys[i]];
-  //       };
-  //     };
-  //     $('#addControl').show();
-  //     $('#addControl').append('<textarea>');
-  //     $('#addControl').find('textarea').val(JSON.stringify(k));
-  //   });
-  //   $('#importBtn').on('click',function(){
-  //     $('#addControl').show();
-  //     $('#addControl').append('<textarea>');
-  //     $('#addControl').on('keypress', function (e){
-  //       if (e.keyCode === consts.RETURN_KEY_CODE) {
-  //         $('#addControl').hide();
-  //         var t = $('#addControl').find('textarea').val();
-  //         $('#addControl').find('textarea').remove();
-  //         var json = JSON.parse(t);
-  //         var j = json;
-  //         sts.summaries = j;
-  //         var image_times = [];
-  //         for (var i = 0; i < Object.keys(sts.summaries).length; i++) {
-  //           var key = Object.keys(sts.summaries)[i];
-  //           image_times.push(sts.summaries[key].image_time);
-  //         }
-  //         seekThenCaptureImgTimes(image_times, [], 0, function(captures){
-  //           for (var i = 0; i < captures.length; i++) {
-  //             var key = Object.keys(sts.summaries)[i];
-  //             addCompleteSummary(key, captures[i]);
-  //           };
-  //         });
-  //         $('#controls').hide();
-  //       }
-  //     });
-  //   });
-  // }
-  ;
 
 
   //================ GENERATING TRANSCRIPT VIEW=================
@@ -595,24 +553,24 @@ document.ready = (function ($, IUtils) {
     return $mainDiv;
   };
 
-  var makeAndAppendFirstKeyframe = function(sdid, $summaryDiv) {
-    var $imgDiv = $('<div>');
+  // var makeAndAppendFirstKeyframe = function(sdid, $summaryDiv) {
+  //   var $imgDiv = $('<div>');
 
-    $summaryDiv.find('.keyframeCol').append($imgDiv);
+  //   $summaryDiv.find('.keyframeCol').append($imgDiv);
 
-    sts.video.currentTime = sts.summaries[sdid].image_time;
+  //   sts.video.currentTime = sts.summaries[sdid].image_time;
 
-    $(sts.video).one("seeked", function(){
-      IUtils.capture($imgDiv);
-      $imgDiv.find('img').attr('class', 'img-thumbnail');
-    });
-  };
+  //   $(sts.video).one("seeked", function(){
+  //     IUtils.capture($imgDiv);
+  //     $imgDiv.find('img').attr('class', 'img-thumbnail');
+  //   });
+  // };
 
-  var makeAndAppendTextarea = function(sdid, $summaryDiv) {
-    var $textarea = $('<textarea>').attr('class', 'blendTextarea');
-    $summaryDiv.find('.textCol').append($textarea);
-    return $textarea;
-  };
+  // var makeAndAppendTextarea = function(sdid, $summaryDiv) {
+  //   var $textarea = $('<textarea>').attr('class', 'blendTextarea');
+  //   $summaryDiv.find('.textCol').append($textarea);
+  //   return $textarea;
+  // };
 
   /**
    * Return an array of jquery objects corresponding to the currently highlighted span elements
