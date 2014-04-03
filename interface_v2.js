@@ -41,7 +41,6 @@ document.ready = (function ($, IUtils) {
     vn: 0
   };
 
-
   // helper functions
   var handleSummaryChange = function(e){
     var $this = $(this),
@@ -59,7 +58,7 @@ document.ready = (function ($, IUtils) {
 
     var $spanEls = sts.lastSelection;
     if ($spanEls.length) {
-      createSummaryEntryReturnId($spanEls);
+      //createSummaryEntryReturnId($spanEls);
       // mark span els as associated
       var curSelClass = consts.curSelTransTextClass,
           assocClass = consts.assocClass;
@@ -184,7 +183,7 @@ document.ready = (function ($, IUtils) {
 
   var bindGlobalListeners = function () {
     var $doc = $(document),
-        $trans = $("#" + consts.transId);
+        $trans = $("#" + consts.transWrapId);
 
     $trans.on("mousedown", function (evt) {
       // if not inside a selected element, remove the previous selected range
@@ -557,9 +556,13 @@ document.ready = (function ($, IUtils) {
     $mainDiv.append($textCol);
     $mainDiv.append($removeEl);
 
-    $removeEl.on('click', function () {
+    $removeEl.on('click', function (evt) {
       if (confirm("Do you want to delete this segment (this can't be undone)?")) {
-        // TODO remove the model data
+        var mainId = $mainDiv.attr("id"),
+            segId = sts.sumToTransWrapId[mainId];
+        $("#" + segId).contents().unwrap();
+        delete sts.sumToTransWrapId[mainId];
+        delete sts.summaries[mainId];
         $mainDiv.remove();
       }
     });
