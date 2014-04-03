@@ -58,7 +58,6 @@ document.ready = (function ($, IUtils) {
 
     var $spanEls = sts.lastSelection;
     if ($spanEls.length) {
-      //createSummaryEntryReturnId($spanEls);
       // mark span els as associated
       var curSelClass = consts.curSelTransTextClass,
           assocClass = consts.assocClass;
@@ -279,7 +278,7 @@ document.ready = (function ($, IUtils) {
           sts.summaries[sdid].image_id = sts.capture.image_id;
           sts.summaries[sdid].image_change = true;
           // add current capture
-          $this.find('.' + consts.keyFrameCol).html(sts.capture);
+          $this.find('.' + consts.keyFrameCol).html(sts.capture.$image);
         }
       });
     });
