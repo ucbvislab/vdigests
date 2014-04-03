@@ -9,11 +9,12 @@
     color: #3C3C3C;
 }
 
-::selection {
-	background: #DBEDFF;
+#transcript-wrap *::selection {
+	background: rgb(253, 255, 195);
 	}
-::-moz-selection {
-	background: #DBEDFF;
+
+#transcript-wrap *::-moz-selection {
+	background: rgb(253, 255, 195);
 }
 
 body {
@@ -102,6 +103,10 @@ body {
     font-size: 10px;
 }
 
+.blendTextarea textarea.linked-summary-focus:focus{
+    outline-color: rgb(253, 255, 195);
+}
+
 .keyframeCol {
     width: 24%;
 }
@@ -117,11 +122,18 @@ body {
     width: 53%;
 }
 
-.cur-sel-trans-text {
-    background-color: #DBEDFF;
+.trans-seg{
+    border-right: 4px solid red;
+}
+.trans-seg .word{
     padding-top: 1px;
+    background-color: rgb(217, 232, 248);
 }
 
+.cur-sel-trans-text, .highlight-trans .word {
+    background-color: rgb(253, 255, 195);
+    padding-top: 1px;
+}
 
 #summary {
     float: left;
@@ -174,15 +186,14 @@ video {
 .groupCtrl {
     background-color: none;
     height: 30px;
-    opacity: 1;
-    text-align: left;
-    position: relative;
-    width: 100%;
+    display: inline-block;
+    width: 85%;
 }
 
 .groupRow {
     position: relative;
     margin-bottom: 50px;
+    width: inherit;
 }
 
 .add-group-icon {
@@ -222,7 +233,7 @@ video {
 }
 
 .subtract-icon {
-    right: 8px;
+    right: 0;
     position: absolute;
     top: -13px;
     color: #7A7575;

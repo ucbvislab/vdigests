@@ -6,14 +6,22 @@ document.ready = (function ($, IUtils) {
     docHeight: 900,
     timelineFontSize: 2,
     transFontSize: 13,
+    linkedFocusTextAreaClass: 'linked-summary-focus',
+    hightlightTransClass: 'highlight-trans',
     summaryIdPrefix: "sumDiv",
+    eventsAddedData: "events-added",
     transWrapId: "transcript-wrap",
+    keyFrameCol: "keyframeCol",
     curSelTransTextClass: "cur-sel-trans-text",
     transId: "transcript",
     timelineId: "timeline",
     thumbClass: "img-myThumbnail",
+    assocClass: "summary-associated-text",
+    transSegClass: "trans-seg",
     numInitSegs: 3,
-    ssImgPath: "resources/img/camera-icon.png"
+    ssImgPath: "resources/img/camera-icon.png",
+    endSegmentClass: "end-segment-word",
+    RETURN_KEY_CODE: 13
   };
 
   // state: changes
@@ -29,7 +37,47 @@ document.ready = (function ($, IUtils) {
     groups: {},
     lastGroup: "",
     lastSelection:[],
+    sumToTransWrapId: {},
     vn: 0
+  };
+
+
+  // helper functions
+  var handleSummaryChange = function(e){
+    var $this = $(this),
+        $thisGP = $(this.parentElement.parentElement),
+        sdid = $thisGP.attr("id"),
+        cap = {};
+
+    //record text
+    sts.summaries[sdid].text = $this.val();
+    //update summary
+    sts.summaries[sdid].text_change = false;
+    cap.$image = $thisGP.find('img');
+    cap.image_id = $thisGP.find('img').attr('id');
+    cap.image_time = sts.summaries[sdid].image_time;
+
+    var $spanEls = sts.lastSelection;
+    if ($spanEls.length) {
+      createSummaryEntryReturnId($spanEls);
+      // mark span els as associated
+      var curSelClass = consts.curSelTransTextClass,
+          assocClass = consts.assocClass;
+
+      $spanEls.removeClass(curSelClass);
+      $spanEls.attr("draggable", false);
+      var $segWrap = $("<span>");
+      $segWrap.addClass(consts.transSegClass);
+      var lastEl = $spanEls.eq($spanEls.length-1);
+      $segWrap.attr("draggable", true).attr("id", $spanEls.get(0).id + lastEl.attr("id") + "-swrap");
+
+      $spanEls.eq(0).nextUntil(lastEl).andSelf().add(lastEl).wrapAll($segWrap);
+      sts.sumToTransWrapId[sdid] = $segWrap.attr("id");
+      sts.lastSelection = [];
+    } else {
+      $("#" + sts.sumToTransWrapId[sdid]).removeClass(consts.hightlightTransClass);
+    }
+    $this.removeClass(consts.linkedFocusTextAreaClass);
   };
 
   // Global listeners
@@ -48,7 +96,6 @@ document.ready = (function ($, IUtils) {
 
   //============== INTERFACE CONTROLS ==================
   var addTitle = function() {
-    console.log("Adding title to group: " + sts.lastGroup);
     // $('#'+sts.lastGroup);
   };
 
@@ -66,7 +113,7 @@ document.ready = (function ($, IUtils) {
     };
 
     var sdid = createSummaryEntryReturnId([], {group: sts.groups[groupId]});
-    addCompleteSummary(sdid, cap);
+    var $sdiv = addCompleteSummary(sdid, cap);
     // TODO bind mouseup
   };
 
@@ -76,7 +123,6 @@ document.ready = (function ($, IUtils) {
     $ctrldiv.append($('<input>').attr('placeholder', 'Subtitle'));
     $ctrldiv.on('click',function(){
       sts.lastGroup = $groupRowDiv.attr('id');
-      console.log("Last group is now: " + sts.groups[sts.lastGroup]);
     });
     $groupRowDiv.prepend($ctrldiv);
   };
@@ -124,7 +170,6 @@ document.ready = (function ($, IUtils) {
   };
 
   var makeNewGroupAndAppend = function(){
-    console.log("Making new group.");
     var $groupRowDiv = makeGroupRow(sts.groupIndex);
     bindGroupSummaryPlaceholder($groupRowDiv);
     $('#outputSummary').append($groupRowDiv);
@@ -148,7 +193,6 @@ document.ready = (function ($, IUtils) {
     $trans.on("mouseup", function (evt) {
       // TODO breaks I.E. (use HTML5 shim)
       var sel = document.getSelection();
-      console.log(sel.type);
       if (sel.type === "Range") {
         // TODO if shift is pressed and have a current selection, adjust current
         // the selected region should behave like standard highlighted text
@@ -161,7 +205,7 @@ document.ready = (function ($, IUtils) {
       // deselect selected transcript text if we're not clicking on that text
       var $tar = $(event.target),
           curSelTransTextClass = consts.curSelTransTextClass;
-      if (sts.lastSelection.length && !$tar.hasClass(curSelTransTextClass)) {
+      if (sts.lastSelection.length && !$tar.hasClass(curSelTransTextClass) && document.activeElement.nodeName !== "TEXTAREA") {
         sts.lastSelection.each(function (i, sel) {
           $(sel).removeClass(curSelTransTextClass)
             .attr("draggable", false);
@@ -172,30 +216,24 @@ document.ready = (function ($, IUtils) {
     });
 
     $doc.on("keypress", function(e){
-      if (e.keyCode === 99) {
-        console.log("Calling captureAndBindThumbClick");
+      // TODO be careful about context (e.g. while a input element isn't focused)
+      if (e.keyCode === consts.RETURN_KEY_CODE) {
+        e.target.blur();
+      } else if (e.keyCode === 99) {
         captureAndBindThumbClick();
       } else if (e.keyCode === 49) {
-        console.log("Calling makeNewGroupAndAppend");
         makeNewGroupAndAppend();
-      } else if (e.keyCode === 48) {
-        console.log("Calling showControlsBindClicks");
-        showControlsBindClicks();
+      // } // else if (e.keyCode === 48) {
+        // showControlsBindClicks();
       } else if (e.keyCode === 50) {
         findGroupSummaryPlaceholder();
-        console.log("Pressed 2 on Document");
       }
     });
   };
 
   // seek and capture at time
-
   var seekThenCaptureImgTimes = function(time_list, cap_list, i, callback) {
-
     var vid = sts.video;
-
-    console.log("seekThen", cap_list);
-
     if (i < time_list.length) {
       // set current time to timelist
       vid.currentTime = time_list[i];
@@ -207,7 +245,6 @@ document.ready = (function ($, IUtils) {
         cap.image_id = IUtils.randomId();
 
         var uri = IUtils.capture(sts.video);
-        console.log(uri);
         cap.$image = $(uri)
           .attr('class', 'img-myThumbnail')
           .attr('id', cap.image_id);
@@ -219,7 +256,6 @@ document.ready = (function ($, IUtils) {
         seekThenCaptureImgTimes(time_list, cap_list, i+1, callback);
       });
     } else {
-      console.log("Done capturing images.");
       callback(cap_list);
     }
   };
@@ -236,17 +272,15 @@ document.ready = (function ($, IUtils) {
       $('.summaryRow').on("click", function(event){
         event.stopPropagation();
         if (event.target.classList[0] === "img-myThumbnail") {
-          console.log("Thumbnail clicked.");
           // unbind the click
           $('.summaryRow').unbind("click");
-          // $(this).replaceWith(img);
-          // var sdid = $(this).parent().parent().parent().attr('id');
-          var sdid = $(this).attr('id');
+          var $this = $(this),
+              sdid = $(this).attr('id');
           sts.summaries[sdid].image_time = sts.capture.image_time;
           sts.summaries[sdid].image_id = sts.capture.image_id;
           sts.summaries[sdid].image_change = true;
-          // refresh with current capture
-          $(this).replaceWith(addCompleteSummary(sdid, sts.capture));
+          // add current capture
+          $this.find('.' + consts.keyFrameCol).html(sts.capture);
         }
       });
     });
@@ -256,6 +290,7 @@ document.ready = (function ($, IUtils) {
   // change start time, end time, and image time then
   var eDroppedOnEl = function(e, $el){
     var data = e.originalEvent.dataTransfer.getData('text/html');
+
     var ids = [];
 
     $(data).each(function(){
@@ -265,7 +300,6 @@ document.ready = (function ($, IUtils) {
       }
     });
 
-    console.log(ids);
     var sumId = $el.attr('id');
 
     var st = $('#' + ids[0]).data('start');
@@ -279,7 +313,7 @@ document.ready = (function ($, IUtils) {
     sts.summaries[sumId].text_change = true;
 
     seekThenCaptureImgTimes([st+(et-st)/2], [], 0, function(captures){
-      $el.replaceWith(addCompleteSummary(sumId, captures[0]));
+      $el.find('.' + consts.keyFrameCol).html(captures[0].$image);
     });
   };
 
@@ -294,38 +328,71 @@ document.ready = (function ($, IUtils) {
   }
 
   var bindDragHandle = function($el){
-    $el.on('dragenter', function(){
+    $el.on('dragover', function(evt){
       $(this).css('opacity', '0.5');
+      evt.stopPropagation();
+    });
+    $el.on('dragenter', function(evt){
+      $(this).css('opacity', '0.5');
+      evt.stopPropagation();
     });
     $el.on('dragleave', function(){
       $(this).css('opacity', '1');
     });
-    $el.on('drop', function(e){
+    $el.on('drop', function(evt){
+      console.log("drop");
       var v = keyWhereValue(sts.groups,sts.summaries[$(this).attr('id')].group);
       if (v != undefined) {
         sts.lastGroup = v;
       }
       $(this).css('opacity', '1');
-      eDroppedOnEl(e, $(this));
+      eDroppedOnEl(evt, $(this));
+      var $ftextarea = $($el.find('textarea'));
+      $ftextarea.focus();
+      $ftextarea.attr("placeholder", "provide a brief summary of the highlighted text");
+      $ftextarea.addClass(consts.linkedFocusTextAreaClass);
+      // don't fill the textarea with text
+      evt.preventDefault();
     });
   };
 
+  /**
+   * This function adds a complete summary [placeholder] with a specified id and capture object
+   * this should only be called when creating a new summary (don't replace old ones)
+   */
   var addCompleteSummary = function(sdid, capture) {
-    console.log("Adding summary with: ");
-    console.log("sdid: " + sdid);
-    console.log(capture);
+    var $div = makeSummaryDiv(sdid),
+        group = sts.summaries[sdid].group;
 
-    var $div = makeSummaryDiv(sdid);
     bindDragHandle($div);
-
-    var group = sts.summaries[sdid].group;
     while (group > $('.groupRow').length - 1) {
       makeNewGroupAndAppend();
     }
+    // COLO TODO this shouldn't go here
     $($('.groupRow')[group]).find('.summaryCol').append($div);
 
-    // append the capture
-    $div.find('.keyframeCol').append(capture.$image);
+    $div.find('.textCol')
+      .append('<textarea>')
+      .attr('class', 'blendTextarea');
+    var $textA = $div.find('textarea');
+    $textA.on("blur", handleSummaryChange);
+    $textA.on("focus", function (evt) {
+      var curTar = evt.currentTarget,
+          transSpanId = sts.sumToTransWrapId[$div.attr("id")];
+      console.log( transSpanId );
+      var $transSpan = $("#" + transSpanId);
+      if ($transSpan.length) {
+        $transSpan.addClass(consts.hightlightTransClass);
+        $textA.addClass(consts.linkedFocusTextAreaClass);
+        $("#transcript-wrap").scrollTo($transSpan, {offsetTop : $textA.offset().top});
+          // $('#transcript-wrap').animate({
+          //   scrollTop: $transSpan.position().top
+          // }, 800);
+      }
+
+      // get the transcript div and highlight
+      // form a dict that links to the transcript and vice-versa and highlight back and forth
+    });
 
     // TODO bind click to play
     // $div.on("click", function(){
@@ -337,125 +404,58 @@ document.ready = (function ($, IUtils) {
     //     video.play();
     //   });
 
-    if (sts.summaries[sdid].text === "" && !sts.summaries[sdid].image_change){
-      // add text area to enter summary
-      $div.find('.textCol')
-        .append('<textarea>')
-        .attr('class', 'blendTextarea');
+    // place the capture
+    $div.find('.' + consts.keyFrameCol).html(capture.$image);
 
-      // bind enter to updating the summary
-      $div.find('textarea').on("keypress", function(e){
-        if (e.keyCode === 13) {
-          // get sdid
-          var sdid = $(this).parent().parent().attr('id');
-          //record text
-          sts.summaries[sdid].text = $(this).val();
-          //update summary
-          sts.summaries[sdid].text_change = false;
-
-          var cap = {};
-          cap.$image = $(this).parent().parent().find('img');
-          cap.image_id = $(this).parent().parent().find('img').attr('id');
-          cap.image_time = sts.summaries[sdid].image_time;
-
-          $div.replaceWith(addCompleteSummary(sdid, cap));
-        }
-      });
-
-    } else if (sts.summaries[sdid].text_change === true) {
-      var rid = IUtils.randomId();
-
-      // update to have text instead of textarea
-
-      // old code: puts text in textarea when you drag and drop
-      // $div.find('.textCol')
-      //   .append('<textarea>')
-      //   .attr('rid', rid)
-      //   .attr('class', 'blendTextarea')
-      // $div.find('textarea')
-      //   .html(replaceAll(' {p}','',sts.summaries[sdid].text));
-
-      //new code: puts text as placeholder in textarea when you drag and drop
-      var $ta = $('<textarea>')
-            .attr('placeholder', IUtils.replaceAll(' {p}','',sts.summaries[sdid].text));
-
-      $div.find('.textCol')
-        .append($ta)
-        .attr('rid', rid)
-        .attr('class', 'blendTextarea');
-      // end new code
-
-      $div.find('textarea').on("keypress", function(e){
-        if (e.keyCode === 13) {
-          // get sdid
-          var sdid = $(this).parent().parent().attr('id');
-          //record text
-          sts.summaries[sdid].text = $(this).val();
-          //update summary
-          sts.summaries[sdid].text_change = false;
-          var cap = {};
-          cap.$image = $(this).parent().parent().find('img');
-          cap.image_id = $(this).parent().parent().find('img').attr('id');
-          cap.image_time = sts.summaries[sdid].image_time;
-
-          $div.replaceWith(addCompleteSummary(sdid, cap));
-        }
-      });
-
-    } else {
-      $div.find('.textCol').append($('<p>'))
-        .html($('<p>').html(sts.summaries[sdid].text));
-    }
     if (sts.summaries[sdid].image_change) {
       sts.summaries[sdid].image_change = false;
     }
     return $div;
   };
 
-  var showControlsBindClicks = function() {
-    $('#controls').show();
-    $('#addControl').hide();
-    $('#exportBtn').on("click", function(){
-      console.log(sts.summaries);
-      var k = sts.summaries;
-      var keys = Object.keys(k);
-      for (var i = 0; i < keys.length; i++) {
-        if (k[keys[i]].text === "") {
-          delete k[keys[i]];
-        };
-      };
-      $('#addControl').show();
-      $('#addControl').append('<textarea>');
-      $('#addControl').find('textarea').val(JSON.stringify(k));
-    });
-    $('#importBtn').on('click',function(){
-      $('#addControl').show();
-      $('#addControl').append('<textarea>');
-      $('#addControl').on('keypress', function (e){
-        if (e.keyCode === 13) {
-          $('#addControl').hide();
-          var t = $('#addControl').find('textarea').val();
-          $('#addControl').find('textarea').remove();
-          console.log(t);
-          var json = JSON.parse(t);
-          var j = json;
-          sts.summaries = j;
-          var image_times = [];
-          for (var i = 0; i < Object.keys(sts.summaries).length; i++) {
-            var key = Object.keys(sts.summaries)[i];
-            image_times.push(sts.summaries[key].image_time);
-          }
-          seekThenCaptureImgTimes(image_times, [], 0, function(captures){
-            for (var i = 0; i < captures.length; i++) {
-              var key = Object.keys(sts.summaries)[i];
-              addCompleteSummary(key, captures[i]);
-            };
-          });
-          $('#controls').hide();
-        }
-      });
-    });
-  };
+  // var showControlsBindClicks = function() {
+  //   $('#controls').show();
+  //   $('#addControl').hide();
+  //   $('#exportBtn').on("click", function(){
+  //     var k = sts.summaries;
+  //     var keys = Object.keys(k);
+  //     for (var i = 0; i < keys.length; i++) {
+  //       if (k[keys[i]].text === "") {
+  //         delete k[keys[i]];
+  //       };
+  //     };
+  //     $('#addControl').show();
+  //     $('#addControl').append('<textarea>');
+  //     $('#addControl').find('textarea').val(JSON.stringify(k));
+  //   });
+  //   $('#importBtn').on('click',function(){
+  //     $('#addControl').show();
+  //     $('#addControl').append('<textarea>');
+  //     $('#addControl').on('keypress', function (e){
+  //       if (e.keyCode === consts.RETURN_KEY_CODE) {
+  //         $('#addControl').hide();
+  //         var t = $('#addControl').find('textarea').val();
+  //         $('#addControl').find('textarea').remove();
+  //         var json = JSON.parse(t);
+  //         var j = json;
+  //         sts.summaries = j;
+  //         var image_times = [];
+  //         for (var i = 0; i < Object.keys(sts.summaries).length; i++) {
+  //           var key = Object.keys(sts.summaries)[i];
+  //           image_times.push(sts.summaries[key].image_time);
+  //         }
+  //         seekThenCaptureImgTimes(image_times, [], 0, function(captures){
+  //           for (var i = 0; i < captures.length; i++) {
+  //             var key = Object.keys(sts.summaries)[i];
+  //             addCompleteSummary(key, captures[i]);
+  //           };
+  //         });
+  //         $('#controls').hide();
+  //       }
+  //     });
+  //   });
+  // }
+  ;
 
 
   //================ GENERATING TRANSCRIPT VIEW=================
@@ -481,7 +481,6 @@ document.ready = (function ($, IUtils) {
   };
 
   var createTranscriptWordSpan = function(word) {
-
     var $span = $('<span>')
           .addClass('word')
           .attr('id', word.overallIndex + ""+ word.idSuffix)
@@ -492,7 +491,6 @@ document.ready = (function ($, IUtils) {
           .data("paragraph", word.paragraph)
           .data("ind", word.overallIndex)
           .on("click", function(){
-            console.log($(this).data('word') + "  " + $(this).data('start'));
             var video = sts.video;
             video.currentTime = $(this).data('start');
             video.play();
@@ -502,42 +500,6 @@ document.ready = (function ($, IUtils) {
   };
 
   //================ END GENERATING TRANSCRIPT VIEW=================
-
-
-  var makeThumbnail = function(seconds) {
-    // change video time to this time
-    var video = sts.video;
-    video.currentTime = seconds;
-    video.pause();
-
-    var pic = IUtils.capture(sts.video);
-    return pic;
-  };
-
-  var saveSummary = function(textarea, $summaryDiv) {
-    // get text from text area
-    var taText = $(textarea).val();
-    // transfer style to paragraph
-    var taStyle = $(textarea).attr('style');
-    // delete text area
-
-    var sdid = $summaryDiv.attr('id');
-    console.log("Updating Status, Text, Style for " + sdid);
-    sts.summaries[sdid].text = taText;
-    sts.summaries[sdid].textStyle = taStyle;
-    sts.summaries[sdid].state = 2;
-    // TODO
-    alert("TODO refreshSummary is missing");
-    //refreshSummary(sdid);
-  };
-
-  var bindSummarySave = function($summaryDiv) {
-    $summaryDiv.find('textarea').on("keypress", function(e){
-      if (e.keyCode === 13) {
-        saveSummary(this, $summaryDiv);
-      }
-    });
-  };
 
   var getImageTime = function(start, end) {
     return (end-start)/2 + start;
@@ -573,7 +535,6 @@ document.ready = (function ($, IUtils) {
     }
 
     sts.summaries[summaryId] = entry;
-    console.log("Created summary entry with ID: " + summaryId);
     return summaryId;
   };
 
@@ -585,16 +546,11 @@ document.ready = (function ($, IUtils) {
     var $mainDiv = $('<div>')
           .attr('id', sdid)
           .attr('class', ' row summaryRow')
-          .on('mouseup', function(){
-            // mouseup on main div TODO move to controller section
-            var $spanEls = sts.lastSelection;
-            var sdid = createSummaryEntryReturnId($spanEls);
-          })
           .on('mouseenter', function (evt) {
-              $removeEl.show();
+            $removeEl.show();
           })
           .on('mouseleave', function (evt) {
-              $removeEl.hide();
+            $removeEl.hide();
           });
 
     $mainDiv.append($keyframeCol);
@@ -603,6 +559,7 @@ document.ready = (function ($, IUtils) {
 
     $removeEl.on('click', function () {
       if (confirm("Do you want to delete this segment (this can't be undone)?")) {
+        // TODO remove the model data
         $mainDiv.remove();
       }
     });
@@ -647,18 +604,6 @@ document.ready = (function ($, IUtils) {
     return $spanEls;
   };
 
-  // var getSpanIdsCreateSummary = function(){
-  //   var spanIds = getSelSpanIds();
-
-  //   // make the new entry
-  //   var sdid = createSummaryEntryReturnId(spanIds);
-  //   seekThenCaptureImgTimes([sts.summaries[sdid].image_time],
-  //                           [], 0,
-  //                           function(cap_list){
-  //                             addCompleteSummary(sdid, cap_list[0]);
-  //                           });
-  // };
-
   function handleDragStart(e) {
     var ids = $(e.currentTarget.children).map(function(d, item){
       return $(item).attr('id');
@@ -667,7 +612,6 @@ document.ready = (function ($, IUtils) {
     e.originalEvent.dataTransfer.dropEffect = "move";
     e.originalEvent.dataTransfer.setData('text/html', e.currentTarget.innerHTML);
     e.data = {id_list: id_list};
-
   }
 
   /**
@@ -694,108 +638,19 @@ document.ready = (function ($, IUtils) {
     createSummaryPlaceholder(lastGroup.key);
   };
 
-
-  // // attach scrollbox to timeline, then bind scroll events
-  // var createScrollBox = function(timelineId, transcriptId){
-
-  //   var $timeline = $('#' + timelineId);
-  //   var $transcript = $('#' + transcriptId);
-  //   var timeHeight = $timeline[0].scrollHeight;
-  //   var timeWidth = IUtils.getIntFromPx($timeline.css("width"));
-
-  //   // how much of the timeline is in the transcript view?
-  //   console.log("Constructing Scroll Box");
-  //   var docHeight = consts.docHeight;
-  //   var transHeight = $transcript[0].scrollHeight;
-  //   var scrollBoxHeight = timeHeight*(docHeight/transHeight);
-
-  //   var $scrollBox = $('<div>')
-  //         .attr('id', 'scrollView')
-  //         .css({
-  //           position: 'absolute',
-  //           top: '0px',
-  //           left: '0px',
-  //           opacity: .1,
-  //           'background-color': 'black',
-  //           width: timeWidth,
-  //           height: scrollBoxHeight + 8
-  //         });
-
-  //   $timeline.append($scrollBox);
-
-  //   return $scrollBox;
-  // };
-
-  // input looks like {<paragraph number>: [{
-  //     paragraph: <paragraph number>,
-  //     start: <start time>,
-  //     end: <end time>,
-  //     aligned: <aligned word>,
-  //     word: <original word>,
-  //     lineBreak: <yes if break should be put after>,
-  //     overallIndex: <word index in transcript>
-  // }]}
   var layoutAndAppendParagraphs = function(pDict, id, fontSize){
     for (var i = 0; i < Object.keys(pDict).length; i++) {
       var key = parseInt(Object.keys(pDict)[i]);
-      var $el = $('<p>');
+      var $el = $('#' + id);
       for (var j = 0; j < pDict[key].length; j++) {
         var word = pDict[key][j];
         var $span = createTranscriptWordSpan(word);
         $el.append($span);
       }
-      $('#' + id).append($el);
-      var a = $el.css('line-height');
-      var newPx = IUtils.getIntFromPx(a)*4;
+      // $('#' + id).append($el);
+      $el.append("<br>");
+      $el.append("<br>");
     }
-  };
-
-
-  // just for attaching scroll events
-  var attachScrollEvents = function(timelineId, transcriptId, transWrapId) {
-    var $transWrap  = $('#' + transWrapId),
-        $timeline = $('#' + timelineId),
-        $transcript = $('#' + transcriptId);
-
-    // TODO need scaling functions
-    var trToTlHeight = function(n) {
-      var tlHeight = 462,
-          tsHeight = IUtils.getIntFromPx($transcript.css('height'));
-          return n * (tlHeight/tsHeight);
-    };
-
-    var tlToTrHeight = function(n) {
-      var tlHeight = 462;
-      var tsHeight = IUtils.getIntFromPx($transcript.css('height'));
-      return n * (tsHeight/tlHeight);
-    };
-
-    // if you scroll the tl/summary scroll box
-    // then the timeline view will update
-    $transWrap.on('scroll', function(){
-      // var newBoxPosition = trToTlHeight(this.scrollTop);
-      // $scrollBox.css({
-      //   top: newBoxPosition + 'px'
-      // });
-    });
-
-    // if you click anywhere on the timeline image
-    // the center scrollbox will update
-    $timeline.click(function(e){
-
-      var x = e.pageX - e.target.offsetLeft,
-          y = e.pageY - e.target.offsetTop;
-
-      // // move the scrollbox to click position
-      // $scrollBox.css('top', y);
-
-      var newCPos = tlToTrHeight(y)
-            - (consts.docHeight/2);
-      if (newCPos < 0)  { newCPos = 0; }
-
-      // move timeline to equivalent position centered
-      $transWrap.scrollTop(newCPos);
-    });
   };
 
   var loadTranscript = function(){
@@ -804,20 +659,16 @@ document.ready = (function ($, IUtils) {
       async: false,
       dataType: 'json',
       success: function (response) {
-        console.log('Loaded transcript');
         sts.transcript = response;
         var transcriptPDict = IUtils.pDictFromTranscript(response, 85, 'main'),
             timelinePDict = IUtils.pDictFromTranscript(response, 85, 'sub');
-            //$scrollbox = createScrollBox(consts.timelineId, consts.transId);
+        //$scrollbox = createScrollBox(consts.timelineId, consts.transId);
 
         layoutAndAppendParagraphs(transcriptPDict, consts.transId, consts.transFontSize + 'px');
         layoutAndAppendParagraphs(timelinePDict, consts.timelineId, consts.timelineFontSize + 'px');
-        attachScrollEvents(consts.timelineId, consts.transId, consts.transWrapId); //, $scrollbox);
         bindGlobalListeners();
       },
       error: function(e){
-        console.log('Error occured when loading transcript');
-        console.log(e);
       }
     });
   };
@@ -835,10 +686,9 @@ document.ready = (function ($, IUtils) {
 
   sts.video.addEventListener("loadedmetadata", function(){
     // need the meta data to do anything else
-    console.log("Video meta data loaded.");
     loadTranscript();
   });
 
   // REMOVE ME -- TODO FIXME DEVELOPMENT
-$("video").prop('muted', true); //mute: Colorado's tired of hearing Han go on about Swedish students and chimpanzees
+  $("video").prop('muted', true); //mute: Colorado's tired of hearing Han go on about Swedish students and chimpanzees
 })(window.jQuery, window.IUtils);
