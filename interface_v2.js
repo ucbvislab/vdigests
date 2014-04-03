@@ -14,6 +14,7 @@ document.ready = (function ($, IUtils) {
     keyFrameCol: "keyframeCol",
     curSelTransTextClass: "cur-sel-trans-text",
     transId: "transcript",
+    outputSummaryId: "outputSummary",
     timelineId: "timeline",
     thumbClass: "img-myThumbnail",
     assocClass: "summary-associated-text",
@@ -37,7 +38,9 @@ document.ready = (function ($, IUtils) {
     groups: {},
     lastGroup: "",
     lastSelection:[],
+    // TODO make an object for these
     sumToTransWrapId: {},
+    transWrapToSumId: {},
     vn: 0
   };
 
@@ -71,6 +74,7 @@ document.ready = (function ($, IUtils) {
 
       $spanEls.eq(0).nextUntil(lastEl).andSelf().add(lastEl).wrapAll($segWrap);
       sts.sumToTransWrapId[sdid] = $segWrap.attr("id");
+      sts.transWrapToSumId[$segWrap.attr("id")] = sdid;
       sts.lastSelection = [];
     } else {
       $("#" + sts.sumToTransWrapId[sdid]).removeClass(consts.hightlightTransClass);
@@ -196,6 +200,27 @@ document.ready = (function ($, IUtils) {
         // the selected region should behave like standard highlighted text
         // TODO how to handle overlapping selections?
         makeSelectionDraggable();
+      } else {
+        // show the corresponding segment summary
+        var $tar = $(evt.target),
+            $seg = $tar.closest("." + consts.transSegClass);
+        if ($seg.length) {
+          // if we're inside a segment: highlight and show the corresponding summary
+          var sumId = sts.transWrapToSumId[$seg.attr("id")];
+          if (sumId) {
+            var $sumEl = $("#" + sumId);
+            // bring it into view and then
+            $("#" + consts.outputSummaryId).scrollTo($sumEl, {
+              offsetTop : $seg.offset().top,
+              duration: 250
+              },
+              function () {
+                console.log("scroll complete");
+                $sumEl.find("textarea").focus();
+              }
+            );
+          }
+        }
       }
     });
 
@@ -382,7 +407,7 @@ document.ready = (function ($, IUtils) {
       if ($transSpan.length) {
         $transSpan.addClass(consts.hightlightTransClass);
         $textA.addClass(consts.linkedFocusTextAreaClass);
-        $("#transcript-wrap").scrollTo($transSpan, {offsetTop : $textA.offset().top});
+        $("#" + consts.transWrapId).scrollTo($transSpan, {offsetTop : $textA.offset().top});
           // $('#transcript-wrap').animate({
           //   scrollTop: $transSpan.position().top
           // }, 800);
@@ -561,6 +586,7 @@ document.ready = (function ($, IUtils) {
             segId = sts.sumToTransWrapId[mainId];
         $("#" + segId).contents().unwrap();
         delete sts.sumToTransWrapId[mainId];
+        delete sts.transWrapToSumId[mainId];
         delete sts.summaries[mainId];
         $mainDiv.remove();
       }
