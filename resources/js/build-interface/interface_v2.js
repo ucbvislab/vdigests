@@ -28,7 +28,7 @@ document.ready = (function ($, IUtils) {
 
   // state: changes
   var sts = {
-    transcriptFile: 'resources/HansRosling_aligned.json',
+    transcriptFile: 'resources/content/HansRosling_aligned.json',
     video: undefined,
     $video: undefined,
     summaries: {},
@@ -139,7 +139,7 @@ document.ready = (function ($, IUtils) {
     sts.groups[gid] = groupNumber;
     var $videoCol = $('<div>').attr('class', 'col-xs-6 videoCol');
     //TODO: fix this awfulness
-    var $video = $('<video controls preload="auto" width="315px" height="236px" poster="resources/HansRosling_poster.png"> <source src="resources/HansRosling'+sts.vn+'.mp4" type="video/mp4" /> </video>');
+    var $video = $('<video controls preload="auto" width="315px" height="236px" poster="resources/content/HansRosling_poster.png"> <source src="resources/content/HansRosling'+sts.vn+'.mp4" type="video/mp4" /> </video>');
     var $summaryCol = $('<div>').attr('class', 'col-xs-6 summaryCol');
     sts.vn++;
     $videoCol.append($video);
