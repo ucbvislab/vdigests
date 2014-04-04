@@ -20,7 +20,7 @@ document.ready = (function ($, IUtils) {
     assocClass: "summary-associated-text",
     absSummaryClass: "abs-summary",
     transSegClass: "trans-seg",
-    numInitSegs: 1,
+    numInitSegs: 3,
     ssImgPath: "resources/img/camera-icon-2.png",
     endSegmentClass: "end-segment-word",
     RETURN_KEY_CODE: 13
@@ -245,7 +245,8 @@ document.ready = (function ($, IUtils) {
         e.target.blur();
         e.stopPropagation();
         e.preventDefault();
-      } else if (e.keyCode === 99) {
+      } else if (e.keyCode === 67) {
+        console.log( "capture" );
         captureAndBindThumbClick();
       } else if (e.keyCode === 50) {
         findGroupSummaryPlaceholder();
@@ -521,7 +522,14 @@ document.ready = (function ($, IUtils) {
   var makeSummaryDiv = function(sdid) {
     var $keyframeCol = $('<div>').attr('class', 'col-xs-3 keyframeCol');
     var $textCol = $('<div>').attr('class', 'col-xs-9 textCol');
-    var $removeEl = $('<div>').attr('class', 'subtract-icon iconicfill-x-alt');
+    // TODO hack fix
+    var $removeEl = $('<div>').attr('class', 'subtract-icon iconicfill-x-alt')
+          .on("mouseenter", function () {
+            $textCol.addClass("show-border");
+          })
+          .on("mouseleave", function () {
+            $textCol.removeClass("show-border");
+          });
 
     var $mainDiv = $('<div>')
           .attr('id', sdid)
@@ -674,6 +682,4 @@ document.ready = (function ($, IUtils) {
     loadTranscript();
   });
 
-  // REMOVE ME -- TODO FIXME DEVELOPMENT
-  $("video").prop('muted', true); //mute: Colorado's tired of hearing Han go on about Swedish students and chimpanzees
 })(window.jQuery, window.IUtils);

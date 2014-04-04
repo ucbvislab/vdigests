@@ -111,7 +111,8 @@ body {
 
 }
 
-.blendTextarea .abs-summary:empty, .blendTextarea .abs-summary:focus {
+.blendTextarea .abs-summary:empty, .blendTextarea .abs-summary:focus, .blendTextarea .abs-summary:hover,
+.blendTextarea.show-border .abs-summary{
     border: 1px dashed #A3A1A1;
 }
 
@@ -194,8 +195,9 @@ body {
 .img-myThumbnail {
     position: relative;
     border: 1px solid #555555;
-    right: 20px;
-    height: 43px;
+    right: 15px;
+    top: 2px;
+    height: 40px;
 }
 
 video {
