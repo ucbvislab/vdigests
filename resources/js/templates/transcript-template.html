@@ -1,0 +1,13 @@
+<div class="transcript-words">
+  <p>
+    <% var prevSpk = 0 %>
+    <% words.each(function (word, i) { %>
+        <% if (prevSpk !== word.get("speaker") && word.get("speaker") > 0) {%>
+            <% prevSpk = word.get("speaker") %>
+          </p>
+          <p>
+        <% } %>
+        <span class="word" id="<%-word.cid%>"><%- word.get("word") %></span>
+    <% });%>
+  </p>
+</div>

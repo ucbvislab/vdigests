@@ -14,7 +14,7 @@ document.ready = (function ($, IUtils) {
     keyFrameCol: "keyframeCol",
     curSelTransTextClass: "cur-sel-trans-text",
     transId: "transcript",
-    outputSummaryId: "outputSummary",
+    digestWrapId: "digest-wrap",
     timelineId: "timeline",
     thumbClass: "img-myThumbnail",
     assocClass: "summary-associated-text",
@@ -175,7 +175,7 @@ document.ready = (function ($, IUtils) {
   var makeNewGroupAndAppend = function(){
     var $groupRowDiv = makeGroupRow(sts.groupIndex);
     bindGroupSummaryPlaceholder($groupRowDiv);
-    $('#outputSummary').append($groupRowDiv);
+    $('#' + consts.digestWrapId).append($groupRowDiv);
     sts.groupIndex++;
     for (var i = 0; i < consts.numInitSegs; i++) {
       findGroupSummaryPlaceholder();
@@ -211,7 +211,7 @@ document.ready = (function ($, IUtils) {
           if (sumId) {
             var $sumEl = $("#" + sumId);
             // bring it into view and then
-            $("#" + consts.outputSummaryId).scrollTo($sumEl, {
+            $("#" + consts.digestWrapId).scrollTo($sumEl, {
               offsetTop : $seg.offset().top,
               duration: 250
               },

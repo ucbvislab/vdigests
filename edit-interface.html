@@ -5,29 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="resources/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="resources/css/edit-interface.css" rel="stylesheet">
-    <script src="resources/js/lib/canvas2image.js"></script>
   </head>
   <body>
-    <!-- <div id="timeline"> -->
-    <!-- </div> -->
-    <div id="outputSummary">
-        <div id="title-wrap">
-          <h1 contenteditable="true" id="maintitle" data-ph="Title"></h1>
-        </div>
-    </div>
 
-    <div id="transcript-wrap">
-      <div id="transcript"></div>
-    </div>
-
-    <button id="export" class="btn" style="width:340px">Export</button>
-    <textarea id="exported" class="form-control" style="height:231px"></textarea>
-    <canvas id="imageView" style="display:none; left: 0; top: 0; z-index: 0;border:none" width="100" height="75"> </canvas>
-
-    <script src="https://code.jquery.com/jquery.js"></script>
-    <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-    <script src="resources/js/lib/jquery.scrollTo.js"></script>
-    <script src="resources/js/build-interface/interface_v2_extras.js"></script>
-    <script src="resources/js/build-interface/interface_v2.js"></script>
+    <script data-main="resources/js/editing-interface/main.js" type="text/javascript" src="resources/js/lib/require.js"></script>
   </body>
 </html>
