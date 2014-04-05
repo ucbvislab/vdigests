@@ -25,7 +25,6 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
     summaryKeyUp: function (evt) {
       var thisView = this,
       $curTar = $(evt.currentTarget);
-      console.log($curTar.text());
       thisView.model.set("summary", $curTar.text());
     }
 

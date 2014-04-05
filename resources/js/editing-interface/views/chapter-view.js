@@ -16,7 +16,9 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       var thisView = this;
       thisView.listenTo(thisView.model.get("sections"), "add", function (newSec) {
         thisView = thisView.render();
-        thisView.$el.find("#" + newSec.cid + " ." + consts.absSummaryClass).get(0).focus();
+        window.setTimeout(function () {
+          thisView.$el.find("#" + newSec.cid + " ." + consts.absSummaryClass).focus();
+        }, 50);
       });
     },
 
