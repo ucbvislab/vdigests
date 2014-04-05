@@ -13,7 +13,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/chapt
     initialize: function () {
       var thisModel = this;
       thisModel.listenTo(thisModel.get("chapters"), "add", function (newChap) {
-        newChap.get("startWord").set("startSection", true);
+        window.setTimeout(function(){newChap.get("startWord").set("startSection", true);}, 200);
       });
     }
   });

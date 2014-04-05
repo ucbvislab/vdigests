@@ -1,6 +1,6 @@
 
 /*global define */
-define(["backbone", "underscore", "jquery", "text!templates/chapter-template.html", "editing-interface/views/compound-view", "editing-interface/views/section-view", "editing-interface/views/collection-view"], function (Backbone, _, $, tmpl, CompoundBackboneView, SectionView, CollectionView) {
+define(["backbone", "underscore", "jquery", "text!templates/chapter-template.html", "editing-interface/views/compound-view", "editing-interface/views/section-view", "editing-interface/views/collection-view", "editing-interface/utils/utils", "editing-interface/models/thumbnail-model"], function (Backbone, _, $, tmpl, CompoundBackboneView, SectionView, CollectionView, Utils, ThumbnailModel) {
 
   var consts = {
     sectionWrapClass: "summary-column",
@@ -12,16 +12,29 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
     template: _.template(tmpl),
     className: consts.viewClass,
 
-    initialize: function () {
-      var thisView = this;
-      thisView.listenTo(thisView.model.get("sections"), "add", function (newSec) {
-        thisView = thisView.render();
-        window.setTimeout(function () {
-          thisView.$el.find("#" + newSec.cid + " ." + consts.absSummaryClass).focus();
-        }, 50);
-      });
+    events: {
+      'keyup .chapter-header input': function (evt) {
+        var thisView = this,
+            $curTar = $(evt.currentTarget);
+        thisView.set("title", $curTar.val());
+      }
     },
 
+    initialize: function () {
+      var thisView = this,
+          thisModel = thisView.model;
+      thisView.listenTo(thisView.model.get("sections"), "add", function (newSec) {
+        thisView.assign(thisView.getAssignedObject());
+        window.setTimeout(function () {
+          thisView.$el.find("#" + newSec.cid + " ." + consts.absSummaryClass).focus();
+
+          var $vid = thisView.$el.find("video");
+          Utils.seekThenCaptureImgTime($vid, newSec.get("startWord").get("start"), function (newImgData) {
+            newSec.set("thumbnail", new ThumbnailModel({data: newImgData}));
+          });
+        }, 200);
+      });
+    },
 
     /**
      * return the {selector: rendered element} object used in the superclass render function

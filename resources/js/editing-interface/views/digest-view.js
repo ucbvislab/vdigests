@@ -9,6 +9,13 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
   return CompoundBackboneView.extend({
     template: _.template(tmpl),
 
+    events: {
+      "keyup .digest-title-wrap h1": function (evt) {
+          var thisView = this;
+        thisView.model.set("title", $(evt.currentTarget).text());
+      }
+    },
+
     initialize: function () {
       var thisView = this;
       thisView.listenTo(thisView.model.get("chapters"), "add", function (newChap) {

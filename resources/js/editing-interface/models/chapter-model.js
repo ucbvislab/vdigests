@@ -6,10 +6,14 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
     defaults: function () {
       return {
         sections: new SectionCollection(),
-        video: null,
         start_word: null,
         title: ""
       };
+    },
+
+    initialize: function () {
+      // FIXME HACK
+      this.set("vct", window.vct++);
     }
   });
 

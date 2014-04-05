@@ -2,7 +2,9 @@
 /*global define */
 define(["backbone", "underscore", "jquery", "text!templates/section-template.html"], function (Backbone, _, $, tmpl) {
   var consts = {
-    className: "row section-row"
+    className: "row section-row",
+    keyframeClass: "keyframe-col",
+    thumbClass: "section-thumbnail"
   };
 
   return Backbone.View.extend({
@@ -14,6 +16,16 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
 
     events: {
       'keyup .abs-summary': "summaryKeyUp"
+    },
+
+    initialize: function () {
+      var thisView = this;
+      thisView.listenTo(thisView.model, "change:thumbnail", function (mdl) {
+        var $img = $("<img>");
+        $img.addClass(consts.thumbClass);
+        $img.attr("src", mdl.get("thumbnail").get("data"));
+        thisView.$el.find("." + consts.keyframeClass).html($img);
+      });
     },
 
     render: function () {

@@ -38,6 +38,9 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
   "use strict";
   console.log("started main");
   var appRouter = new AppRouter();
+  // FIXME HACK for video count
+  window.vct = 0;
+
   Backbone.history.start();
 
   // keep body size to the size of the viewport

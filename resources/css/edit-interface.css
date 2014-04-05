@@ -30,8 +30,9 @@ body {
   font-style: italic;
 }
 
+
 /********************/
-/* edit-level css   */
+/* editor-level css   */
 /********************/
 .editor-wrap {
     height: inherit;
@@ -81,6 +82,7 @@ body {
     background: linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(247, 248, 255,1) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f5f6ff', GradientType=1 );
 }
+
 
 /*************************/
 /* chapter-level css     */
@@ -133,7 +135,6 @@ body {
     position: relative;
 }
 
-
 .keyframe-col {
     width: 59px;
     height: 43px;
@@ -148,6 +149,35 @@ body {
     background-size: 59px 43px;
     background-repeat: no-repeat;
     background-position: -1px -1px;
+}
+
+
+/*************************/
+/* section level css     */
+/************************/
+.blendTextarea .abs-summary {
+    width: 300px;
+    border: none;
+    border-radius: 4px;
+    margin-left: 80px;
+    font-size: 10px;
+    min-height: 43px;
+
+}
+
+.blendTextarea .abs-summary:empty, .blendTextarea .abs-summary:focus, .blendTextarea .abs-summary:hover, .blendTextarea.show-border .abs-summary{
+    border: 1px dashed #A3A1A1;
+}
+.blendTextarea .abs-summary:empty {
+    padding: 3px 4px;
+}
+
+.section-thumbnail {
+    position: relative;
+    border: 1px solid #555555;
+    right: 15px;
+    top: 2px;
+    height: 40px;
 }
 
 
@@ -192,6 +222,7 @@ body {
     padding-top: 20px;
 }
 
+/* so clicking near the word activates the word */
 .word {
     padding: 5px 0;
 }
@@ -208,151 +239,4 @@ body {
     height: 10px;
     background-color: blue;
     display: inline-block;
-}
-
-.textCol p {
-    margin: 0 0 0 -25px;
-    font-size: 10px;
-    padding-right: 5px;
-}
-
-.container {
-    height: 900px;
-}
-
-.blendTextarea .abs-summary {
-    width: 300px;
-    border: none;
-    border-radius: 4px;
-    margin-left: 80px;
-    font-size: 10px;
-    min-height: 43px;
-
-}
-
-.blendTextarea .abs-summary:empty, .blendTextarea .abs-summary:focus, .blendTextarea .abs-summary:hover,
-.blendTextarea.show-border .abs-summary{
-    border: 1px dashed #A3A1A1;
-}
-
-.blendTextarea .abs-summary:empty {
-    padding: 3px 4px;
-}
-
-.blendTextarea .abs-summary.linked-summary-focus:focus{
-    outline-color: rgb(253, 255, 195);
-}
-
-.trans-seg{
-    border-right: 4px solid red;
-}
-.trans-seg .word{
-    padding-top: 1px;
-    background-color: rgb(217, 232, 248);
-}
-
-.cur-sel-trans-text, .highlight-trans .word {
-    background-color: rgb(253, 255, 195);
-    padding-top: 1px;
-}
-
-#summary {
-    float: left;
-    width: 490px;
-    height: 900px;
-    background-color: #deebde;
-}
-
-
-#timeline {
-    float: left;
-    height:900px;
-    background-color: white;
-}
-
-#controls {
-    margin-left: 2px;
-    background-color: white;
-}
-
-#timeline {
-    width: 80px;
-    background-color: lavender;
-}
-
-.img-myThumbnail {
-    position: relative;
-    border: 1px solid #555555;
-    right: 15px;
-    top: 2px;
-    height: 40px;
-}
-
-
-
-
-.add-group-icon {
-    position: absolute;
-    bottom: -26px;
-    left: 17px;
-    color: #797878;
-    font-size: 17px;
-    cursor: pointer;
-}
-
-.add-group-icon:hover {
-    text-decoration: underline;
-}
-
-.add-segment {
-    left: 150px;
-    width: 96px;
-    color: #C5C3C3;
-    position: absolute;
-    bottom: -7px;
-    margin-bottom: 4px;
-    padding: 2px 6px 2px 6px;
-    font-size: 11px;
-    background: transparent;
-    border-radius: 3px;
-    border: 1px #aaaaaa solid;
-}
-
-.add-segment span {
-    color: #868686;
-}
-
-.add-segment:hover {
-    border-color: #333;
-    color: #333;
-}
-
-.add-segment:focus, .subtract-icon:focus {
-    outline: 0;
-}
-
-.subtract-icon {
-    right: 0;
-    position: absolute;
-    top: -13px;
-    color: #7A7575;
-    font-size: 19px;
-    cursor: pointer;
-    display: none;
-    font-weight: bold;
-}
-
-.subtract-icon:hover {
-    color: rgb(189, 1, 1);
-}
-
-
-.boundary {
-    position: relative;
-    z-index: 10;
-    top: -900px;
-    width: 900px;
-    height: 2px;
-    top: 0px;
-    background: blue;
 }

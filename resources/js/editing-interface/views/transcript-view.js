@@ -45,7 +45,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
       // do nothing if we're mousedowning on a breakpoint
 
       // add a section break
-      if (evt.shiftKey) {
+      if (evt.altKey) {
         var $wordEl = $tar,
             changeType = "startSection";
 
