@@ -4,7 +4,8 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
 
   var consts = {
     sectionWrapClass: "summary-column",
-    viewClass: "chapter row"
+    viewClass: "chapter row",
+    absSummaryClass: "abs-summary"
   };
 
   return CompoundBackboneView.extend({
@@ -13,7 +14,10 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
 
     initialize: function () {
       var thisView = this;
-      thisView.listenTo(thisView.model.get("sections"), "add", thisView.render);
+      thisView.listenTo(thisView.model.get("sections"), "add", function (newSec) {
+        thisView = thisView.render();
+        thisView.$el.find("#" + newSec.cid + " ." + consts.absSummaryClass).get(0).focus();
+      });
     },
 
 

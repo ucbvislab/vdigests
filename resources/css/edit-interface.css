@@ -125,6 +125,28 @@ body {
     width: 53%;
 }
 
+.section-row {
+    padding-bottom: 8px;
+    position: relative;
+}
+
+
+.keyframe-col {
+    width: 59px;
+    height: 43px;
+    margin-left: 15px;
+    border-radius: 3px;
+    border: none;
+}
+
+.keyframe-col:empty {
+    border: 1px dashed #A3A1A1;
+    background-image: url('../img/camera-icon-2.png');
+    background-size: 59px 43px;
+    background-repeat: no-repeat;
+    background-position: -1px -1px;
+}
+
 
 /*************************/
 /* transcript-level css */
@@ -217,28 +239,6 @@ body {
 .blendTextarea .abs-summary.linked-summary-focus:focus{
     outline-color: rgb(253, 255, 195);
 }
-
-.keyframeCol {
-    width: 59px;
-    height: 43px;
-    margin-left: 15px;
-    border-radius: 3px;
-    border: none;
-}
-
-.keyframeCol:empty {
-    border: 1px dashed #A3A1A1;
-    background-image: url('../img/camera-icon-2.png');
-    background-size: 59px 43px;
-    background-repeat: no-repeat;
-    background-position: -1px -1px;
-}
-
-.summaryRow {
-    padding-bottom: 8px;
-    position: relative;
-}
-
 
 .trans-seg{
     border-right: 4px solid red;

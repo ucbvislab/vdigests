@@ -16,7 +16,5 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/chapt
         newChap.get("startWord").set("startSection", true);
       });
     }
-
   });
-
 });

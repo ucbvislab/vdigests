@@ -7,7 +7,6 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
       return {
         summary: "",
         startWord: null,
-        endWord: null,
         thumbnail: ""
       };
     }

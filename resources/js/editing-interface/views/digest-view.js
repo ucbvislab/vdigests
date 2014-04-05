@@ -11,7 +11,9 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
 
     initialize: function () {
       var thisView = this;
-      thisView.listenTo(thisView.model.get("chapters"), "add", thisView.render);
+      thisView.listenTo(thisView.model.get("chapters"), "add", function (newChap) {
+        thisView.render();
+      });
     },
 
     /**

@@ -2,11 +2,14 @@
 /*global define */
 define(["backbone", "underscore", "jquery", "text!templates/section-template.html"], function (Backbone, _, $, tmpl) {
   var consts = {
-    className: "row summaryRow"
+    className: "row section-row"
   };
+
   return Backbone.View.extend({
     template: _.template(tmpl),
-
+    id: function () {
+      return this.model.cid;
+    },
     className: consts.className,
 
     events: {
