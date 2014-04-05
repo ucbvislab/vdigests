@@ -1,35 +1,47 @@
 
 /*global define */
 define(["backbone", "underscore", "jquery", "text!templates/editing-template.html", "editing-interface/views/compound-view", "editing-interface/views/digest-view",
-  "editing-interface/views/transcript-view"], function (Backbone, _, $, tmpl, CompoundBackboneView, DigestView, TranscriptView) {
+        "editing-interface/views/transcript-view", "editing-interface/models/chapter-model", "editing-interface/models/section-model"], function (Backbone, _, $, tmpl, CompoundBackboneView, DigestView, TranscriptView, ChapterModel, SectionModel) {
 
-  var consts = {
-    digestWrapClass: "digest-wrap",
-    transWrapClass: "transcript-wrap",
-    viewClass: "editor-wrap"
-  };
+          var consts = {
+            digestWrapClass: "digest-wrap",
+            transWrapClass: "transcript-wrap",
+            viewClass: "editor-wrap",
+            RETURN_KEY_CODE: 13
+          };
 
-  return CompoundBackboneView.extend({
-    template: _.template(tmpl),
+          return CompoundBackboneView.extend({
+            template: _.template(tmpl),
 
-    className: consts.viewClass,
+            className: consts.viewClass,
 
-    /**
-     * return the {selector: rendered element} object used in the superclass render function
-     */
-    getAssignedObject: function () {
-      var thisView = this;
+            events: {
+              "keydown": function (evt) {
+                if (evt.keyCode === consts.RETURN_KEY_CODE) {
+                  // enter should always blur
+                  evt.target.blur();
+                  evt.stopPropagation();
+                  evt.preventDefault();
+                }
+              }
+            },
 
-      // prep the subviews
-      thisView.digestView = thisView.digestView || new DigestView({model: thisView.model.get("digest")});
-      thisView.transView = thisView.transView || new TranscriptView({model: thisView.model.get("transcript")});
+            /**
+             * return the {selector: rendered element} object used in the superclass render function
+             */
+            getAssignedObject: function () {
+              var thisView = this;
 
-      // now add the digest and transcript view components to the editor template shell using the assign method
-      var assignObj = {};
-      assignObj["." + consts.digestWrapClass] = thisView.digestView;
-      assignObj["." + consts.transWrapClass] = thisView.transView;
+              // prep the subviews
+              thisView.digestView = thisView.digestView || new DigestView({model: thisView.model.get("digest")});
+              thisView.transView = thisView.transView || new TranscriptView({model: thisView.model.get("transcript")});
 
-      return assignObj;
-    }
-  });
-});
+              // now add the digest and transcript view components to the editor template shell using the assign method
+              var assignObj = {};
+              assignObj["." + consts.digestWrapClass] = thisView.digestView;
+              assignObj["." + consts.transWrapClass] = thisView.transView;
+
+              return assignObj;
+            }
+          });
+        });

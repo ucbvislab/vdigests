@@ -11,12 +11,12 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/chapt
     },
 
     initialize: function () {
-      var thisView = this;
-      // make sure each digest has at least 1 chapter
-      if (thisView.get("chapters").length === 0) {
-        thisView.get("chapters").add(new ChapterModel());
-      }
+      var thisModel = this;
+      thisModel.listenTo(thisModel.get("chapters"), "add", function (newChap) {
+        newChap.get("startWord").set("startSection", true);
+      });
     }
+
   });
 
 });

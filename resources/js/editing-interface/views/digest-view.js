@@ -9,6 +9,11 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
   return CompoundBackboneView.extend({
     template: _.template(tmpl),
 
+    initialize: function () {
+      var thisView = this;
+      thisView.listenTo(thisView.model.get("chapters"), "add", thisView.render);
+    },
+
     /**
      * return the {selector: rendered element} object used in the superclass render function
      */

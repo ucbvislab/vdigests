@@ -24,7 +24,9 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
         var thisRoute = this;
 
         // create the editor model which has the trans and digest views
-        thisRoute.editorModel = thisRoute.editorModel || new EditorModel();
+        if (!thisRoute.editorModel) {
+          thisRoute.editorModel = new EditorModel();
+        }
 
         thisRoute.editorModel.get("transcript").fetch({success: function () {
           // create the editor view
@@ -32,7 +34,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
 
           // now  show the editor view
           $("body").prepend(thisRoute.editorView.render().el);
-
+          thisRoute.editorModel.postInit();
         }});
       }
     });

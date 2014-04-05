@@ -178,6 +178,12 @@ body {
     display: inline-block;
 }
 
+.start-chapter-marker {
+    width: 10px;
+    height: 10px;
+    background-color: blue;
+    display: inline-block;
+}
 
 .textCol p {
     margin: 0 0 0 -25px;

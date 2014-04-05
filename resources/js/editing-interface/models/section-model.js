@@ -10,9 +10,6 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
         endWord: null,
         thumbnail: ""
       };
-    },
-
-    initialize: function () {
     }
   });
 
