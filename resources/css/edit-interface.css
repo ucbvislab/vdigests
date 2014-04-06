@@ -230,13 +230,20 @@ body {
 .start-section-marker {
     width: 10px;
     height: 10px;
-    background-color: red;
+    background-color: blue;
     display: inline-block;
 }
 
 .start-chapter-marker {
     width: 10px;
     height: 10px;
-    background-color: blue;
+    background-color: red;
     display: inline-block;
+}
+
+.drag-chapter-word {
+    color: red;
+}
+.drag-section-word {
+    color: blue;
 }

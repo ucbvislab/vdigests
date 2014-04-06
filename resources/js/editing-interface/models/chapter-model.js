@@ -6,15 +6,18 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
     defaults: function () {
       return {
         sections: new SectionCollection(),
-        start_word: null,
+        startWord: null,
         title: ""
       };
     },
 
     initialize: function () {
-      // FIXME HACK
-      this.set("vct", window.vct++);
+      var thisModel = this;
+      // FIXME HACK to keep track of videos
+      thisModel.set("vct", window.vct++);
+      thisModel.listenTo(thisModel.get("startWord"), "change:switchStartWord", function (oldWord, newWord) {
+        thisModel.set("startWord", newWord);
+      });
     }
   });
-
 });
