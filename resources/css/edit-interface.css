@@ -226,6 +226,9 @@ body {
 .word {
     padding: 5px 0;
 }
+.word:hover {
+    color: #BBBBBB;
+}
 
 .start-section-marker {
     width: 10px;

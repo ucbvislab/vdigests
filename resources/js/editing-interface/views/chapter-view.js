@@ -8,6 +8,15 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
     absSummaryClass: "abs-summary"
   };
 
+  var playOneVideo = function (vid, time) {
+    vid.currentTime = time;
+    $(document.body).find("video").each(function (i, vid) {
+      console.log(vid);
+      vid.pause();
+    });
+    vid.play();
+  };
+
   return CompoundBackboneView.extend({
     template: _.template(tmpl),
     className: consts.viewClass,
@@ -23,16 +32,31 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
     initialize: function () {
       var thisView = this,
           thisModel = thisView.model;
+
+      // add section listener
       thisView.listenTo(thisView.model.get("sections"), "add", function (newSec) {
         thisView.assign(thisView.getAssignedObject());
+        // pause to let other events finish
         window.setTimeout(function () {
           thisView.$el.find("#" + newSec.cid + " ." + consts.absSummaryClass).focus();
-
           var $vid = thisView.$el.find("video");
           Utils.seekThenCaptureImgTime($vid, newSec.get("startWord").get("start"), function (newImgData) {
             newSec.set("thumbnail", new ThumbnailModel({data: newImgData}));
           });
         }, 200);
+      });
+
+      // listen for play events from the underlying chapter
+      thisView.listenTo(thisView.model, "startVideo", function (stTime) {
+        var $vid = thisView.$el.find("video"),
+            vid = $vid[0];
+        try {
+          playOneVideo(vid, stTime);
+        } catch (e) {
+          $vid.one("canplay", function () {
+            playOneVideo(vid, stTime);
+          });
+        }
       });
     },
 

@@ -56,7 +56,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
     },
 
     /**
-     *
+     * Mouse over a word in the transcript view
      */
     wordMouseOver: function (evt) {
       var thisView = this;
@@ -85,7 +85,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
     },
 
     /**
-     *
+     * Mouseleave a word in the transcript view
      */
     wordMouseLeave: function (evt) {
       var thisView = this;
@@ -102,16 +102,17 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
      *
      */
     transMouseUp: function (evt) {
-      var thisView = this;
+      var thisView = this,
+          $tar = $(evt.target);
       if (thisView.$mdel) {
         $("." + thisView.$mdel.mouseOverClass).removeClass(thisView.$mdel.mouseOverClass);
         var $newWord = thisView.$mdel.$curWord,
-            oldWord = thisView.$mdel.origWordModel;
+            oldWord = thisView.$mdel.origWordModel,
+            words = thisView.model.get("words");
         if ($newWord){
           var newId = $newWord.attr("id");
           if (newId !== oldWord.cid) {
-            var thisModel = thisView.model,
-                words = thisView.model.get("words");
+            var thisModel = thisView.model;
             thisModel.changeBreakStart(oldWord, words.get(newId));
           }
         }
@@ -173,11 +174,17 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
         stWordModel.set(changeType, true);
       } // end alt-key
       else {
+        var $fWord = thisView.$mdel.next();
+        thisView.$mdel.origIndex = $fWord.data("idx");
+        // make sure we leave the original segment
+        if (thisView.$mdel.origIndex === 0) {
+          return;
+        }
+
         thisView.$mdel.mdStartPt = thisView.$mdel.hasClass(consts.segStClass);
         thisView.$mdel.isChap = thisView.$mdel.hasClass(consts.startChapterClass);
         if (thisView.$mdel.mdStartPt) {
-          var $fWord = thisView.$mdel.next(),
-              revIndex = -1,
+          var revIndex = -1,
               fwdIndex = Infinity,
               $mdel = thisView.$mdel;
           thisView.$mdel.mouseOverClass = $mdel.isChap ? consts.dragChapClass : consts.dragSecClass;
@@ -193,7 +200,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
               fwdIndex = $maxWord.data("idx");
             }
           }
-        // get the backward section/chapter index
+          // get the backward section/chapter index
           if ($fWord.hasClass(consts.wordClass)) {
             var bstartModel = fwordModel.getPrevSectionStart();
             if (bstartModel) {
@@ -206,7 +213,16 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
           console.log("fwd index " + fwdIndex);
           $mdel.revIndex = revIndex;
           $mdel.fwdIndex = fwdIndex;
-          $mdel.origIndex = $fWord.data("idx");
+        } else {
+          // we're not clicking on a breakpoint
+          if ($tar.hasClass(consts.wordClass)) {
+            // we're mousedowning on a word
+            var upword = words.get($tar.attr("id")),
+                chstWord = upword.getPrevChapterStart(true);
+            if (chstWord) {
+              chstWord.trigger("startVideo", upword.get("start"));
+            }
+          }
         }
       }
     },

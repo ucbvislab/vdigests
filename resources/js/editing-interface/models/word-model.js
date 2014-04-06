@@ -36,20 +36,20 @@ define(["backbone", "underscore", "jquery"], function (Backbone, _, $) {
       }
     },
 
-    getPrevChapterStart: function () {
-      return this.traverseCheck(false, "Chapter", "start");
+    getPrevChapterStart: function (includeSelf) {
+      return this.traverseCheck(false, "Chapter", "start", includeSelf);
     },
 
-    getPrevSectionStart: function () {
-      return this.traverseCheck(false, "Section", "start");
+    getPrevSectionStart: function (includeSelf) {
+      return this.traverseCheck(false, "Section", "start", includeSelf);
     },
 
-    getNextChapterStart: function () {
-      return this.traverseCheck(true, "Chapter", "start");
+    getNextChapterStart: function (includeSelf) {
+      return this.traverseCheck(true, "Chapter", "start", includeSelf);
     },
 
-    getNextSectionStart: function () {
-      return this.traverseCheck(true, "Section", "start");
+    getNextSectionStart: function (includeSelf) {
+      return this.traverseCheck(true, "Section", "start", includeSelf);
     }
   });
 });

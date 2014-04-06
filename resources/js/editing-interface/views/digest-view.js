@@ -3,7 +3,8 @@
 define(["backbone", "underscore", "jquery", "text!templates/digest-template.html", "editing-interface/views/compound-view", "editing-interface/views/collection-view", "editing-interface/views/chapter-view"], function (Backbone, _, $, tmpl, CompoundBackboneView, CollectionView, ChapterView) {
 
   var consts = {
-    chapterWrapClass: "digest-chapters-wrap"
+    chapterWrapClass: "digest-chapters-wrap",
+    chapterClass: "chapter"
   };
 
   return CompoundBackboneView.extend({
@@ -17,9 +18,19 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
     },
 
     initialize: function () {
-      var thisView = this;
-      thisView.listenTo(thisView.model.get("chapters"), "add", function (newChap) {
-        thisView.render();
+      var thisView = this,
+          chaps = thisView.model.get("chapters");
+
+      thisView.listenTo(chaps, "add", function (newChap) {
+        var cindex = chaps.indexOf(newChap),
+            $chapEls = thisView.$el.find("." + consts.chapterClass),
+            newChapView = new ChapterView({model: newChap}),
+            $newEl = newChapView.render().$el;
+        if (cindex > 0) {
+          $chapEls.eq(cindex-1).after($newEl);
+        } else {
+          thisView.$el.find("." + consts.chapterWrapClass).prepend($newEl);
+        }
       });
     },
 

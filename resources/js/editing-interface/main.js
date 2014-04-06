@@ -9,7 +9,6 @@ requirejs.config({
   baseUrl: "resources/js",
   paths: {
     jquery:"lib/jquery-1.11.0.min",
-    jqueryui: "lib/jquery-ui-1.10.4.min",
     underscore: "lib/underscore-min",
     backbone: "lib/backbone-min",
     jqueryScrollTo: "lib/jquery.scrollTo",
@@ -20,7 +19,6 @@ requirejs.config({
     underscore: {
       exports: "_"
     },
-    jqueryui: ['jquery'],
     jqueryScrollTo: {
       deps: ['jquery']
     },
@@ -33,7 +31,7 @@ requirejs.config({
 });
 
 // launch the main application (start the router)
-requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router", "jqueryScrollTo", "jqueryui"], function ($, _, Backbone, AppRouter) {
+requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router", "jqueryScrollTo"], function ($, _, Backbone, AppRouter) {
   "use strict";
   console.log("started main");
   var appRouter = new AppRouter();
