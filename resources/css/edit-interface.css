@@ -200,6 +200,30 @@ body {
 	background: rgb(253, 255, 195);
 }
 
+/** transcript scrollbar style **/
+.jspTrack {
+    background-color: rgb(232, 234, 246);
+}
+
+.jspDrag {
+    background-color: rgb(184, 189, 216);
+}
+
+.start-chapter-scroll-marker, .start-section-scroll-marker {
+    position: absolute;
+    right: 0;
+    width: 16px;
+    height: 3px;
+}
+.start-chapter-scroll-marker {
+    background-color: red;
+}
+.start-section-scroll-marker {
+    background-color: blue;
+}
+
+/****/
+
 .transcript-words {
     float: left;
     background-color: white;

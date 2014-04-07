@@ -4,7 +4,8 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
 
   var consts = {
     chapterWrapClass: "digest-chapters-wrap",
-    chapterClass: "chapter"
+    chapterClass: "chapter",
+    ESCAPE_KEYCODE: 27
   };
 
   return CompoundBackboneView.extend({
@@ -30,6 +31,14 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
           $chapEls.eq(cindex-1).after($newEl);
         } else {
           thisView.$el.find("." + consts.chapterWrapClass).prepend($newEl);
+        }
+      });
+
+      $(document.body).on("keyup", function (evt) {
+        if (evt.keyCode === consts.ESCAPE_KEYCODE) {
+          $("video").each(function (i, vid) {
+            vid.pause();
+          });
         }
       });
     },

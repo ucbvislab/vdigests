@@ -29,11 +29,19 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       }
     },
 
+    /**
+     * Only render the summaries (avoid re-rendering the video)
+     */
+    renderSummariesOnly: function () {
+      var thisView = this;
+      thisView.assign(thisView.getAssignedObject());
+    },
+
     initialize: function () {
       var thisView = this,
           thisModel = thisView.model;
 
-      // add section listener
+      // 'add' section listener
       thisView.listenTo(thisView.model.get("sections"), "add", function (newSec) {
         thisView.assign(thisView.getAssignedObject());
         // pause to let other events finish
@@ -44,6 +52,11 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
             newSec.set("thumbnail", new ThumbnailModel({data: newImgData}));
           });
         }, 200);
+      });
+
+      // 'remove' section listener
+      thisView.listenTo(thisView.model.get("sections"), "remove", function (newSec) {
+        thisView.assign(thisView.getAssignedObject());
       });
 
       // listen for play events from the underlying chapter

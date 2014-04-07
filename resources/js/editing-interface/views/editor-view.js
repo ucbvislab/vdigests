@@ -12,9 +12,7 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
 
           return CompoundBackboneView.extend({
             template: _.template(tmpl),
-
             className: consts.viewClass,
-
             events: {
               "keydown": function (evt) {
                 if (evt.keyCode === consts.RETURN_KEY_CODE) {
@@ -24,6 +22,17 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
                   evt.preventDefault();
                 }
               }
+            },
+
+            /**
+             * Add the custom scrollbar after the rendering
+             */
+            postRender: function () {
+              var thisView = this;
+              // FIXME jScrollPane needs to be called after DOM insertion?
+              window.setTimeout(function () {
+                thisView.$el.find("." + consts.transWrapClass).jScrollPane();
+              }, 100);
             },
 
             /**

@@ -20,9 +20,14 @@ define(["backbone", "underscore", "jquery"], function (Backbone, _, $) {
       // now add the digest and transcript view components to the editor template shell using the assign method
       var assignObj = thisView.getAssignedObject();
       thisView.assign(assignObj);
-
+      thisView.postRender();
       return thisView;
     },
+
+    /**
+     * Overwrite in the subclass
+     */
+    postRender: function () {},
 
     /**
      * Return the "assign" object {selector: rendered element}

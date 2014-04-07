@@ -4,29 +4,17 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
 
   var consts = {
     wordClass: "word",
+    transWordsClass: "transcript-words",
     startChapterClass: "start-chapter-marker",
     startSectionClass: "start-section-marker",
+    startChapScrollClass: "start-chapter-scroll-marker",
+    startSecScrollClass: "start-section-scroll-marker",
     segStClass: "start-marker",
     dragChapClass: "drag-chapter-word",
-    dragSecClass: "drag-section-word"
+    dragSecClass: "drag-section-word",
+    jspTrackClass: "jspTrack",
+    scrollMarkPrefix: "scrollmark-"
   };
-
-  function moveAnimate(element, newParent){
-    var oldOffset = element.offset();
-    newParent.before(element);
-    var newOffset = element.offset();
-
-    var temp = element.clone().appendTo('body');
-    temp    .css('position', 'absolute')
-      .css('left', oldOffset.left)
-      .css('top', oldOffset.top)
-      .css('zIndex', 1000);
-    element.hide();
-    temp.animate( {'top': newOffset.top, 'left':newOffset.left}, 80, function(){
-      temp.remove();
-      element.show();
-    });
-  }
 
   return Backbone.View.extend({
     template: _.template(tmpl),
@@ -40,7 +28,6 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
 
     initialize: function () {
       var thisView = this;
-
       // set up model listeners
       thisView.listenTo(thisView.model.get("words"), "change:startSection", thisView.changeStartSection);
       thisView.listenTo(thisView.model.get("words"), "change:startChapter", thisView.changeStartChapter);
@@ -79,7 +66,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
             $curTar.addClass(thisView.$mdel.mouseOverClass);
           }
           $placeMdl.before($mdel);
-          // moveAnimate(thisView.$mdel, $curTar);
+          thisView.moveScrollMarker($mdel);
         }, 30);
       }
     },
@@ -99,7 +86,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
     },
 
     /**
-     *
+     * mouseup on the transcript area
      */
     transMouseUp: function (evt) {
       var thisView = this,
@@ -228,13 +215,22 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
     },
 
     changeStartSection:  function (wmodel, newVal) {
+      var thisView = this;
+
       if (!wmodel.get("startChapter")) {
-        this.changeSpanIndicator(wmodel, newVal, consts.startSectionClass);
+        var $chapEl = thisView.changeSpanIndicator(wmodel, newVal, consts.startSectionClass);
+        // add marker to the scrollbar
+        var  mpos = thisView.getScrollMarkPercent($chapEl);
+        thisView.addScrollMarker(mpos, consts.startSecScrollClass, $chapEl.attr("id"));
       }
     },
 
     changeStartChapter:  function (wmodel, newVal) {
-      this.changeSpanIndicator(wmodel, newVal, consts.startChapterClass);
+      var thisView = this,
+          $secEl = thisView.changeSpanIndicator(wmodel, newVal, consts.startChapterClass);
+      // add marker to the scrollbar
+      var mpos = thisView.getScrollMarkPercent($secEl);
+      thisView.addScrollMarker(mpos, consts.startChapScrollClass, $secEl.attr("id"));
     },
 
     changeSpanIndicator: function (wmodel, newVal, spanClass) {
@@ -242,12 +238,34 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
           $wel = thisView.$el.find("#" + wmodel.cid),
           $startEl = $('<span>');
       if (newVal) {
-        $startEl.data("word", wmodel.cid);
+        $startEl.attr("id", Math.random().toString(36).substr(10));
         $startEl.addClass(spanClass);
         $startEl.addClass(consts.segStClass);
         $startEl.insertBefore($wel);
       }
       return $startEl;
+    },
+
+    addScrollMarker: function (pos, mclass, relid) {
+      var thisView = this,
+          $smark = $("<div>");
+      $smark.addClass(mclass);
+      $smark.css("top", pos);
+      $smark.attr("id", consts.scrollMarkPrefix + relid);
+      $(document.body).append($smark);
+    },
+
+    moveScrollMarker: function ($corrEl) {
+      var thisView = this,
+          pos = thisView.getScrollMarkPercent($corrEl),
+          $scrollEl = $("#" + consts.scrollMarkPrefix + $corrEl.attr("id"));
+      $scrollEl.css("top", pos);
+      return $scrollEl;
+    },
+
+    getScrollMarkPercent: function ($transEl) {
+      var thisView = this;
+      return $transEl.position().top/thisView.$el.find("." + consts.transWordsClass).height()*100 - 0.1 + "%";
     }
   });
 });
