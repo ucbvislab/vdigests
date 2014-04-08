@@ -55,8 +55,24 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       });
 
       // 'remove' section listener
-      thisView.listenTo(thisView.model.get("sections"), "remove", function (newSec) {
-        thisView.assign(thisView.getAssignedObject());
+      thisView.listenTo(thisModel.get("sections"), "remove", function (remSec) {
+        var nsecs = thisView.model.get("sections").length;
+        if (nsecs === 0) {
+          // we're out of sections: delete the chapter
+          thisView.$el.find("video").get(0).pause();
+          thisModel.collection.remove(thisModel);
+          thisModel.get("startWord").set("startChapter", false);
+          thisModel.get("startWord").set("startSection", false);
+          thisView.remove();
+        } else if (remSec.get("startWord").cid === thisModel.get("startWord").cid){
+          // we deleted the leading section but have another section that we can make the leading section
+          var newStartWord = thisModel.get("sections").models[0].get("startWord"),
+              oldStartWord = thisModel.get("startWord");
+          newStartWord.set("startChapter", true, {silent: true});
+          // inform listeners that the word has changed from a section start to a chapter start
+          newStartWord.trigger("sectionToChapter", newStartWord);
+          oldStartWord.trigger("change:switchStartWord", oldStartWord, newStartWord);
+        }
       });
 
       // listen for play events from the underlying chapter

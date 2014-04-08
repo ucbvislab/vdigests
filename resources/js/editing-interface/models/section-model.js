@@ -13,9 +13,13 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
 
     initialize: function () {
       var thisModel = this;
-      thisModel.listenTo(thisModel.get("startWord"), "change:switchStartWord", function (oldWord, newWord) {
-        thisModel.set("startWord", newWord);
-      });
+      thisModel.listenToOnce(thisModel.get("startWord"), "change:switchStartWord", thisModel.switchStartWord);
+    },
+
+    switchStartWord: function (oldWord, newWord) {
+      var thisModel = this;
+      thisModel.set("startWord", newWord);
+      thisModel.listenToOnce(newWord, "change:switchStartWord", thisModel.switchStartWord);
     }
   });
 });

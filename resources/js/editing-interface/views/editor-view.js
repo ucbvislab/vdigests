@@ -24,6 +24,11 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
               }
             },
 
+            initialize: function () {
+              var thisView = this;
+              // TODO show the transcript text changing as a vide plays
+            },
+
             /**
              * Add the custom scrollbar after the rendering
              */

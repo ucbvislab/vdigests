@@ -180,6 +180,22 @@ body {
     height: 40px;
 }
 
+.remove-section {
+    display: none;
+    position: absolute;
+    top: -12px;
+    right: 9px;
+    font-size: 18px;
+    color: #555555;
+    cursor: pointer;
+}
+.remove-section:hover {
+    color: rgb(224, 9, 9);
+}
+.section-row:hover .remove-section {
+    display: block;
+}
+
 
 /*************************/
 /* transcript-level css */
@@ -262,9 +278,18 @@ body {
 }
 
 .start-chapter-marker {
-    width: 10px;
-    height: 10px;
+    width: 5px;
+    height: 14px;
     background-color: red;
+    display: inline-block;
+    margin-right: 13px;
+}
+.start-chapter-marker:after {
+    content: "";
+    margin-left: 6px;
+    height: 10px;
+    width: 10px;
+    background-color: blue;
     display: inline-block;
 }
 

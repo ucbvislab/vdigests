@@ -14,6 +14,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
     switchStartWord: function (oldWord, newWord) {
       var thisModel = this;
       thisModel.set("startWord", newWord);
+      thisModel.listenToOnce(newWord, "change:switchStartWord", thisModel.switchStartWord);
     },
 
     initialize: function () {

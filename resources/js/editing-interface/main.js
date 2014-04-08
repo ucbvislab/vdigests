@@ -15,10 +15,14 @@ requirejs.config({
     canvas2Image: "lib/canvas2image",
     text: "lib/text",
     jscrollpane: "lib/jquery.jscrollpane.min",
+    filesaver: "lib/FileSaver",
     jmousewheel: "lib/jquery.mousewheel"
   },
   shim: {
   jmousewheel: ["jquery"],
+  filesaver: {
+    exports: ["saveAs", "Blob"]
+  },
   jscrollpane: ["jquery", "jmousewheel"],
     underscore: {
       exports: "_"
@@ -35,7 +39,7 @@ requirejs.config({
 });
 
 // launch the main application (start the router)
-requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router", "jqueryScrollTo", "jscrollpane", "jmousewheel"], function ($, _, Backbone, AppRouter) {
+requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router", "jqueryScrollTo", "jscrollpane", "jmousewheel", "filesaver"], function ($, _, Backbone, AppRouter) {
   "use strict";
   console.log("started main");
   var appRouter = new AppRouter();

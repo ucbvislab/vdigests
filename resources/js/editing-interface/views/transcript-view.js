@@ -1,4 +1,3 @@
-
 /*global define */
 define(["backbone", "underscore", "jquery", "text!templates/transcript-template.html"], function (Backbone, _, $, tmpl) {
 
@@ -31,6 +30,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
       // set up model listeners
       thisView.listenTo(thisView.model.get("words"), "change:startSection", thisView.changeStartSection);
       thisView.listenTo(thisView.model.get("words"), "change:startChapter", thisView.changeStartChapter);
+      thisView.listenTo(thisView.model.get("words"), "sectionToChapter", thisView.sectionToChapter);
     },
 
     /**
@@ -217,33 +217,59 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
     changeStartSection:  function (wmodel, newVal) {
       var thisView = this;
 
-      if (!wmodel.get("startChapter")) {
-        var $chapEl = thisView.changeSpanIndicator(wmodel, newVal, consts.startSectionClass);
-        // add marker to the scrollbar
-        var  mpos = thisView.getScrollMarkPercent($chapEl);
-        thisView.addScrollMarker(mpos, consts.startSecScrollClass, $chapEl.attr("id"));
+      if (!newVal || !wmodel.get("startChapter")) {
+        var $secEl = thisView.changeSpanIndicator(wmodel, newVal, consts.startSectionClass);
+        if (newVal) {
+          // add marker to the scrollbar
+          var  mpos = thisView.getScrollMarkPercent($secEl);
+          thisView.addScrollMarker(mpos, consts.startSecScrollClass, $secEl.attr("id"));
+        } else {
+          // else remove the marker if one is present before the given word
+          thisView.removeScrollMarker($secEl.attr("id"));
+        }
       }
     },
 
     changeStartChapter:  function (wmodel, newVal) {
       var thisView = this,
-          $secEl = thisView.changeSpanIndicator(wmodel, newVal, consts.startChapterClass);
-      // add marker to the scrollbar
-      var mpos = thisView.getScrollMarkPercent($secEl);
-      thisView.addScrollMarker(mpos, consts.startChapScrollClass, $secEl.attr("id"));
+          $chapEl = thisView.changeSpanIndicator(wmodel, newVal, consts.startChapterClass);
+      if (newVal) {
+        // add marker to the scrollbar
+        var mpos = thisView.getScrollMarkPercent($chapEl);
+        thisView.addScrollMarker(mpos, consts.startChapScrollClass, $chapEl.attr("id"));
+      } else {
+        // remove the marker from the scrollbar
+        thisView.removeScrollMarker($chapEl.attr("id"));
+      }
     },
 
     changeSpanIndicator: function (wmodel, newVal, spanClass) {
       var thisView = this,
           $wel = thisView.$el.find("#" + wmodel.cid),
-          $startEl = $('<span>');
+          $startEl;
       if (newVal) {
+        $startEl = $('<span>');
         $startEl.attr("id", Math.random().toString(36).substr(10));
         $startEl.addClass(spanClass);
         $startEl.addClass(consts.segStClass);
         $startEl.insertBefore($wel);
+      } else {
+        $startEl = $wel.prev();
+        if ($startEl.hasClass(consts.segStClass)) {
+          $startEl.remove();
+        } else {
+          $startEl = $();
+        }
       }
       return $startEl;
+    },
+
+    sectionToChapter: function (startWord) {
+      var thisView = this;
+      // remove the section marker
+      thisView.changeStartSection(startWord, false);
+      // add a chapter marker
+      thisView.changeStartChapter(startWord, true);
     },
 
     addScrollMarker: function (pos, mclass, relid) {
@@ -253,6 +279,11 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
       $smark.css("top", pos);
       $smark.attr("id", consts.scrollMarkPrefix + relid);
       $(document.body).append($smark);
+    },
+
+    removeScrollMarker: function (relid) {
+      var $mpiece = $("#" + consts.scrollMarkPrefix + relid);
+      $mpiece.remove();
     },
 
     moveScrollMarker: function ($corrEl) {
