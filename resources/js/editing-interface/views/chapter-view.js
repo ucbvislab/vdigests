@@ -39,10 +39,11 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
 
     initialize: function () {
       var thisView = this,
-          thisModel = thisView.model;
+          thisModel = thisView.model,
+          secs = thisModel.get("sections");
 
       // add screenshotes for existing sections
-      thisModel.get("sections").each(function (sec) {
+      secs.each(function (sec) {
         if (!sec.get("thumbnail")) {
           // TODO DRY
           window.setTimeout(function () {
@@ -56,22 +57,18 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       });
 
       // 'add' section listener
-      thisView.listenTo(thisView.model.get("sections"), "add", function (newSec) {
+      thisView.listenTo(secs, "add", function (newSec) {
         thisView.assign(thisView.getAssignedObject());
         console.log("adding a section in the chapter view");
         // pause to let other events finish
         window.setTimeout(function () {
-          thisView.$el.find("#" + newSec.cid + " ." + consts.absSummaryClass).focus();
-          var $vid = thisView.$el.find("video");
-          Utils.seekThenCaptureImgTime($vid, newSec.get("startWord").get("start"), function (newImgData) {
-            newSec.set("thumbnail", new ThumbnailModel({data: newImgData}));
-          });
+            thisView.placeThumbnailInSec(newSec);
         }, 200);
       });
 
       // 'remove' section listener
-      thisView.listenTo(thisModel.get("sections"), "remove", function (remSec) {
-        var nsecs = thisView.model.get("sections").length;
+      thisView.listenTo(secs, "remove", function (remSec) {
+        var nsecs = secs.length;
         if (nsecs === 0) {
           // we're out of sections: delete the chapter
           thisView.$el.find("video").get(0).pause();
@@ -104,6 +101,25 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
             playOneVideo(vid, stTime);
           });
         }
+      });
+
+      // listen for screenshot capture requests from sections
+      thisView.listenTo(secs, "captureThumbnail", function (secModel) {
+        var time = thisView.$el.find("video")[0].currentTime;
+        thisView.placeThumbnailInSec(secModel, time);
+      });
+    },
+
+    /**
+     * Place a thumbnail in the given section at the given time (optional time)
+     */
+    placeThumbnailInSec: function (sec, time) {
+      var thisView = this;
+      time = time || sec.get("startWord").get("start");
+      thisView.$el.find("#" + sec.cid + " ." + consts.absSummaryClass).focus();
+      var $vid = thisView.$el.find("video");
+      Utils.seekThenCaptureImgTime($vid, time, function (newImgData) {
+        sec.set("thumbnail", new ThumbnailModel({data: newImgData}));
       });
     },
 

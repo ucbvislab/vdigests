@@ -16,7 +16,8 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
 
     events: {
       'keyup .abs-summary': "summaryKeyUp",
-      "click .remove-section": "removeSection"
+      "click .remove-section": "removeSection",
+      "click .take-thumbnail-image": "takeThumbnailImage"
     },
 
     initialize: function () {
@@ -54,9 +55,16 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
           thisModel = thisView.model;
       // TODO for now, make sure it's not the first section
       if (window.confirm("Are you sure you want to remove this section?")) {
-        thisModel.collection.remove(thisModel);
-        console.log("deleted");
+        thisModel.get("startWord").set("startSection", false);
+        console.log("section deleted");
       }
+    },
+
+    takeThumbnailImage: function () {
+      var thisView = this,
+          thisModel = thisView.model;
+      thisModel.trigger("captureThumbnail", thisModel);
+      console.log("capturing thumbnail image.");
     }
   });
 });

@@ -180,6 +180,25 @@ body {
     height: 40px;
 }
 
+.take-thumbnail-image {
+    cursor: pointer;
+    color: #444444;
+    background-color: white;
+    font-size: 11px;
+    border: 1px solid #444444;
+    border-radius: 5px;
+    padding: 0px 3px;
+    margin: 0;
+    position: absolute;
+    left: 33.5px;
+    bottom: 3px;
+    display: none;
+}
+
+.take-thumbnail-image:hover, .keyframe-col:hover + .take-thumbnail-image {
+    display: block;
+}
+
 .remove-section {
     display: none;
     position: absolute;

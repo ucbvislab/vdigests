@@ -12,14 +12,24 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
     },
 
     initialize: function () {
-      var thisModel = this;
-      thisModel.listenToOnce(thisModel.get("startWord"), "change:switchStartWord", thisModel.switchStartWord);
+      var thisModel = this,
+          startWord = thisModel.get("startWord");
+      thisModel.switchStartWordListeners(null, startWord);
     },
 
-    switchStartWord: function (oldWord, newWord) {
+    switchStartWordListeners: function (oldWord, newWord) {
       var thisModel = this;
       thisModel.set("startWord", newWord);
       thisModel.listenToOnce(newWord, "change:switchStartWord", thisModel.switchStartWord);
+      thisModel.listenTo(newWord, "change:startSection", thisModel.handleSectionChange);
+      if (oldWord) {
+        thisModel.stopListening(oldWord);
+      }
+    },
+
+    handleSectionChange: function () {
+      var thisModel = this;
+      thisModel.destroy();
     }
   });
 });
