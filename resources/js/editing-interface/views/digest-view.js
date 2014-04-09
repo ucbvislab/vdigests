@@ -25,6 +25,7 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
 
       // add chapters
       thisView.listenTo(chaps, "add", function (newChap) {
+        console.log( "add chapter in digest view" );
         var cindex = chaps.indexOf(newChap),
             $chapEls = thisView.$el.find("." + consts.chapterClass),
             newChapView = new ChapterView({model: newChap}),

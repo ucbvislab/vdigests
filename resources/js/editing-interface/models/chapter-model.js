@@ -18,10 +18,17 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
     },
 
     initialize: function () {
-      var thisModel = this;
+      var thisModel = this,
+          startWord = thisModel.get("startWord");
       // FIXME HACK to keep track of videos
       thisModel.set("vct", window.vct++);
-      thisModel.switchStartWordListeners(null, thisModel.get("startWord"));
+      thisModel.switchStartWordListeners(null, startWord);
+
+      // chapters should always have at least one section
+      if (thisModel.get("sections").length === 0) {
+        startWord.set("startSection", true, {silent: true});
+        thisModel.get("sections").add(new SectionModel({startWord: startWord}));
+      }
     },
 
     switchStartWordListeners: function (oldWord, newWord) {

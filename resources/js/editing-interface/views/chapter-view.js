@@ -11,9 +11,9 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
   var playOneVideo = function (vid, time) {
     vid.currentTime = time;
     $(document.body).find("video").each(function (i, vid) {
-      console.log(vid);
       vid.pause();
     });
+    console.log(vid);
     vid.play();
   };
 
@@ -41,9 +41,24 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       var thisView = this,
           thisModel = thisView.model;
 
+      // add screenshotes for existing sections
+      thisModel.get("sections").each(function (sec) {
+        if (!sec.get("thumbnail")) {
+          // TODO DRY
+          window.setTimeout(function () {
+            thisView.$el.find("#" + sec.cid + " ." + consts.absSummaryClass).focus();
+            var $vid = thisView.$el.find("video");
+            Utils.seekThenCaptureImgTime($vid, sec.get("startWord").get("start"), function (newImgData) {
+              sec.set("thumbnail", new ThumbnailModel({data: newImgData}));
+            });
+          }, 500);
+        };
+      });
+
       // 'add' section listener
       thisView.listenTo(thisView.model.get("sections"), "add", function (newSec) {
         thisView.assign(thisView.getAssignedObject());
+        console.log("adding a section in the chapter view");
         // pause to let other events finish
         window.setTimeout(function () {
           thisView.$el.find("#" + newSec.cid + " ." + consts.absSummaryClass).focus();
@@ -60,9 +75,12 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
         if (nsecs === 0) {
           // we're out of sections: delete the chapter
           thisView.$el.find("video").get(0).pause();
-          thisModel.collection.remove(thisModel);
+          // TODO move this
           thisModel.get("startWord").set("startChapter", false);
-          thisModel.get("startWord").set("startSection", false);
+          //thisModel.collection.remove(thisModel);
+          // thisModel.get("startWord").set("startChapter", false);
+          // thisModel.get("startWord").set("startSection", false);
+          // TODO should this go here?
           thisView.remove();
         } else if (remSec.get("startWord").cid === thisModel.get("startWord").cid){
           // we deleted the leading section but have another section that we can make the leading section

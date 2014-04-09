@@ -12,9 +12,16 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/chapt
 
     initialize: function () {
       var thisModel = this;
-      thisModel.listenTo(thisModel.get("chapters"), "add", function (newChap) {
-        window.setTimeout(function(){newChap.get("startWord").set("startSection", true);}, 200);
-      });
+      // thisModel.listenTo(thisModel.get("chapters"), "add", function (newChap) {
+      //   window.setTimeout(function(){
+      //     var newStartWord = newChap.get("startWord");
+      //     newStartWord.set("startChapter", true);
+      //   }, 200);
+      // });
+      // thisModel.listenTo(thisModel.get("chapters"), "remove", function (rmChap) {
+      //     var newStartWord = rmChap.get("startWord");
+      //     newStartWord.set("startChapter", false);
+      // });
     }
   });
 });

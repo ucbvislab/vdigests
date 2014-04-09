@@ -27,6 +27,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
       // mark the first chapter if no chapters are present
       var chaps = thisModel.get("digest").get("chapters");
       if (!chaps.length) {
+        console.log("postinit");
         var fw = thisModel.get("transcript").get("words").first();
         fw.set("startChapter", true);
       }
@@ -41,6 +42,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
           chWordStTime = chWord.get("start");
 
       if (newVal) {
+        console.log( "new chapter in editor model" );
         // we're creating a new chapter
         var newChap = new ChapterModel({startWord: chWord}),
             prevChWord = chWord.getPrevChapterStart();
@@ -57,8 +59,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
         chaps.add(newChap);
 
       } else {
-        // don't allow the deletion of the first chapter
-        // we're removing a chapter
+        console.log("editor model false chapter");
       }
     },
 
@@ -86,6 +87,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
         prevChap.get("sections").add(newSection);
 
       } else {
+          console.log("editor model false section");
         // we're removing a section
       }
     }

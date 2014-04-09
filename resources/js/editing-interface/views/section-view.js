@@ -34,8 +34,6 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
       // remove the view if the underlying model is removed
       thisView.listenTo(thisModel, "remove", function (mdl) {
         thisView.remove();
-        thisModel.get("startWord").set("startSection", false);
-        thisModel.get("startWord").set("startChapter", false);
       });
     },
 
