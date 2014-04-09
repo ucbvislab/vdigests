@@ -12,7 +12,8 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
     dragChapClass: "drag-chapter-word",
     dragSecClass: "drag-section-word",
     jspTrackClass: "jspTrack",
-    scrollMarkPrefix: "scrollmark-"
+    scrollMarkPrefix: "scrollmark-",
+    highlightClass: "word-highlight"
   };
 
   return Backbone.View.extend({
@@ -26,11 +27,13 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
     },
 
     initialize: function () {
-      var thisView = this;
+      var thisView = this,
+          words = thisView.model.get("words");
       // set up model listeners
-      thisView.listenTo(thisView.model.get("words"), "change:startSection", thisView.changeStartSection);
-      thisView.listenTo(thisView.model.get("words"), "change:startChapter", thisView.changeStartChapter);
-      thisView.listenTo(thisView.model.get("words"), "sectionToChapter", thisView.sectionToChapter);
+      thisView.listenTo(words, "change:startSection", thisView.changeStartSection);
+      thisView.listenTo(words, "change:startChapter", thisView.changeStartChapter);
+      thisView.listenTo(words, "sectionToChapter", thisView.sectionToChapter);
+      thisView.listenTo(words, "change:highlight", thisView.changeHighlight);
     },
 
     /**
@@ -40,6 +43,18 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
       var thisView = this;
       thisView.$el.html(thisView.template(thisView.model.toJSON()));
       return thisView;
+    },
+
+    /**
+     * decide whether to highlight a word
+     */
+    changeHighlight: function (wrd, val) {
+      var $wrd = $("#" + wrd.cid);
+      if (val) {
+        $wrd.addClass(consts.highlightClass);
+      } else {
+        $wrd.removeClass(consts.highlightClass);
+      }
     },
 
     /**
@@ -123,11 +138,11 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
       thisView.$mdel = $tar;
 
       // add a section break
-      if (evt.altKey) {
+      if (evt.metaKey) {
         var $wordEl = $tar,
             changeType = "startSection";
 
-        if (evt.metaKey || evt.ctrlKey) {
+        if (evt.altKey || evt.ctrlKey) {
           changeType = "startChapter";
         }
 
@@ -155,10 +170,22 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
 
         var stWordModel = words.get($wordEl.attr('id'));
         // do nothing if the word already starts a section/chapter
-        if (stWordModel.get(changeType)) {
+        if (stWordModel.get("startChapter") || stWordModel.get("startSection")) {
+          if (changeType === "startChapter" && !stWordModel.get("startChapter")){
+            // change section to a chapter
+            thisView.changeStartSection (stWordModel, false);
+            stWordModel.set("startChapter", true);
+          } else if (changeType === "startSection"
+                     && stWordModel.get("startChapter")) {
+            // change chapter to section
+            stWordModel.set("startChapter", false);
+            thisView.changeStartSection (stWordModel, true);
+          }
           return;
+        } else {
+          // word does not already start a section/chapter
+          stWordModel.set(changeType, true);
         }
-        stWordModel.set(changeType, true);
       } // end alt-key
       else {
         var $fWord = thisView.$mdel.next();

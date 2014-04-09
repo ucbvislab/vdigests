@@ -25,7 +25,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       'keyup .chapter-header input': function (evt) {
         var thisView = this,
             $curTar = $(evt.currentTarget);
-        thisView.set("title", $curTar.val());
+        thisView.model.set("title", $curTar.val());
       }
     },
 
@@ -49,11 +49,13 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
           window.setTimeout(function () {
             thisView.$el.find("#" + sec.cid + " ." + consts.absSummaryClass).focus();
             var $vid = thisView.$el.find("video");
-            Utils.seekThenCaptureImgTime($vid, sec.get("startWord").get("start"), function (newImgData) {
-              sec.set("thumbnail", new ThumbnailModel({data: newImgData}));
-            });
+            thisView.placeThumbnailInSec(sec);
           }, 500);
         };
+      });
+
+      thisView.listenTo(thisModel, "destroy", function (chp) {
+        thisView.remove();
       });
 
       // 'add' section listener
@@ -108,6 +110,28 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
         var time = thisView.$el.find("video")[0].currentTime;
         thisView.placeThumbnailInSec(secModel, time);
       });
+
+      // listen to transcript progression from the video
+      window.setTimeout(function () {
+        var $elvid = thisView.$el.find("video"),
+            elvid = $elvid[0];
+        // only play one video at a time
+        $elvid.on("play", function () {
+          $("video").each(function (i, vid) {
+            if (vid != elvid){
+              vid.pause();
+            }
+          });
+        });
+        $elvid.on("timeupdate", function () {
+          var ct = $elvid.get(0).currentTime + 0.1, // add 0.1 so the transcript update appears instant
+              words = thisModel.get("startWord").collection;
+          // TODO this is baaad architecture
+          var hlWords = words.each(function (wrd) {
+            wrd.set("highlight", wrd.get("start") < ct && wrd.get("end") > ct);
+          });
+        });
+      }, 300);
     },
 
     /**
@@ -119,7 +143,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       thisView.$el.find("#" + sec.cid + " ." + consts.absSummaryClass).focus();
       var $vid = thisView.$el.find("video");
       Utils.seekThenCaptureImgTime($vid, time, function (newImgData) {
-        sec.set("thumbnail", new ThumbnailModel({data: newImgData}));
+        sec.set("thumbnail", new ThumbnailModel({data: newImgData, time: time}));
       });
     },
 

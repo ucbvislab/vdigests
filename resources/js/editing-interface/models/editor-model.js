@@ -43,8 +43,9 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
 
       if (newVal) {
         console.log( "new chapter in editor model" );
+        var sec2Chap = chWord.get("startSection");
         // we're creating a new chapter
-        var newChap = new ChapterModel({startWord: chWord}),
+        var newChap = new ChapterModel({startWord: chWord, sec2Chap: sec2Chap}),
             prevChWord = chWord.getPrevChapterStart();
 
         if (prevChWord) {

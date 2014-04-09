@@ -39,6 +39,7 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
 
       // remove chapters
       thisView.listenTo(chaps, "remove", function (removedChap) {
+        console.log("remove from digest view");
         thisView.$el.find("#" + removedChap.cid).remove();
       });
 
@@ -48,7 +49,7 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
             vid.pause();
           });
         } else if (evt.keyCode === consts.F1_KEYCODE) {
-          var blob = new window.Blob([window.JSON.stringify(thisView.model.toJSON())], {type: "text/plain;charset=utf-8"});
+          var blob = new window.Blob([window.JSON.stringify(thisView.model.getOutputJSON())], {type: "text/plain;charset=utf-8"});
           window.saveAs(blob, "video-digest.json");
         }
       });
