@@ -36,7 +36,7 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
                     vid.pause();
                   });
                 } else if (evt.keyCode === consts.F1_KEYCODE) {
-                  var blob = new window.Blob([window.JSON.stringify(thisView.model.getOutputJSON())], {type: "text/plain;charset=utf-8"});
+                  var blob = new window.Blob([window.JSON.stringify(thisView.model.get("digest").getOutputJSON())], {type: "text/plain;charset=utf-8"});
                   window.saveAs(blob, "video-digest.json");
                 } else if (evt.keyCode === consts.F2_KEY_CODE) {
                   $('input[type=file]').one("change", function() {

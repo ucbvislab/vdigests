@@ -14,7 +14,6 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
     $(document.body).find("video").each(function (i, vid) {
       vid.pause();
     });
-    console.log(vid);
     vid.play();
   };
 
@@ -70,6 +69,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
         if (!thisView.model.swapping) {
           thisView.placeThumbnailInSec(newSec);
         }
+        newSec.handleGainFocus();
       });
 
       // 'remove' section listener
@@ -131,7 +131,9 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
     placeThumbnailInSec: function (sec, time) {
       var thisView = this;
       time = time || sec.get("startWord").get("start");
-      thisView.$el.find("#" + sec.cid + " ." + consts.absSummaryClass).focus();
+      window.setTimeout(function () {
+        thisView.$el.find("#" + sec.cid + " ." + consts.absSummaryClass).focus();
+      }, 200);
       var $vid = thisView.$el.find("video");
       Utils.seekThenCaptureImgTime($vid, time, function (newImgData) {
         sec.set("thumbnail", new ThumbnailModel({data: newImgData, time: time}));

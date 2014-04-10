@@ -38,6 +38,12 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
         thisView.$el.find("." + consts.summaryDivClass).html(val);
       });
 
+      thisView.listenTo(thisModel, "gainfocus", function (mdl, val) {
+        window.setTimeout(function () {
+          thisView.$el.find("." + consts.summaryDivClass)[0].focus();
+        }, 200);
+      });
+
       // remove the view if the underlying model is removed
       thisView.listenTo(thisModel, "remove", function (mdl) {
         thisView.remove();

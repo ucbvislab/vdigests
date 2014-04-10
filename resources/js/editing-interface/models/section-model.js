@@ -20,16 +20,26 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
     switchStartWordListeners: function (oldWord, newWord) {
       var thisModel = this;
       thisModel.set("startWord", newWord);
-      thisModel.listenToOnce(newWord, "change:switchStartWord", thisModel.switchStartWord);
+      thisModel.listenToOnce(newWord, "change:switchStartWord", thisModel.switchStartWordListeners);
       thisModel.listenTo(newWord, "change:startSection", thisModel.handleSectionChange);
+      thisModel.listenTo(newWord, "infocus", thisModel.handleGainFocus);
       if (oldWord) {
         thisModel.stopListening(oldWord);
       }
+      window.setTimeout(function () {
+        thisModel.handleGainFocus();
+      }, 200);
     },
 
     handleSectionChange: function () {
       var thisModel = this;
       thisModel.destroy();
+    },
+
+    handleGainFocus: function () {
+      var thisModel = this;
+      thisModel.trigger("gainfocus");
     }
+
   });
 });

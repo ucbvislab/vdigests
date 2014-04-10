@@ -232,9 +232,11 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
           if ($tar.hasClass(consts.wordClass)) {
             // we're mousedowning on a word
             var upword = words.get($tar.attr("id")),
-                chstWord = upword.getPrevChapterStart(true);
+                chstWord = upword.getPrevChapterStart(true),
+                secWord = upword.getPrevSectionStart(true);;
             if (chstWord) {
               chstWord.trigger("startVideo", upword.get("start"));
+              secWord.trigger("infocus");
             }
           }
         }
