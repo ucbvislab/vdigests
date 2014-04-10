@@ -11,7 +11,7 @@ requirejs.config({
     jquery:"lib/jquery-1.11.0.min",
     underscore: "lib/underscore-min",
     backbone: "lib/backbone-min",
-    jqueryScrollTo: "lib/jquery.scrollTo",
+    jqueryScrollIntoView: "lib/jquery.scrollintoview",
     canvas2Image: "lib/canvas2image",
     text: "lib/text",
     jscrollpane: "lib/jquery.jscrollpane.min",
@@ -27,7 +27,7 @@ requirejs.config({
     underscore: {
       exports: "_"
     },
-    jqueryScrollTo: {
+    jqueryScrollIntoView: {
       deps: ['jquery']
     },
     backbone: {
@@ -39,7 +39,7 @@ requirejs.config({
 });
 
 // launch the main application (start the router)
-requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router", "jqueryScrollTo", "jscrollpane", "jmousewheel", "filesaver"], function ($, _, Backbone, AppRouter) {
+requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router", "jqueryScrollIntoView", "jscrollpane", "jmousewheel", "filesaver"], function ($, _, Backbone, AppRouter) {
   "use strict";
   console.log("started main");
   var appRouter = new AppRouter();

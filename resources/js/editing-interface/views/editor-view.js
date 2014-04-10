@@ -55,7 +55,9 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
               var thisView = this;
               // FIXME jScrollPane needs to be called after DOM insertion?
               window.setTimeout(function () {
-                thisView.$el.find("." + consts.transWrapClass).jScrollPane();
+                var el = thisView.$el.find("." + consts.transWrapClass).jScrollPane({autoReinitialise: true, autoReinitialiseDelay: 2000});
+                // TODO bad globals
+                window.jspApi = el.data("jsp");
               }, 100);
             },
 

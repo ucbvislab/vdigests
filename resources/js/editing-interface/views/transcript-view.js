@@ -13,7 +13,8 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
     dragSecClass: "drag-section-word",
     jspTrackClass: "jspTrack",
     scrollMarkPrefix: "scrollmark-",
-    highlightClass: "word-highlight"
+    highlightClass: "word-highlight",
+    blinkClass: "blink-me"
   };
 
   return Backbone.View.extend({
@@ -34,6 +35,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
       thisView.listenTo(words, "change:startChapter", thisView.changeStartChapter);
       thisView.listenTo(words, "sectionToChapter", thisView.sectionToChapter);
       thisView.listenTo(words, "change:highlight", thisView.changeHighlight);
+      thisView.listenTo(words, "focus", thisView.focusOnWord);
     },
 
     /**
@@ -326,6 +328,15 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
     getScrollMarkPercent: function ($transEl) {
       var thisView = this;
       return $transEl.position().top/thisView.$el.find("." + consts.transWordsClass).height()*100 - 0.1 + "%";
+    },
+
+    focusOnWord: function (fword) {
+      if (window.jspApi) {
+        window.jspApi.scrollToElement("#" + fword.cid, true, true);
+      }
+      var $segMark =  $('#' + fword.cid).prevAll("." + consts.segStClass + ":first");
+      console.log( $segMark );
+      $segMark.addClass(consts.blinkClass);
     }
   });
 });

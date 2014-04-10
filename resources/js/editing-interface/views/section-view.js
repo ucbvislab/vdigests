@@ -19,7 +19,8 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
       'keyup .abs-summary': "summaryKeyUp",
       "click .remove-section": "removeSection",
       "click .take-thumbnail-image": "takeThumbnailImage",
-      "click .keyframe-col": "startVideo"
+      "click .keyframe-col": "startVideo",
+      "click .abs-summary": "clickSummary"
     },
 
     initialize: function () {
@@ -83,6 +84,12 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
       var thisView= this,
           thisModel = thisView.model;
       thisModel.trigger("startVideo", thisModel.get("startWord").get("start"));
+    },
+
+    clickSummary: function () {
+      var thisView = this,
+          startWord = thisView.model.get("startWord");
+      startWord.trigger("focus", startWord);
     }
   });
 });
