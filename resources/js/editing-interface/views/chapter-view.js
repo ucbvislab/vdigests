@@ -136,7 +136,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       }, 200);
       var $vid = thisView.$el.find("video");
       Utils.seekThenCaptureImgTime($vid, time, function (newImgData) {
-        sec.set("thumbnail", new ThumbnailModel({data: newImgData, time: time}));
+        sec.set("thumbnail", new ThumbnailModel({data: newImgData, image_time: time}));
       });
     },
 

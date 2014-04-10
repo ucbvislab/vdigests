@@ -180,6 +180,34 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
         mchp.swapping = false;
       });
       addThumbs(toAddThumbs);
+    },
+
+    getOutputJSON: function () {
+      var thisModel = this,
+          outjson = {},
+          ij = 0;
+      thisModel.get("digest").get("chapters").each(function (chap, i) {
+        chap.get("sections").each(function (sec, j) {
+          var secjson = {
+            group: i,
+            group_title: chap.get("title"),
+            text: [sec.get("summary")],
+            start_time: sec.get("startWord").get("start"),
+            text_change: false,
+            image_change: false,
+            image_id: sec.get("thumbnail").cid,
+            image_time: sec.get("thumbnail").get("image_time")
+          };
+
+          if (ij) {
+            outjson[ij-1].end_time = secjson.start_time;
+          }
+          outjson[ij++] = secjson;
+        });
+      });
+      var words = thisModel.get("transcript").get("words");
+      outjson[ij-1].end_time = words.at(words.length - 1).get("end");
+      return outjson;
     }
   });
 });

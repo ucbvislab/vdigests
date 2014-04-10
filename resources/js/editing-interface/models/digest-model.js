@@ -33,28 +33,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/chapt
             console.log("chapter removed with no preceeding chapter");
           }
         });
-    },
-
-    getOutputJSON: function () {
-      var thisModel = this,
-          outjson = {},
-          ij = 0;
-      thisModel.get("chapters").each(function (chap, i) {
-        chap.get("sections").each(function (sec, j) {
-          var secjson = {
-            group: i,
-            group_title: chap.get("title"),
-            text: [sec.get("summary")],
-            start_time: sec.get("startWord").get("start"),
-            text_change: false,
-            image_change: false,
-            image_id: sec.get("thumbnail").cid,
-            image_time: sec.get("thumbnail").get("time")
-          };
-          outjson[ij++] = secjson;
-        });
-      });
-      return outjson;
     }
+
   });
 });
