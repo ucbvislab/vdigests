@@ -1,6 +1,18 @@
 
 /*global define */
-define(["backbone", "underscore", "jquery", "editing-interface/models/digest-model", "editing-interface/models/transcript-model", "editing-interface/models/chapter-model", "editing-interface/models/section-model"], function (Backbone, _, $, DigestModel, TranscriptModel, ChapterModel, SectionModel) {
+define(["backbone", "underscore", "jquery", "editing-interface/models/digest-model", "editing-interface/models/transcript-model", "editing-interface/models/chapter-model", "editing-interface/models/section-model", "editing-interface/utils/utils", "editing-interface/models/thumbnail-model"], function (Backbone, _, $, DigestModel, TranscriptModel, ChapterModel, SectionModel, Utils, ThumbnailModel) {
+
+
+  var addThumbs = function (toAddThumbs) {
+    if (toAddThumbs.length === 0) {
+      return;
+    }
+    var addThumb = toAddThumbs.pop();
+    Utils.seekThenCaptureImgTime(addThumb.$vid, addThumb.time, function (data) {
+      addThumb.addSec.set("thumbnail", new ThumbnailModel({data: data, image_time: addThumb.time}));
+      addThumbs(toAddThumbs);
+    });
+  };
 
   return Backbone.Model.extend({
 
@@ -91,6 +103,83 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
           console.log("editor model false section");
         // we're removing a section
       }
+    },
+
+    useJSONData: function (inpData) {
+
+      // parse the segment data
+      var thisModel = this,
+          words = thisModel.get("transcript").get("words"),
+          chaps = {};
+
+      // set the thumbnail TODO FIXME BAD this is soooo bad, the model shouldn't access the html,
+      // but Colorado is on a deadline =\
+      var vid = $("video").get(0),
+          $vid = $(vid);
+
+      // reset the transcript
+      thisModel.get("transcript").resetState();
+
+      _.each(inpData, function (inobj) {
+        var chasn = inobj.group,
+            sec = {summary: inobj.text[0], startWord: null, image_time: inobj.image_time};
+            // find the start word
+            var closestWord = null,
+                closestDist = Infinity,
+                compTime = inobj.start_time;
+            words.each(function (wrd) {
+              var dist = Math.abs(wrd.get("start") - compTime);
+              if (dist < closestDist) {
+                closestDist = dist;
+                closestWord = wrd;
+              }
+            });
+            sec.startWord = closestWord;
+
+        chaps[chasn] = chaps[chasn] || {"sections": [], startWord: null, title: inobj.group_title};
+        chaps[chasn].sections.push(sec);
+      });
+
+      _.each(chaps, function (chp) {
+        chp.sections = chp.sections.sort(function (s1, s2) {
+          return s1.startWord.get("start") - s2.startWord.get("start");
+        });
+        chp.startWord = chp.sections[0].startWord;
+      });
+      chaps = $.map(chaps, function (ch) {
+        return ch;
+      }).sort(function (c1, c2) {
+        return c1.startWord.get("start") - c2.startWord.get("start");
+      });
+
+      var modelChaps = thisModel.get("digest").get("chapters"),
+          toAddThumbs = [];
+      // set the start word of the chapter
+      _.each(chaps, function (chp) {
+        var mchp;
+        _.each(chp.sections, function (sec, i) {
+          var addSec = null;
+          if (i === 0) {
+            sec.startWord.set("startChapter", true);
+            mchp = modelChaps.findWhere({startWord: sec.startWord});
+            // FIXME hack
+            mchp.swapping = true;
+            mchp.set("title", chp.title);
+            // chapter has been created
+          } else {
+            sec.startWord.set("startSection", true);
+          }
+          addSec = mchp.get("sections").findWhere({startWord: sec.startWord});
+          if (addSec) {
+            addSec.set("summary", sec.summary);
+          } else {
+            throw Error("unable to find section matching start word");
+          }
+          toAddThumbs.push({$vid: $vid, time:  sec.image_time, addSec: addSec});
+        });
+        mchp.swapping = false;
+      });
+      addThumbs(toAddThumbs);
     }
   });
 });

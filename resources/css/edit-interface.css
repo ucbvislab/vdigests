@@ -110,6 +110,7 @@ body {
     margin-left: 20px;
     position: relative;
     bottom: 3px;
+    color: #645C6F;
 }
 .chapter-header:hover {
     opacity: 1;
@@ -321,4 +322,13 @@ body {
 }
 .drag-section-word {
     color: blue;
+}
+
+/** ASSORTED OTHER CSS */
+input[type=file] {
+    display:block;
+    height:0;
+    width:0;
+    position: absolute;
+    top: 0;
 }

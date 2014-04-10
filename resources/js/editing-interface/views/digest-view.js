@@ -4,9 +4,7 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
 
   var consts = {
     chapterWrapClass: "digest-chapters-wrap",
-    chapterClass: "chapter",
-    ESCAPE_KEYCODE: 27,
-    F1_KEYCODE: 112
+    chapterClass: "chapter"
   };
 
   return CompoundBackboneView.extend({
@@ -41,17 +39,6 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
       thisView.listenTo(chaps, "remove", function (removedChap) {
         console.log("remove from digest view");
         thisView.$el.find("#" + removedChap.cid).remove();
-      });
-
-      $(document.body).on("keyup", function (evt) {
-        if (evt.keyCode === consts.ESCAPE_KEYCODE) {
-          $("video").each(function (i, vid) {
-            vid.pause();
-          });
-        } else if (evt.keyCode === consts.F1_KEYCODE) {
-          var blob = new window.Blob([window.JSON.stringify(thisView.model.getOutputJSON())], {type: "text/plain;charset=utf-8"});
-          window.saveAs(blob, "video-digest.json");
-        }
       });
     },
 

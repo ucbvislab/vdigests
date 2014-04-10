@@ -13,27 +13,31 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
     return Backbone.Router.extend({
 
       routes: {
-        "": "mainRoute"
+        "": "noParams",
+        ":params": "mainRoute"
+      },
+
+      noParams: function () {
+        alert("you must set the desired data after the hashbang");
       },
 
       /**
        * Main route for editing interface
        * TODO allow input video to be specified as a param?
        */
-      mainRoute: function () {
+      mainRoute: function (dataname) {
         var thisRoute = this;
+        console.log("in router with params: " + dataname);
+        window.dataname = dataname;
 
         // create the editor model which has the trans and digest views
-        if (!thisRoute.editorModel) {
-          thisRoute.editorModel = new EditorModel();
-        }
-
+        thisRoute.editorModel = new EditorModel();
         thisRoute.editorModel.get("transcript").fetch({success: function () {
           // create the editor view
-          thisRoute.editorView = thisRoute.editorView || new EditorView({model: thisRoute.editorModel});
+          thisRoute.editorView =  new EditorView({model: thisRoute.editorModel});
 
           // now  show the editor view
-          $("body").prepend(thisRoute.editorView.render().el);
+          $("body").html(thisRoute.editorView.render().el);
           thisRoute.editorModel.postInit();
         }});
       }

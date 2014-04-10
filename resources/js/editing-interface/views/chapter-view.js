@@ -5,7 +5,8 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
   var consts = {
     sectionWrapClass: "summary-column",
     viewClass: "chapter row",
-    absSummaryClass: "abs-summary"
+    absSummaryClass: "abs-summary",
+    chapHeaderClass: "chapter-header"
   };
 
   var playOneVideo = function (vid, time) {
@@ -42,6 +43,10 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
           thisModel = thisView.model,
           secs = thisModel.get("sections");
 
+      thisView.listenTo(thisModel, "change:title", function (mdl, val) {
+        thisView.$el.find("." + consts.chapHeaderClass + " input").val(val);
+      });
+
       // add screenshotes for existing sections
       secs.each(function (sec) {
         if (!sec.get("thumbnail")) {
@@ -50,7 +55,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
             thisView.$el.find("#" + sec.cid + " ." + consts.absSummaryClass).focus();
             var $vid = thisView.$el.find("video");
             thisView.placeThumbnailInSec(sec);
-          }, 500);
+          }, 200);
         };
       });
 
@@ -62,10 +67,9 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       thisView.listenTo(secs, "add", function (newSec) {
         thisView.assign(thisView.getAssignedObject());
         console.log("adding a section in the chapter view");
-        // pause to let other events finish
-        window.setTimeout(function () {
-            thisView.placeThumbnailInSec(newSec);
-        }, 200);
+        if (!thisView.model.swapping) {
+          thisView.placeThumbnailInSec(newSec);
+        }
       });
 
       // 'remove' section listener
@@ -76,10 +80,6 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
           thisView.$el.find("video").get(0).pause();
           // TODO move this
           thisModel.get("startWord").set("startChapter", false);
-          //thisModel.collection.remove(thisModel);
-          // thisModel.get("startWord").set("startChapter", false);
-          // thisModel.get("startWord").set("startSection", false);
-          // TODO should this go here?
           thisView.remove();
         } else if (remSec.get("startWord").cid === thisModel.get("startWord").cid){
           // we deleted the leading section but have another section that we can make the leading section
@@ -93,17 +93,8 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       });
 
       // listen for play events from the underlying chapter
-      thisView.listenTo(thisView.model, "startVideo", function (stTime) {
-        var $vid = thisView.$el.find("video"),
-            vid = $vid[0];
-        try {
-          playOneVideo(vid, stTime);
-        } catch (e) {
-          $vid.one("canplay", function () {
-            playOneVideo(vid, stTime);
-          });
-        }
-      });
+      thisView.listenTo(thisView.model, "startVideo", thisView.startVideo);
+      thisView.listenTo(thisView.model.get("sections"), "startVideo", thisView.startVideo);
 
       // listen for screenshot capture requests from sections
       thisView.listenTo(secs, "captureThumbnail", function (secModel) {
@@ -163,6 +154,19 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       assignObj["." + consts.sectionWrapClass] = thisView.sectionsView;
 
       return assignObj;
-    }
+    },
+
+    startVideo: function (stTime) {
+        var thisView = this,
+            $vid = thisView.$el.find("video"),
+            vid = $vid[0];
+        try {
+          playOneVideo(vid, stTime);
+        } catch (e) {
+          $vid.one("canplay", function () {
+            playOneVideo(vid, stTime);
+          });
+        }
+      }
   });
 });

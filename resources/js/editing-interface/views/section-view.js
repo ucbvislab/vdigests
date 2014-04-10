@@ -4,7 +4,8 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
   var consts = {
     className: "row section-row",
     keyframeClass: "keyframe-col",
-    thumbClass: "section-thumbnail"
+    thumbClass: "section-thumbnail",
+    summaryDivClass: "abs-summary"
   };
 
   return Backbone.View.extend({
@@ -17,7 +18,8 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
     events: {
       'keyup .abs-summary': "summaryKeyUp",
       "click .remove-section": "removeSection",
-      "click .take-thumbnail-image": "takeThumbnailImage"
+      "click .take-thumbnail-image": "takeThumbnailImage",
+      "click .keyframe-col": "startVideo"
     },
 
     initialize: function () {
@@ -30,6 +32,10 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
         $img.addClass(consts.thumbClass);
         $img.attr("src", mdl.get("thumbnail").get("data"));
         thisView.$el.find("." + consts.keyframeClass).html($img);
+      });
+
+      thisView.listenTo(thisModel, "change:summary", function (mdl, val) {
+        thisView.$el.find("." + consts.summaryDivClass).html(val);
       });
 
       // remove the view if the underlying model is removed
@@ -60,11 +66,17 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
       }
     },
 
-    takeThumbnailImage: function () {
+    takeThumbnailImage: function (evt) {
       var thisView = this,
           thisModel = thisView.model;
       thisModel.trigger("captureThumbnail", thisModel);
       console.log("capturing thumbnail image.");
+    },
+
+    startVideo: function () {
+      var thisView= this,
+          thisModel = thisView.model;
+      thisModel.trigger("startVideo", thisModel.get("startWord").get("start"));
     }
   });
 });

@@ -7,7 +7,10 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
             digestWrapClass: "digest-wrap",
             transWrapClass: "transcript-wrap",
             viewClass: "editor-wrap",
-            RETURN_KEY_CODE: 13
+            RETURN_KEY_CODE: 13,
+            ESCAPE_KEYCODE: 27,
+            F1_KEYCODE: 112,
+            F2_KEY_CODE:113
           };
 
           return CompoundBackboneView.extend({
@@ -26,6 +29,23 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
 
             initialize: function () {
               var thisView = this;
+
+              $(document.body).on("keyup", function (evt) {
+                if (evt.keyCode === consts.ESCAPE_KEYCODE) {
+                  $("video").each(function (i, vid) {
+                    vid.pause();
+                  });
+                } else if (evt.keyCode === consts.F1_KEYCODE) {
+                  var blob = new window.Blob([window.JSON.stringify(thisView.model.getOutputJSON())], {type: "text/plain;charset=utf-8"});
+                  window.saveAs(blob, "video-digest.json");
+                } else if (evt.keyCode === consts.F2_KEY_CODE) {
+                  $('input[type=file]').one("change", function() {
+                    thisView.handleUpload(this);
+                    console.log("input file change");
+                  });
+                  $('input[type=file]').trigger('click');
+                }
+              });
             },
 
             /**
@@ -55,6 +75,24 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
               assignObj["." + consts.transWrapClass] = thisView.transView;
 
               return assignObj;
+            },
+
+            handleUpload: function (uploadEl) {
+              var thisView = this;
+
+              if (window.File && window.FileReader && window.FileList && window.Blob) {
+                var uploadFile = uploadEl.files[0];
+                var filereader = new window.FileReader();
+
+                filereader.onload = function(){
+                  var txtRes = filereader.result;
+                  var jsonObj = JSON.parse(txtRes);
+                  thisView.model.useJSONData(jsonObj);
+                };
+                filereader.readAsText(uploadFile);
+              } else {
+                alert("Your browser won't let you upload a file...");
+              }
             }
           });
         });

@@ -30,7 +30,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/chapt
           if (closestChapter) {
             closestChapter.get("sections").add(chp.get("sections").models);
           } else {
-            throw Error("Changed chapter does not have a preceeding chapter");
+            console.log("chapter removed with no preceeding chapter");
           }
         });
     },
@@ -44,7 +44,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/chapt
           var secjson = {
             group: i,
             group_title: chap.get("title"),
-            text: sec.get("summary"),
+            text: [sec.get("summary")],
             start_time: sec.get("startWord").get("start"),
             text_change: false,
             image_change: false,

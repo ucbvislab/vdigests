@@ -47,5 +47,6 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
         thisModel.stopListening(oldWord);
       }
     }
+
   });
 });

@@ -4,7 +4,9 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/word-
 
   return Backbone.Model.extend({
     // TODO fix hardcoding
-    url: "resources/content/HansRosling_aligned.json",
+    url: function () {
+      return "resources/content/" + window.dataname + "_aligned.json";
+    },
 
     defaults: function () {
       return {
@@ -46,6 +48,14 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/word-
       newStartModel.set("startSection", oldStartSec, {silent: true});
       oldStartModel.trigger("change:switchStartWord", oldStartModel, newStartModel);
       newStartModel.trigger("change:switchStartWord", oldStartModel, newStartModel);
+    },
+
+    resetState: function () {
+      var thisModel = this;
+      thisModel.get("words").each(function (wrd) {
+        wrd.set("startChapter", false);
+        wrd.set("startSection", false);
+      });
     }
   });
 });
