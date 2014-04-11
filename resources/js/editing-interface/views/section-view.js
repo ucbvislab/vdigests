@@ -16,7 +16,7 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
     className: consts.className,
 
     events: {
-      'keyup .abs-summary': "summaryKeyUp",
+      'blur .abs-summary': "summaryBlur",
       "click .remove-section": "removeSection",
       "click .take-thumbnail-image": "takeThumbnailImage",
       "click .keyframe-col": "startVideo",
@@ -57,10 +57,16 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
       return thisView;
     },
 
-    summaryKeyUp: function (evt) {
+    summaryBlur: function (evt) {
       var thisView = this,
-      $curTar = $(evt.currentTarget);
-      thisView.model.set("summary", $curTar.text());
+      $curTar = $(evt.currentTarget),
+      text = $curTar.text();
+      if (text !== thisView.model.get("summary")) {
+        thisView.model.set("summary", text);
+
+        // USE STATS
+        window.vdstats.nSummaryEdits.push((new Date()).getTime());
+      }
     },
 
     removeSection: function (evt) {

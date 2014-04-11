@@ -363,7 +363,6 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
         window.jspApi.scrollToElement("#" + fword.cid, true, true);
       }
       var $segMark =  $('#' + fword.cid).prevAll("." + consts.segStClass + ":first");
-      console.log( $segMark );
       $segMark.addClass(consts.blinkClass);
     }
   });

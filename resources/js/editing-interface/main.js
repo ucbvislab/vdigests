@@ -75,7 +75,8 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
     nChap2Sec: [], // done
     nKeyFrameChanges: [], // done
     nVideoStartsFromTrans: [], // done
-    nVideoStartsFromVideo: [] // done
+    nVideoStartsFromVideo: [], // done
+    nSummaryEdits: []
   };
   var lastTime = (new Date()).getTime();
   $(window).on("keyup", function (e) {
