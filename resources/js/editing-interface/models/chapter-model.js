@@ -28,12 +28,22 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
 
     switchStartWordListeners: function (oldWord, newWord) {
       var thisModel = this;
+
+      // USE STATS
+      if (oldWord) {
+        window.vdstats.nChapMoves.push((new Date()).getTime());
+      }
+
       thisModel.listenToOnce(newWord, "change:switchStartWord", thisModel.switchStartWordListeners);
       thisModel.listenTo(newWord, "startVideo", function (stTime) {
         thisModel.trigger("startVideo", stTime);
       });
       thisModel.listenTo(newWord, "change:startChapter", function (wrd, val) {
         if (!val) {
+
+          // USE STATS
+          window.vdstats.nChapDeletion.push((new Date()).getTime());
+
           thisModel.destroy();
         }
       });

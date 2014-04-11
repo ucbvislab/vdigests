@@ -61,4 +61,27 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
   window.onbeforeunload = function () {
     return "are you finished creating a digest?";
   };
+
+
+  // USE STATS collection for interface study
+  window.vdstats = {
+    nChapCreation: [], // done
+    nSecCreation: [], // done
+    nChapDeletion: [],  // done
+    nSecDeletion: [],  // done
+    nChapMoves: [], // done
+    nSecMoves: [], // done
+    nSec2Chap: [], // done
+    nChap2Sec: [], // done
+    nKeyFrameChanges: [], // done
+    nVideoStartsFromTrans: [], // done
+    nVideoStartsFromVideo: [] // done
+  };
+  var lastTime = (new Date()).getTime();
+  $(window).on("keyup", function (e) {
+    if (e.keyCode == 119) {
+      alert("elapsed seconds: " + ((new Date()).getTime() - lastTime)/1000);
+      lastTime = (new Date()).getTime();
+    }
+  });
 });

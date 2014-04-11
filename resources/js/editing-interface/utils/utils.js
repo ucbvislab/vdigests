@@ -11,7 +11,12 @@ define(["underscore", "jquery", "canvas2Image"], function (_, $, Canvas2Image) {
     var vid = $video[0];
     w = w || 59;
     h = h || 43;
+
+    // USE STATS
+    window.imgSeek = true;
+
     // when the video has seeked to that time
+
     $video.one('seeked', function(){
       // return a capture
       var canvas = document.createElement("canvas");
@@ -20,6 +25,11 @@ define(["underscore", "jquery", "canvas2Image"], function (_, $, Canvas2Image) {
       canvas.getContext('2d').drawImage(vid, 0, 0, canvas.width, canvas.height);
       var imdata = canvas.toDataURL();
       callback(imdata, w, h);
+      window.setTimeout(function () {
+        // USE STATS
+        window.imgSeek = false;
+      }, 200);
+
     });
     // change the vid time;
     try {

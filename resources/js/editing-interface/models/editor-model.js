@@ -53,6 +53,13 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
           chaps = thisModel.get("digest").get("chapters"),
           chWordStTime = chWord.get("start");
 
+      // USE STATS
+      if (!window.changingSecChap) {
+        if (newVal) {
+          window.vdstats.nChapCreation.push((new Date()).getTime());
+        }
+      }
+
       if (newVal) {
         console.log( "new chapter in editor model" );
         var sec2Chap = chWord.get("startSection");
@@ -82,6 +89,16 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
     handleSectionChange: function (chWord, newVal) {
       var thisModel = this,
           chaps = thisModel.get("digest").get("chapters");
+
+      if (!window.changingSecChap) {
+        // USE STATS
+        if (newVal) {
+          window.vdstats.nSecCreation.push((new Date()).getTime());
+        } else {
+          window.vdstats.nSecDeletion.push((new Date()).getTime());
+        }
+      }
+
 
       if (newVal) {
         // we're adding a section

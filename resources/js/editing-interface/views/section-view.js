@@ -78,6 +78,10 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
           thisModel = thisView.model;
       thisModel.trigger("captureThumbnail", thisModel);
       console.log("capturing thumbnail image.");
+
+      // USE STATS
+      window.vdstats.nKeyFrameChanges.push((new Date()).getTime());
+
     },
 
     startVideo: function () {

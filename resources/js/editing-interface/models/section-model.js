@@ -19,6 +19,12 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
 
     switchStartWordListeners: function (oldWord, newWord) {
       var thisModel = this;
+
+      // USE STATS
+      if (oldWord) {
+        window.vdstats.nSecMoves.push((new Date()).getTime());
+      }
+
       thisModel.set("startWord", newWord);
       thisModel.listenToOnce(newWord, "change:switchStartWord", thisModel.switchStartWordListeners);
       thisModel.listenTo(newWord, "change:startSection", thisModel.handleSectionChange);

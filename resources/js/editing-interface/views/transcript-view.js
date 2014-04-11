@@ -1,3 +1,4 @@
+
 /*global define */
 define(["backbone", "underscore", "jquery", "text!templates/transcript-template.html"], function (Backbone, _, $, tmpl) {
 
@@ -175,13 +176,30 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
         if (stWordModel.get("startChapter") || stWordModel.get("startSection")) {
           if (changeType === "startChapter" && !stWordModel.get("startChapter")){
             // change section to a chapter
+
+            // USE STATS
+            window.vdstats.nSec2Chap.push((new Date()).getTime());
+            window.changingSecChap = true;
+
             thisView.changeStartSection (stWordModel, false);
             stWordModel.set("startChapter", true);
+
+            // USE STATS
+            window.changingSecChap = false;
+
           } else if (changeType === "startSection"
                      && stWordModel.get("startChapter")) {
             // change chapter to section
+
+            // USE STATS
+            window.vdstats.nChap2Sec.push((new Date()).getTime());
+            window.changingSecChap = true;
+
             stWordModel.set("startChapter", false);
             thisView.changeStartSection (stWordModel, true);
+
+            // USE STATS
+            window.changingSecChap = false;
           }
           return;
         } else {
@@ -237,8 +255,18 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
                 chstWord = upword.getPrevChapterStart(true),
                 secWord = upword.getPrevSectionStart(true);;
             if (chstWord) {
+              // USE STATS
+              window.vdstats.nVideoStartsFromTrans.push((new Date()).getTime());
+              window.startFromTran = true;
+
               chstWord.trigger("startVideo", upword.get("start"));
               secWord.trigger("infocus");
+
+              // USE STATS
+              window.setTimeout(function () {
+                window.startFromTran = false;
+              }, 800);
+
             }
           }
         }

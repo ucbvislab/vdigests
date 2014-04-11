@@ -15,6 +15,13 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/chapt
         thisModel.listenTo(thisModel.get("chapters"), "remove", function (chp) {
           // move section of the chapter to the preceding chapter if it exists
           console.log("remove chapter from digest model");
+
+          // make sure we have remaining sections
+          if (chp.get("sections").length == 0) {
+            return;
+          }
+
+          // move the remaining sections
           var chpStartTime = chp.get("sections").models[0].get("startWord").get("start"),
               closestChapter,
               curMin = Infinity;

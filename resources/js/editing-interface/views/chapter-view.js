@@ -106,8 +106,22 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       window.setTimeout(function () {
         var $elvid = thisView.$el.find("video"),
             elvid = $elvid[0];
+
+        // USE  STATS
+        $elvid.on("seeked", function () {
+          if (!window.startFromTran && !window.imgSeek) {
+            window.vdstats.nVideoStartsFromVideo.push((new Date()).getTime());
+          }
+        });
+
         // only play one video at a time
         $elvid.on("play", function () {
+
+          // USE STATS
+          if (!window.startFromTran) {
+            window.vdstats.nVideoStartsFromVideo.push((new Date()).getTime());
+          }
+
           $("video").each(function (i, vid) {
             if (vid != elvid){
               vid.pause();
@@ -135,6 +149,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
         thisView.$el.find("#" + sec.cid + " ." + consts.absSummaryClass).focus();
       }, 200);
       var $vid = thisView.$el.find("video");
+
       Utils.seekThenCaptureImgTime($vid, time, function (newImgData) {
         sec.set("thumbnail", new ThumbnailModel({data: newImgData, image_time: time}));
       });
