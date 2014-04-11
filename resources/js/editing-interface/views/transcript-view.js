@@ -364,6 +364,9 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
       }
       var $segMark =  $('#' + fword.cid).prevAll("." + consts.segStClass + ":first");
       $segMark.addClass(consts.blinkClass);
+      window.setTimeout(function () {
+        $segMark.removeClass(consts.blinkClass);
+      }, 3300);
     }
   });
 });

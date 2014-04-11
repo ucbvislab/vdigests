@@ -69,7 +69,7 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
     float: left;
-    width: 720px;
+    width: 780px;
     height: inherit;
     padding-left: 10px;
     background: rgba(255,255,255,1);
@@ -102,7 +102,7 @@ body {
 }
 .chapter-header input {
     outline: none;
-    width: 50%;
+    width: 110%;
     font-size: 20px;
     border: none;
     overflow: hidden;
@@ -129,7 +129,7 @@ body {
     position: relative;
     padding-bottom: 30px;
     width: 53%;
-    padding-left: 12px;
+    padding-left: 78px;
 }
 
 .section-row {
@@ -158,10 +158,10 @@ body {
 /* section level css     */
 /************************/
 .blendTextarea .abs-summary {
-    width: 285px;
+    width: 289px;
     border: none;
     border-radius: 4px;
-    margin-left: 80px;
+    margin-left: 75px;
     font-size: 10px;
     min-height: 43px;
 
@@ -205,7 +205,7 @@ body {
     display: none;
     position: absolute;
     top: -12px;
-    right: 26px;
+    right: -10px;
     font-size: 18px;
     color: #555555;
     cursor: pointer;
@@ -327,17 +327,17 @@ body {
 
 .blink-me {
     -webkit-animation-name: blinker;
-    -webkit-animation-duration: 1.5s;
+    -webkit-animation-duration: 1s;
     -webkit-animation-timing-function: linear;
     -webkit-animation-iteration-count: 3;
 
     -moz-animation-name: blinker;
-    -moz-animation-duration: 1.5s;
+    -moz-animation-duration: 1s;
     -moz-animation-timing-function: linear;
     -moz-animation-iteration-count: 3;
 
     animation-name: blinker;
-    animation-duration: 1.5s;
+    animation-duration: 1s;
     animation-timing-function: linear;
     animation-iteration-count: 3;
 }

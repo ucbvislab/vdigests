@@ -27,10 +27,16 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
        */
       mainRoute: function (dataname) {
         var thisRoute = this;
-        console.log("in router with params: " + dataname);
-        window.dataname = dataname;
 
         // create the editor model which has the trans and digest views
+        if (thisRoute.editorModel) {
+          if (!confirm("Do you want to remove your current work?")) {
+            return;
+          }
+        }
+
+        window.dataname = dataname;
+
         thisRoute.editorModel = new EditorModel();
         thisRoute.editorModel.get("transcript").fetch({success: function () {
           // create the editor view
