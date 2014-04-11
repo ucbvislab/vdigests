@@ -58,5 +58,7 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
     setBodyHeight($window.height());
   });
   setBodyHeight($window.height());
-
+  window.onbeforeunload = function () {
+    return "are you finished creating a digest?";
+  };
 });
