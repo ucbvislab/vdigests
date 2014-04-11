@@ -29,11 +29,14 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
     switchStartWordListeners: function (oldWord, newWord) {
       var thisModel = this;
 
+      console.log( "switch start word listeners" );
+
       // USE STATS
       if (oldWord) {
         window.vdstats.nChapMoves.push((new Date()).getTime());
       }
 
+      thisModel.set("startWord", newWord);
       thisModel.listenToOnce(newWord, "change:switchStartWord", thisModel.switchStartWordListeners);
       thisModel.listenTo(newWord, "startVideo", function (stTime) {
         thisModel.trigger("startVideo", stTime);
@@ -47,6 +50,8 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
           thisModel.destroy();
         }
       });
+
+      // stop listening to the old word
       if (oldWord) {
         thisModel.stopListening(oldWord);
       }

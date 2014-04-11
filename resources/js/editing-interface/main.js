@@ -82,6 +82,11 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
     if (e.keyCode == 119) {
       alert("elapsed seconds: " + ((new Date()).getTime() - lastTime)/1000);
       lastTime = (new Date()).getTime();
+    } else if (e.keyCode == 120) {
+      // export the user stats
+      window.vdstats.compTime = ((new Date()).getTime() - lastTime)/1000;
+      var blob = new window.Blob([window.JSON.stringify(window.vdstats)], {type: "text/plain;charset=utf-8"});
+      window.saveAs(blob, "use-stats.json");
     }
   });
 });
