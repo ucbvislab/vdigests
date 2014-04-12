@@ -62,7 +62,6 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
     return "are you finished creating a digest?";
   };
 
-
   // USE STATS collection for interface study
   window.vdstats = {
     nChapCreation: [], // done
@@ -76,13 +75,14 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
     nKeyFrameChanges: [], // done
     nVideoStartsFromTrans: [], // done
     nVideoStartsFromVideo: [], // done
-    nSummaryEdits: []
+    nSummaryEdits: [],
+    nSubtitleEdits: []
   };
   var lastTime = (new Date()).getTime();
   $(window).on("keyup", function (e) {
     if (e.keyCode == 119) {
       alert("elapsed seconds: " + ((new Date()).getTime() - lastTime)/1000);
-      lastTime = (new Date()).getTime();
+      // lastTime = (new Date()).getTime();
     } else if (e.keyCode == 120) {
       // export the user stats
       window.vdstats.compTime = ((new Date()).getTime() - lastTime)/1000;
@@ -90,4 +90,17 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
       window.saveAs(blob, "use-stats.json");
     }
   });
+
+  var saveToLocalStorage = function () {
+     window.setTimeout(function () {
+       var jvd = window.JSON.stringify(window.vdstats),
+           jdm = window.JSON.stringify(window.editorModel.getOutputJSON());
+       window.localStorage["vdstats"] = jvd;
+       window.localStorage["editorData"] = jdm;
+       console.log("saved to local");
+     }, 30000);
+  };
+
+  saveToLocalStorage();
+
 });

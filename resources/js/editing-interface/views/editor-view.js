@@ -10,7 +10,8 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
             RETURN_KEY_CODE: 13,
             ESCAPE_KEYCODE: 27,
             F1_KEYCODE: 112,
-            F2_KEY_CODE:113
+            F2_KEY_CODE:113,
+            SPACE_KEYCODE: 32
           };
 
           return CompoundBackboneView.extend({
@@ -32,9 +33,21 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
 
               $(document.body).on("keyup", function (evt) {
                 if (evt.keyCode === consts.ESCAPE_KEYCODE) {
+                  var wasPlaying = false;
                   $("video").each(function (i, vid) {
-                    vid.pause();
+                    if (!vid.paused) {
+                      wasPlaying = true;
+                      vid.pause();
+                    }
                   });
+                  if (!wasPlaying) {
+                    if (window.prevPlayVid) {
+                      window.prevPlayVid.play();
+                      evt.stopPropagation();
+                    } else {
+                      $("video")[0].play();
+                    }
+                  }
                 } else if (evt.keyCode === consts.F1_KEYCODE) {
                   var blob = new window.Blob([window.JSON.stringify(thisView.model.getOutputJSON())], {type: "text/plain;charset=utf-8"});
                   window.saveAs(blob, "video-digest.json");

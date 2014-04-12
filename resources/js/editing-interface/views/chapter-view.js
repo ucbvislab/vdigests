@@ -25,7 +25,11 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       'keyup .chapter-header input': function (evt) {
         var thisView = this,
             $curTar = $(evt.currentTarget);
+        thisView.typing = true;
         thisView.model.set("title", $curTar.val());
+        // USE STATS
+        window.vdstats.nSubtitleEdits.push((new Date()).getTime());
+        thisView.typing = false;
       }
     },
 
@@ -43,7 +47,9 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
           secs = thisModel.get("sections");
 
       thisView.listenTo(thisModel, "change:title", function (mdl, val) {
-        thisView.$el.find("." + consts.chapHeaderClass + " input").val(val);
+        if (!thisView.typing) {
+          thisView.$el.find("." + consts.chapHeaderClass + " input").val(val);
+        }
       });
 
       // add screenshotes for existing sections
@@ -127,6 +133,8 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
               vid.pause();
             }
           });
+
+          window.prevPlayVid = $elvid[0];
         });
         $elvid.on("timeupdate", function () {
           var ct = $elvid.get(0).currentTime + 0.1, // add 0.1 so the transcript update appears instant

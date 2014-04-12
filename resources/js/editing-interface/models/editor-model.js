@@ -29,6 +29,9 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
                         "change:startSection", thisModel.handleSectionChange);
       thisModel.listenTo(thisModel.get("transcript").get("words"),
                          "change:startChapter", thisModel.handleChapterChange);
+
+      // USE STATS
+      window.editorModel = thisModel;
     },
 
     /**

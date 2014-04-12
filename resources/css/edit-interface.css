@@ -83,6 +83,10 @@ body {
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f5f6ff', GradientType=1 );
 }
 
+.digest-chapters-wrap {
+    margin-top: 12px;
+}
+
 
 /*************************/
 /* chapter-level css     */
@@ -127,9 +131,8 @@ body {
 
 .summary-column {
     position: relative;
-    padding-bottom: 30px;
     width: 53%;
-    padding-left: 78px;
+    padding-left: 76px;
 }
 
 .section-row {
@@ -138,8 +141,8 @@ body {
 }
 
 .keyframe-col {
-    width: 59px;
-    height: 43px;
+    width: 68px;
+    height: 50px;
     margin-left: 15px;
     border-radius: 3px;
     border: none;
@@ -150,7 +153,7 @@ body {
     background-image: url('../img/camera-icon-2.png');
     background-size: 59px 43px;
     background-repeat: no-repeat;
-    background-position: -1px -1px;
+    background-position: 5px 3px;
 }
 
 
@@ -158,17 +161,20 @@ body {
 /* section level css     */
 /************************/
 .blendTextarea .abs-summary {
-    width: 289px;
+    width: 282px;
     border: none;
     border-radius: 4px;
-    margin-left: 75px;
+    margin-left: 89px;
     font-size: 10px;
-    min-height: 43px;
-
+    min-height: 50px;
+    top: 2px;
+    position: relative;
+    border: 1px dashed;
+    border-color:  rgba(163,161,161,0);
 }
 
-.blendTextarea .abs-summary:empty, .blendTextarea .abs-summary:focus, .blendTextarea .abs-summary:hover, .blendTextarea.show-border .abs-summary{
-    border: 1px dashed #A3A1A1;
+.blendTextarea .abs-summary:empty, .blendTextarea .abs-summary:focus, .blendTextarea .abs-summary:hover, .blendTextarea.show-border .abs-summary, .section-row:hover .abs-summary{
+    border-color:  rgba(163,161,161,1);
 }
 .blendTextarea .abs-summary:empty {
     padding: 3px 4px;
@@ -179,7 +185,7 @@ body {
     border: 1px solid #555555;
     right: 15px;
     top: 2px;
-    height: 40px;
+    height: 50px;
 }
 
 .take-thumbnail-image {
@@ -192,7 +198,7 @@ body {
     padding: 0px 3px;
     margin: 0;
     position: absolute;
-    left: 33.5px;
+    left: 40.5px;
     bottom: 3px;
     display: none;
 }
@@ -204,8 +210,8 @@ body {
 .remove-section {
     display: none;
     position: absolute;
-    top: -12px;
-    right: -10px;
+    top: -10px;
+    right: -13px;
     font-size: 18px;
     color: #555555;
     cursor: pointer;
