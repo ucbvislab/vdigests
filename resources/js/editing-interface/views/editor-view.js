@@ -103,6 +103,9 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
                   var txtRes = filereader.result;
                   var jsonObj = JSON.parse(txtRes);
                   thisView.model.useJSONData(jsonObj);
+                  window.setTimeout(function () {
+                    $("." + consts.digestWrapClass).scrollTop(0);
+                  }, 500);
                 };
                 filereader.readAsText(uploadFile);
               } else {
