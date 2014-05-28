@@ -1,3 +1,4 @@
+13
 .grey {
 	background-image: linear-gradient(to right, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.19) 49%,rgba(0,0,0,0.5) 99%,rgba(0,0,0,0.5) 100%);
 }
@@ -13,7 +14,6 @@
 .chapter-title {
     text-align: center;
     margin: 10px auto;
-    font-style: italic;
     font-size: 25px;
     color: #645C6F;
 }
@@ -45,11 +45,21 @@
 	width: 566px;
 	float: left;
 }
+
+.sections {
+    margin-left: 10px;
+    width: 400px;
+    float: left;
+}
+
 .section {
+  cursor: pointer;
 	float: left;
 	min-height: 58px;
 	width: 472px;
 	margin-bottom: 6px;
+  border-top: 1px solid rgba(0, 0, 0, 0);
+  border-bottom: 1px solid rgba(0, 0, 0, 0);
 }
 .section:hover {
 	background-color: rgba(0,0,0,0.05);
