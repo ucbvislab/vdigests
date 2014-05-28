@@ -1,3 +1,4 @@
+
 /**
  * Main function to kick off the app, set to data-main with require.js
  */
@@ -103,8 +104,6 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
                 console.log("saved to local");
               }, 30000);
             };
-
             saveToLocalStorage();
-
           }
          );

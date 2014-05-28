@@ -96,10 +96,6 @@ define(["backbone", "underscore", "jquery", "text!templates/output-digest-templa
               curPlayEnd = curNextEndTime;
               curPlaying.seekTo(curTime - 0.1, true);
               $.smoothScroll($(curPlaying.a.parentElement).offset().top - 300);
-              //   {
-              //   scrollElement: $('body'),
-              //   scrollTarget: "#" + curPlaying.a.id
-              // });
               //curPlaying.playVideo();
               window.setTimeout(function () {
                 curPlaying.playVideo();
@@ -119,7 +115,6 @@ define(["backbone", "underscore", "jquery", "text!templates/output-digest-templa
           });
         }
       }, 100);
-
     }
   });
 });

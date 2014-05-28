@@ -147,7 +147,11 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
       // reset the transcript
       thisModel.get("transcript").resetState();
 
-      _.each(inpData, function (inobj) {
+      if (inpData.title) {
+        thisModel.get("digest").set("title", inpData.title);
+      }
+
+      _.each(inpData.chapters || inpData, function (inobj) {
         var chasn = inobj.group,
             sec = {summary: inobj.text[0], startWord: null, image_time: inobj.image_time, image_data: inobj.image_data};
             // find the start word
@@ -211,7 +215,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
 
     getOutputJSON: function () {
       var thisModel = this,
-          outjson = {},
+          chapters = {},
           ij = 0;
       thisModel.get("digest").get("chapters").each(function (chap, i) {
         chap.get("sections").each(function (sec, j) {
@@ -229,13 +233,18 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
           };
 
           if (ij) {
-            outjson[ij-1].end_time = secjson.start_time;
+            chapters[ij-1].end_time = secjson.start_time;
           }
-          outjson[ij++] = secjson;
+          chapters[ij++] = secjson;
         });
       });
       var words = thisModel.get("transcript").get("words");
-      outjson[ij-1].end_time = words.at(words.length - 1).get("end");
+      chapters[ij-1].end_time = words.at(words.length - 1).get("end");
+      var outjson = {
+        title: thisModel.get("digest").get("title"),
+        author: thisModel.get("digest").get("author"),
+        chapters: chapters
+      };
       return outjson;
     }
   });

@@ -38,6 +38,10 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
       thisView.listenTo(chaps, "remove", function (removedChap) {
         thisView.$el.find("#" + removedChap.cid).remove();
       });
+
+      thisView.listenTo(thisView.model, "change:title", function () {
+        thisView.$el.find(".digest-title-wrap h1").text(thisView.model.get("title"));
+      });
     },
 
     /**
