@@ -26,6 +26,15 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
       }
     },
 
+    getStartTime: function () {
+        return this.get("sections").models[0].getStartTime();
+    },
+
+    getEndTime: function () {
+      var secs = this.get("sections");
+      return secs.models[secs.length - 1].getEndTime();
+    },
+
     switchStartWordListeners: function (oldWord, newWord) {
       var thisModel = this;
 

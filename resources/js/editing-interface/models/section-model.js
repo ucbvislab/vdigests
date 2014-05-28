@@ -45,7 +45,15 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
     handleGainFocus: function () {
       var thisModel = this;
       thisModel.trigger("gainfocus");
-    }
+    },
 
+    getStartTime: function () {
+      return this.get("startWord").get("start");
+    },
+
+    getEndTime: function () {
+      var nexSS = this.get("startWord").getNextSectionStart(false);
+      return (nexSS && nexSS.get("start")) || window.Infinity;
+    }
   });
 });

@@ -6,6 +6,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/chapt
     defaults: function () {
       return {
         title: "",
+        author: "",
         chapters: new ChapterCollection()
       };
     },

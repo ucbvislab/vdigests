@@ -23,7 +23,6 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
 
       // add chapters
       thisView.listenTo(chaps, "add", function (newChap) {
-        console.log( "add chapter in digest view" );
         var cindex = chaps.indexOf(newChap),
             $chapEls = thisView.$el.find("." + consts.chapterClass),
             newChapView = new ChapterView({model: newChap}),
@@ -37,7 +36,6 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
 
       // remove chapters
       thisView.listenTo(chaps, "remove", function (removedChap) {
-        console.log("remove from digest view");
         thisView.$el.find("#" + removedChap.cid).remove();
       });
     },

@@ -2,20 +2,28 @@
 /*global define */
 define(["backbone", "underscore", "jquery", "editing-interface/models/digest-model", "editing-interface/models/transcript-model", "editing-interface/models/chapter-model", "editing-interface/models/section-model", "editing-interface/utils/utils", "editing-interface/models/thumbnail-model"], function (Backbone, _, $, DigestModel, TranscriptModel, ChapterModel, SectionModel, Utils, ThumbnailModel) {
 
-
-  var addThumbs = function (toAddThumbs) {
+  var addThumbnails = function (toAddThumbs) {
     if (toAddThumbs.length === 0) {
       return;
     }
     var addThumb = toAddThumbs.pop();
-    Utils.seekThenCaptureImgTime(addThumb.$vid, addThumb.time, function (data) {
-      addThumb.addSec.set("thumbnail", new ThumbnailModel({data: data, image_time: addThumb.time}));
-      addThumbs(toAddThumbs);
-    });
+    if (addThumb.data) {
+      // thumbnail data already present
+      _postAddThumb(addThumb.data, addThumb, toAddThumbs);
+    } else {
+      // capture the thumbnail
+      Utils.seekThenCaptureImgTime(addThumb.$vid, addThumb.time, function (data) {
+        _postAddThumb(data, addThumb, toAddThumbs);
+      });
+    }
+  };
+
+    var _postAddThumb = function (data, addThumb, toAddThumbs) {
+    addThumb.addSec.set("thumbnail", new ThumbnailModel({data: data, image_time: addThumb.time}));
+    addThumbnails(toAddThumbs);
   };
 
   return Backbone.Model.extend({
-
     defaults: function () {
       return {
         digest: new DigestModel(),
@@ -102,7 +110,6 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
         }
       }
 
-
       if (newVal) {
         // we're adding a section
         var prevChapStWord = chWord.getPrevChapterStart(),
@@ -142,7 +149,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
 
       _.each(inpData, function (inobj) {
         var chasn = inobj.group,
-            sec = {summary: inobj.text[0], startWord: null, image_time: inobj.image_time};
+            sec = {summary: inobj.text[0], startWord: null, image_time: inobj.image_time, image_data: inobj.image_data};
             // find the start word
             var closestWord = null,
                 closestDist = Infinity,
@@ -195,11 +202,11 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
           } else {
             throw Error("unable to find section matching start word");
           }
-          toAddThumbs.push({$vid: $vid, time:  sec.image_time, addSec: addSec});
+          toAddThumbs.push({$vid: $vid, time:  sec.image_time, addSec: addSec, data: sec.image_data});
         });
         mchp.swapping = false;
       });
-      addThumbs(toAddThumbs);
+      addThumbnails(toAddThumbs);
     },
 
     getOutputJSON: function () {
@@ -208,6 +215,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
           ij = 0;
       thisModel.get("digest").get("chapters").each(function (chap, i) {
         chap.get("sections").each(function (sec, j) {
+          // TODO use actual image data once new MV* framework is inplace
           var secjson = {
             group: i,
             group_title: chap.get("title"),
@@ -215,6 +223,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
             start_time: sec.get("startWord").get("start"),
             text_change: false,
             image_change: false,
+            image_data: sec.get("thumbnail").get("data"),
             image_id: sec.get("thumbnail").cid,
             image_time: sec.get("thumbnail").get("image_time")
           };

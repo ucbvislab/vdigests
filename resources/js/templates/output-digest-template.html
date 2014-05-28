@@ -1,0 +1,24 @@
+<header class="digest-title-wrap">
+  <h1 class="digest-title"> <%- digest.get("title") %> <h1>
+</header>
+
+<% digest.get("chapters").each(function(chap, i){ %>
+   <div class="row groupRow" data-start="<%= chap.getStartTime() %>" data-end="<%=chap.getEndTime()%>">
+     <div class="groupContent col-md-12">
+       <h4 class="chapter-title"><%- chap.get("title") %></h4>
+       <div id="<%-i%>-outputvideo" class="video-wrap">
+       </div>
+       <div class="sections">
+         <% chap.get("sections").each(function(sec, j){ %>
+         <div class="section" data-start="<%=sec.getStartTime()%>" data-end="<%=sec.getEndTime()%>" data-image-time="<%=sec.get("thumbnail") ? sec.get("thumbnail").get("image_time") : -1%>">
+           <div class="keyframe"><img src="<%= sec.get("thumbnail") && sec.get("thumbnail").get("data") %>" class="img-myThumbnail" id="s9CjN"></div>
+           <div class="caption-highlight-overlay"></div>
+           <div class="caption">
+             <%- sec.get("summary") %>
+           </div>
+         </div>
+         <% }) %>
+       </div>
+     </div>
+   </div>
+<% }) %>

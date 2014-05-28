@@ -48,6 +48,8 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
 
   Backbone.history.start();
 
+  // pull in the youtube api
+
   // keep body size to the size of the viewport
   var $body = $(document.body);
   var setBodyHeight = function (inHeight) {
@@ -64,17 +66,17 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
 
   // USE STATS collection for interface study
   window.vdstats = {
-    nChapCreation: [], // done
-    nSecCreation: [], // done
-    nChapDeletion: [],  // done
-    nSecDeletion: [],  // done
-    nChapMoves: [], // done
-    nSecMoves: [], // done
-    nSec2Chap: [], // done
-    nChap2Sec: [], // done
-    nKeyFrameChanges: [], // done
-    nVideoStartsFromTrans: [], // done
-    nVideoStartsFromVideo: [], // done
+    nChapCreation: [],
+    nSecCreation: [],
+    nChapDeletion: [],
+    nSecDeletion: [],
+    nChapMoves: [],
+    nSecMoves: [],
+    nSec2Chap: [],
+    nChap2Sec: [],
+    nKeyFrameChanges: [],
+    nVideoStartsFromTrans: [],
+    nVideoStartsFromVideo: [],
     nSummaryEdits: [],
     nSubtitleEdits: []
   };

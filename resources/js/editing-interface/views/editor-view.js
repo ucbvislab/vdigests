@@ -45,7 +45,8 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
                       window.prevPlayVid.play();
                       evt.stopPropagation();
                     } else {
-                      $("video")[0].play();
+                      var thevid = $("video")[0];
+                      thevid && thevid.play();
                     }
                   }
                 } else if (evt.keyCode === consts.F1_KEYCODE) {

@@ -6,7 +6,7 @@
 
 * {
     box-sizing: border-box;
-    color: #3C3C3C;
+    color: #564358;
     -webkit-user-select: none;  /* Chrome all / Safari all */
     -moz-user-select: none;     /* Firefox all */
     -ms-user-select: none;      /* IE 10+ */
@@ -53,7 +53,8 @@ body {
     position: relative;
     padding: 0;
     margin: 0;
-    margin-top: 12px;
+    margin-top: 18px;
+    margin-bottom: 22px;
 }
 .digest-title-wrap:focus {
     outline: 0;
@@ -112,9 +113,11 @@ body {
     overflow: hidden;
     background-color: inherit;
     margin-left: 20px;
+    margin-top: 0.5em;
     position: relative;
     bottom: 3px;
     color: #645C6F;
+    text-align: center;
 }
 .chapter-header:hover {
     opacity: 1;

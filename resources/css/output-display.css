@@ -1,0 +1,78 @@
+.grey {
+	background-image: linear-gradient(to right, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.19) 49%,rgba(0,0,0,0.5) 99%,rgba(0,0,0,0.5) 100%);
+}
+
+.digest-title {
+    text-align: center;
+    margin: 0.4em auto;
+}
+.digest-title-wrap h1 {
+    font-size: 48px;
+}
+
+.chapter-title {
+    text-align: center;
+    margin: 10px auto;
+    font-style: italic;
+    font-size: 25px;
+    color: #645C6F;
+}
+
+.groupRow {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.groupRow + .groupRow {
+    margin-top: 50px;
+}
+
+.groupHead {
+	text-align: center;
+	margin-bottom: -5px;
+}
+
+.output-digest {
+    width: 1066px;
+    margin: auto;
+    margin-bottom: 150px;
+}
+
+.video-wrap {
+	background-color: rgba(0,0,0,0.05);
+	border: 1px solid rgba(0,0,0,0.2);
+	height: 312px;
+	width: 566px;
+	float: left;
+}
+.section {
+	float: left;
+	min-height: 58px;
+	width: 472px;
+	margin-bottom: 6px;
+}
+.section:hover {
+	background-color: rgba(0,0,0,0.05);
+/*	border-top: 1px solid rgba(0, 0, 0, .25);
+	border-bottom: 1px solid rgba(0, 0, 0, .25);*/
+}
+
+.keyframe {
+	float: left;
+	margin-left: 10px;
+	height: 58px;
+	width: 87px;
+	background-color: lavender;
+}
+
+.keyframe img {
+    width: inherit;
+}
+
+.caption {
+	font-family: helvetica;
+	float: left;
+	margin-left: 10px;
+	width: 355px;
+	font-size: 12px;
+}
