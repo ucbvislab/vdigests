@@ -9,6 +9,7 @@
 }
 .digest-title-wrap h1 {
     font-size: 48px;
+    margin-bottom: 1em;
 }
 
 .chapter-title {
@@ -61,22 +62,23 @@
   border-top: 1px solid rgba(0, 0, 0, 0);
   border-bottom: 1px solid rgba(0, 0, 0, 0);
 }
-.section:hover {
-	background-color: rgba(0,0,0,0.05);
-/*	border-top: 1px solid rgba(0, 0, 0, .25);
-	border-bottom: 1px solid rgba(0, 0, 0, .25);*/
+.section:hover, .section.active {
+  background-color: rgba(255, 171, 231, 0.05);
+	border-top: 1px solid rgba(0, 0, 0, .25);
+	border-bottom: 1px solid rgba(0, 0, 0, .25);
 }
 
 .keyframe {
 	float: left;
-	margin-left: 10px;
-	height: 58px;
+	height: 62px;
 	width: 87px;
 	background-color: lavender;
 }
 
 .keyframe img {
-    width: inherit;
+    height: inherit;
+    border-right: 1px solid grey;
+    border-left: 1px solid grey;
 }
 
 .caption {

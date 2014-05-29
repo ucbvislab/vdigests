@@ -1,10 +1,12 @@
 
+// TODO remove hardcoding and cleanup!
 /*global define */
 define(["backbone", "underscore", "jquery", "text!templates/output-digest-template.html", "editing-interface/utils/player"], function (Backbone, _, $, tmpl, Player) {
   return Backbone.View.extend({
     template: _.template(tmpl),
     events: {
       // listen for click events on sections, hover events on images
+      "click .section": "sectionClick"
       // listen for video time changes and update the sections accordingly
     },
     className: "output-digest",
@@ -21,13 +23,13 @@ define(["backbone", "underscore", "jquery", "text!templates/output-digest-templa
       };
       var lastEl = 0,
           siid = window.setInterval(function () {
-        if (lastEl < nvids){
-          inputVid($vids[lastEl], Math.floor(Number($vids.eq(lastEl).parent().parent().data("start"))));
-          lastEl += 1;
-        } else {
-          window.clearInterval(siid);
-        }
-      }, 100);
+            if (lastEl < nvids){
+              inputVid($vids[lastEl], Math.floor(Number($vids.eq(lastEl).parent().parent().data("start"))));
+              lastEl += 1;
+            } else {
+              window.clearInterval(siid);
+            }
+          }, 100);
 
       $vids.each(function (i, vel) {
 
@@ -42,6 +44,21 @@ define(["backbone", "underscore", "jquery", "text!templates/output-digest-templa
       }, 100);
 
       return thisView;
+    },
+
+    /**
+     * Clicking on a section should start the video at that location
+     */
+    sectionClick: function (evt) {
+      var thisView = this,
+          curTar = evt.currentTarget,
+          startTime = Number(curTar.getAttribute("data-start")),
+          vidWrapId = curTar.getAttribute("data-chapter"),
+          vid = thisView.vplayers[vidWrapId];
+      vid.seekTo(startTime, true);
+      vid.playVideo();
+      $(".active").removeClass("active");
+      $(curTar).addClass("active");
     },
 
     addVPlayerEvents: function () {
@@ -68,7 +85,10 @@ define(["backbone", "underscore", "jquery", "text!templates/output-digest-templa
       // TODO is there a better way to do this?
       var curPlaying = null,
           curPlayEnd = Infinity,
-          curPlayStart = 0;
+          curPlayStart = 0,
+          $activeSecEl = null,
+          activeSecStart = 0,
+          activeSecEnd = Infinity;
       thisView.checkPlayInterval = window.setInterval(function () {
         if (curPlaying && curPlaying.getPlayerState() === 1) {
           var curTime = curPlaying.getCurrentTime();
@@ -94,7 +114,7 @@ define(["backbone", "underscore", "jquery", "text!templates/output-digest-templa
               curPlaying = nextVP;
               curPlayStart = curNextStartTime;
               curPlayEnd = curNextEndTime;
-              curPlaying.seekTo(curTime - 0.1, true);
+              curPlaying.seekTo(curTime, true);
               $.smoothScroll($(curPlaying.a.parentElement).offset().top - 300);
               //curPlaying.playVideo();
               window.setTimeout(function () {
@@ -102,8 +122,29 @@ define(["backbone", "underscore", "jquery", "text!templates/output-digest-templa
               }, 100);
             }
           }
-          // check if it's exceeded it's playing time and find the next video
-          var x = 5;
+
+          // make the appropriate section active
+          if (!$activeSecEl || (curTime > activeSecEnd || curTime < activeSecStart)) {
+            $activeSecEl && $activeSecEl.removeClass("active");
+            var isSecEarly = curTime < activeSecStart,
+                curNextSecStart = 0,
+                curNextSecEnd = Infinity;
+            curTime += 0.1; // account for youtube irregularities
+            $(".section").each(function (ii, secEl) {
+              var secStart = Number(secEl.getAttribute("data-start")),
+                  secEnd = Number(secEl.getAttribute("data-end"));
+              if ((isSecEarly && curTime > secStart && secStart >= curNextSecStart)
+                  || (!isSecEarly && curTime < secEnd && (secEnd <= curNextSecEnd))) {
+                curNextSecEnd = secEnd;
+                curNextSecStart = secStart;
+                $activeSecEl = secEl;
+              }
+            });
+            $activeSecEl = $($activeSecEl);
+            $activeSecEl.addClass("active");
+            activeSecStart = curNextSecStart;
+            activeSecEnd = curNextSecEnd;
+          }
         } else {
           _.each(thisView.vplayers, function (vp) {
             if (vp.getPlayerState && vp.getPlayerState() === 1) {
@@ -114,7 +155,7 @@ define(["backbone", "underscore", "jquery", "text!templates/output-digest-templa
             };
           });
         }
-      }, 100);
+      }, 50);
     }
   });
 });
