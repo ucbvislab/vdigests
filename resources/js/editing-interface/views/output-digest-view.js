@@ -2,12 +2,22 @@
 // TODO remove hardcoding and cleanup!
 /*global define */
 define(["backbone", "underscore", "jquery", "text!templates/output-digest-template.html", "editing-interface/utils/player"], function (Backbone, _, $, tmpl, Player) {
+
+  var consts = {
+    activeClass: "active",
+    activeRowClass: "active-row",
+    groupRowClass: "groupRow",
+    coverClass: "cover"
+  };
+
   return Backbone.View.extend({
     template: _.template(tmpl),
     events: {
       // listen for click events on sections, hover events on images
-      "click .section": "sectionClick"
-      // listen for video time changes and update the sections accordingly
+      "click .section": "sectionClick",
+      "click #return-to-editor": "returnToEditor",
+      "mouseover .section": "sectionMouseOver",
+      "mouseout .section": "sectionMouseOut"
     },
     className: "output-digest",
     render: function () {
@@ -18,22 +28,20 @@ define(["backbone", "underscore", "jquery", "text!templates/output-digest-templa
       thisView.vplayers = {};
       var $vids = thisView.$el.find(".video-wrap"),
           nvids = $vids.length;
-      var inputVid = function (vel, startTime) {
-        Player.inputVideo(vel, "usdJgEwMinM", thisView.vplayers, startTime);
+      var inputVid = function (vel, floorStartTime, exactStartTime) {
+        Player.inputVideo(vel, "usdJgEwMinM", thisView.vplayers, floorStartTime, exactStartTime);
       };
       var lastEl = 0,
           siid = window.setInterval(function () {
             if (lastEl < nvids){
-              inputVid($vids[lastEl], Math.floor(Number($vids.eq(lastEl).parent().parent().data("start"))));
+              var exactStartTime = Number($vids.eq(lastEl).parent().parent().data("start"));
+              inputVid($vids[lastEl], Math.floor(exactStartTime), exactStartTime);
               lastEl += 1;
             } else {
               window.clearInterval(siid);
             }
           }, 100);
 
-      $vids.each(function (i, vel) {
-
-      });
       // TODO add a proper loading screen
       var thisInterval = window.setInterval(function () {
         if (Object.keys(thisView.vplayers).length >= nvids) {
@@ -42,8 +50,39 @@ define(["backbone", "underscore", "jquery", "text!templates/output-digest-templa
           thisView.addVPlayerEvents();
         }
       }, 100);
-
+      thisView.delegateEvents();
       return thisView;
+    },
+
+    /**
+     * Transition to vdigest preview
+     */
+    returnToEditor: function () {
+      var locSplit = window.location.hash.split("/");
+      window.location.hash = "edit/" + locSplit.slice(1).join("/");
+    },
+
+    /**
+     * Mouseover the keyframe element: show the keyframe over the video
+     */
+    sectionMouseOut: function (evt) {
+      var $curTar = $(evt.currentTarget),
+          $curGroup = $($curTar.closest("." + consts.groupRowClass)),
+          $curCover = $curGroup.find("." + consts.coverClass);
+      $curCover.hide();
+    },
+
+    /**
+     * Mouseover the keyframe element: show the keyframe over the video
+     */
+    sectionMouseOver: function (evt) {
+      var $curTar = $(evt.currentTarget),
+          $curGroup = $($curTar.closest("." + consts.groupRowClass)),
+          $curCover = $curGroup.find("." + consts.coverClass);
+      if (!$curGroup.hasClass(consts.activeRowClass)) {
+        $curCover.html($curTar.find("img").clone());
+        $curCover.show();
+      }
     },
 
     /**
@@ -54,11 +93,12 @@ define(["backbone", "underscore", "jquery", "text!templates/output-digest-templa
           curTar = evt.currentTarget,
           startTime = Number(curTar.getAttribute("data-start")),
           vidWrapId = curTar.getAttribute("data-chapter"),
-          vid = thisView.vplayers[vidWrapId];
+          vid = thisView.vplayers[vidWrapId],
+          activeClass = consts.activeClass;
       vid.seekTo(startTime, true);
       vid.playVideo();
-      $(".active").removeClass("active");
-      $(curTar).addClass("active");
+      $("." + activeClass).removeClass(activeClass);
+      $(curTar).addClass(activeClass);
     },
 
     addVPlayerEvents: function () {
@@ -73,6 +113,8 @@ define(["backbone", "underscore", "jquery", "text!templates/output-digest-templa
             _.each(thisView.vplayers, function (vpe) {
               if (stobj.target != vpe) {
                 vpe.stopVideo();
+              } else {
+                $(vpe.a).parent().find("." + consts.coverClass).hide();
               }
             });
           }
@@ -125,7 +167,7 @@ define(["backbone", "underscore", "jquery", "text!templates/output-digest-templa
 
           // make the appropriate section active
           if (!$activeSecEl || (curTime > activeSecEnd || curTime < activeSecStart)) {
-            $activeSecEl && $activeSecEl.removeClass("active");
+            $activeSecEl && $activeSecEl.removeClass(consts.activeClass);
             var isSecEarly = curTime < activeSecStart,
                 curNextSecStart = 0,
                 curNextSecEnd = Infinity;
@@ -141,9 +183,13 @@ define(["backbone", "underscore", "jquery", "text!templates/output-digest-templa
               }
             });
             $activeSecEl = $($activeSecEl);
-            $activeSecEl.addClass("active");
+            $activeSecEl.addClass(consts.activeClass);
             activeSecStart = curNextSecStart;
             activeSecEnd = curNextSecEnd;
+
+            // make the parent chapter active
+            $("." + consts.activeRowClass).removeClass(consts.activeRowClass);
+            $activeSecEl.closest("." + consts.groupRowClass).addClass(consts.activeRowClass);
           }
         } else {
           _.each(thisView.vplayers, function (vp) {

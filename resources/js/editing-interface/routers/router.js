@@ -7,9 +7,10 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
    * Central router to control URL state
    */
   return (function () {
-    var pvt = {};
-    pvt.consts = {};
-
+    var consts = {
+      editingId: "editing-interface",
+      viewingId: "viewing-interface"
+    };
     return Backbone.Router.extend({
 
       routes: {
@@ -31,9 +32,16 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
           thisRoute.editRoute(dataname, true);
           return;
         }
-        // TODO better switching between views (use meta method)
         thisRoute.outputView = new OutputView({model: thisRoute.editorModel});
-        $("body").html(thisRoute.outputView.render().el);
+        $("#" + consts.viewingId).html(thisRoute.outputView.render().el);
+        thisRoute.$editingInterface = thisRoute.$editingInterface || $("#" + consts.editingId);
+        // pause any playing videos
+          thisRoute.$editingInterface.find("video").each(function (i, vid) {
+            vid.pause();
+          });
+         thisRoute.$editingInterface.hide();
+        thisRoute.$viewingView = thisRoute.$viewingView || $("#" + consts.viewingId);
+        thisRoute.$viewingView.show();
       },
 
       /**
@@ -44,24 +52,25 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
         var thisRoute = this,
             reloadTrans = true;
         // create the editor model which has the trans and digest views
-        if (thisRoute.editorModel) {
-          if (!confirm("Do you want to remove your current work?")) {
-            reloadTrans = false;
-            return;
-          }
-        }
 
         window.dataname = dataname;
-        thisRoute.editorModel = new EditorModel();
 
-        if (reloadTrans) {
+        var showCallback = function () {
+          thisRoute.$viewingView = thisRoute.$viewingView || $("#" + consts.viewingId);
+          thisRoute.$editingView = thisRoute.$editingView || $("#" + consts.editingId);
+          thisRoute.$editingView.show();
+          thisRoute.$viewingView.hide();
+        };
+
+        if (!thisRoute.editorModel) {
+          thisRoute.editorModel = new EditorModel();
+          thisRoute.editorView =  new EditorView({model: thisRoute.editorModel});
           thisRoute.editorModel.get("transcript").fetch({success: function () {
             // create the editor view
-            thisRoute.editorView =  new EditorView({model: thisRoute.editorModel});
-
             // now  show the editor view
-            $("body").html(thisRoute.editorView.render().el);
+            $("#" + consts.editingId).html(thisRoute.editorView.render().el);
             thisRoute.editorModel.postInit();
+            showCallback();
             if (toView) {
               window.setTimeout(function () {
                 thisRoute.editorModel.get("digest").set("title", "The best stats you've ever seen - Hans Rosling");
@@ -69,13 +78,12 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
                 thisRoute.editorModel.get("digest").get("chapters").models[0].get("sections").models[0].set("summary", "After 20 years studying hunger in Africa, I started teaching global development to undergraduate students.");
                 thisRoute.viewRoute(dataname);
                 return;
-
               }, 500);
             }
 
           }});
-        }else {
-          $("body").html(thisRoute.editorView.render().el);
+        } else {
+          showCallback();
         }
       }
     });

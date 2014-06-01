@@ -25,7 +25,8 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
                   evt.stopPropagation();
                   evt.preventDefault();
                 }
-              }
+              },
+              "click #preview-vdigest": "previewVDigest"
             },
 
             initialize: function () {
@@ -93,6 +94,9 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
               return assignObj;
             },
 
+            /**
+             * Handle uploading vdigest data
+             */
             handleUpload: function (uploadEl) {
               var thisView = this;
 
@@ -112,6 +116,14 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
               } else {
                 alert("Your browser won't let you upload a file...");
               }
+            },
+
+            /**
+             * Transition to vdigest preview
+             */
+            previewVDigest: function () {
+              var locSplit = window.location.hash.split("/");
+              window.location.hash = "view/" + locSplit.slice(1).join("/");
             }
           });
         });

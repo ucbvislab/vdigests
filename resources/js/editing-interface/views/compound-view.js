@@ -21,6 +21,7 @@ define(["backbone", "underscore", "jquery"], function (Backbone, _, $) {
       var assignObj = thisView.getAssignedObject();
       thisView.assign(assignObj);
       thisView.postRender();
+      thisView.delegateEvents();
       return thisView;
     },
 

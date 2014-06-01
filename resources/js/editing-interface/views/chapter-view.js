@@ -6,7 +6,9 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
     sectionWrapClass: "summary-column",
     viewClass: "chapter row",
     absSummaryClass: "abs-summary",
-    chapHeaderClass: "chapter-header"
+    chapHeaderClass: "chapter-header",
+    imgHeight: 312,
+    imgWidth: 566
   };
 
   var playOneVideo = function (vid, time) {
@@ -160,7 +162,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
 
       Utils.seekThenCaptureImgTime($vid, time, function (newImgData) {
         sec.set("thumbnail", new ThumbnailModel({data: newImgData, image_time: time}));
-      });
+      }, consts.imgWidth, consts.imgHeight);
     },
 
     /**

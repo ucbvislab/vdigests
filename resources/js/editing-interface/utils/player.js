@@ -2,19 +2,19 @@
 /*global define YT*/
 define(['jquery'], function($) {
   var player = {
-    inputVideo: function(container, videoId, vplayerObj, startTime) {
+    inputVideo: function(container, videoId, vplayerObj, startTime, exactStartTime) {
       if (typeof(window.YT) == 'undefined' || typeof(window.YT.Player) == 'undefined') {
         window.onYouTubeIframeAPIReady = function() {
-          player.loadPlayer(container, videoId, vplayerObj, startTime);
+          player.loadPlayer(container, videoId, vplayerObj, startTime, exactStartTime);
         };
 
         $.getScript('//www.youtube.com/iframe_api');
       } else {
-          player.loadPlayer(container, videoId, vplayerObj, startTime);
+          player.loadPlayer(container, videoId, vplayerObj, startTime, exactStartTime);
       }
     },
 
-    loadPlayer: function(container, videoId, vplayerObj, startTime) {
+    loadPlayer: function(container, videoId, vplayerObj, startTime, exactStartTime) {
       vplayerObj[container.id] = new window.YT.Player(container, {
         videoId: videoId,
         width: 566,
@@ -35,6 +35,7 @@ define(['jquery'], function($) {
               window.setTimeout(function () {
                 event.target.unMute();
                 event.target.pauseVideo();
+                event.target.seekTo(exactStartTime);
               }, 500);
           }
         }

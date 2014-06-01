@@ -2,6 +2,10 @@
   <h1 class="digest-title"> <%- digest.get("title") %> <h1>
 </header>
 
+<div class="toolbar">
+  <i class="fa fa-arrow-left" id="return-to-editor"></i>
+</div>
+
 <% digest.get("chapters").each(function(chap, i){ %>
    <div class="row groupRow" data-start="<%= chap.getStartTime() %>" data-end="<%=chap.getEndTime()%>">
      <div class="groupContent col-md-12">
@@ -20,6 +24,7 @@
          </div>
          <% }) %>
        </div>
+       <div class="cover"></div>
      </div>
    </div>
 <% }) %>
