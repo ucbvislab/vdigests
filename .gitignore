@@ -2,7 +2,7 @@
 *.avi
 *.mp4
 *.wav
-
+config
 *~
 .tern-port
 # Mac
