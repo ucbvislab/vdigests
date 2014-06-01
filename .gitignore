@@ -3,6 +3,8 @@
 *.mp4
 *.wav
 config
+resources/content
+
 *~
 .tern-port
 # Mac
