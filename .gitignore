@@ -4,6 +4,7 @@
 *.wav
 config
 resources/content
+node_modules
 
 *~
 .tern-port
