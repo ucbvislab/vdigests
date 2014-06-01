@@ -3,7 +3,8 @@
 *.mp4
 *.wav
 config
-resources/content
+public/content
+videos
 node_modules
 
 *~
