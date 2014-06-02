@@ -1,22 +1,16 @@
 
 /*global define */
-define(["backbone", "underscore", "jquery", "text!templates/chapter-template.html", "editing-interface/views/compound-view", "editing-interface/views/section-view", "editing-interface/views/collection-view", "editing-interface/utils/utils", "editing-interface/models/thumbnail-model"], function (Backbone, _, $, tmpl, CompoundBackboneView, SectionView, CollectionView, Utils, ThumbnailModel) {
+define(["backbone", "underscore", "jquery", "text!templates/chapter-template.html", "editing-interface/views/compound-view", "editing-interface/views/section-view", "editing-interface/views/collection-view", "editing-interface/utils/utils", "editing-interface/models/thumbnail-model", "editing-interface/utils/player"], function (Backbone, _, $, tmpl, CompoundBackboneView, SectionView, CollectionView, Utils, ThumbnailModel, Player) {
 
   var consts = {
     sectionWrapClass: "summary-column",
-    viewClass: "chapter row",
+    activeClass: "active",
+    viewClass: "chapter",
     absSummaryClass: "abs-summary",
     chapHeaderClass: "chapter-header",
+    videoWrapClass: "video-wrap",
     imgHeight: 312,
     imgWidth: 566
-  };
-
-  var playOneVideo = function (vid, time) {
-    vid.currentTime = time;
-    $(document.body).find("video").each(function (i, vid) {
-      vid.pause();
-    });
-    vid.play();
   };
 
   return CompoundBackboneView.extend({
@@ -33,6 +27,16 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
         window.vdstats.nSubtitleEdits.push((new Date()).getTime());
         thisView.typing = false;
       }
+    },
+
+    /**
+     * Override
+     */
+    postRender: function () {
+      var thisView = this,
+          vel = thisView.$el.find("." + consts.videoWrapClass)[0],
+          startTime = thisView.model.getStartTime();
+      Player.inputVideo(vel, thisView.model.get("videoId"), thisView.model, Math.floor(startTime), startTime, "ytplayer");
     },
 
     /**
@@ -66,8 +70,17 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
         };
       });
 
+      // MODEL LISTENERS
       thisView.listenTo(thisModel, "destroy", function (chp) {
         thisView.remove();
+      });
+
+      thisView.listenTo(thisModel, "change:active", function (chp, val) {
+        if (val) {
+          thisView.$el.addClass(consts.activeClass);
+        } else {
+          thisView.$el.removeClass(consts.activeClass);
+        }
       });
 
       // 'add' section listener
@@ -85,7 +98,9 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
         var nsecs = secs.length;
         if (nsecs === 0) {
           // we're out of sections: delete the chapter
-          thisView.$el.find("video").get(0).pause();
+          thisView.model.ytplayer
+            && thisView.model.ytplayer.stopVideo
+            && thisView.ytplayer.stopVideo();
           // TODO move this
           thisModel.get("startWord").set("startChapter", false);
           thisView.remove();
@@ -106,6 +121,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
 
       // listen for screenshot capture requests from sections
       thisView.listenTo(secs, "captureThumbnail", function (secModel) {
+      // YTFIX
         var time = thisView.$el.find("video")[0].currentTime;
         thisView.placeThumbnailInSec(secModel, time);
       });
@@ -121,32 +137,25 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
             window.vdstats.nVideoStartsFromVideo.push((new Date()).getTime());
           }
         });
-
-        // only play one video at a time
         $elvid.on("play", function () {
 
           // USE STATS
           if (!window.startFromTran) {
             window.vdstats.nVideoStartsFromVideo.push((new Date()).getTime());
           }
-
-          $("video").each(function (i, vid) {
-            if (vid != elvid){
-              vid.pause();
-            }
           });
 
-          window.prevPlayVid = $elvid[0];
+          window.prevPlayVid = thisView.model.ytplayer;
         });
-        $elvid.on("timeupdate", function () {
-          var ct = $elvid.get(0).currentTime + 0.1, // add 0.1 so the transcript update appears instant
-              words = thisModel.get("startWord").collection;
-          // TODO this is baaad architecture
-          var hlWords = words.each(function (wrd) {
-            wrd.set("highlight", wrd.get("start") < ct && wrd.get("end") > ct);
-          });
-        });
-      }, 300);
+      //   $elvid.on("timeupdate", function () {
+      //     var ct = $elvid.get(0).currentTime + 0.1, // add 0.1 so the transcript update appears instant
+      //         words = thisModel.get("startWord").collection;
+      //     // TODO this is baaad architecture
+      //     var hlWords = words.each(function (wrd) {
+      //       wrd.set("highlight", wrd.get("start") < ct && wrd.get("end") > ct);
+      //     });
+      //   });
+      // }, 300);
     },
 
     /**
@@ -184,16 +193,9 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
     },
 
     startVideo: function (stTime) {
-        var thisView = this,
-            $vid = thisView.$el.find("video"),
-            vid = $vid[0];
-        try {
-          playOneVideo(vid, stTime);
-        } catch (e) {
-          $vid.one("canplay", function () {
-            playOneVideo(vid, stTime);
-          });
-        }
+        var thisView = this;
+        thisView.model.ytplayer.seekTo(stTime);
+        thisView.model.ytplayer.playVideo();
       }
   });
 });

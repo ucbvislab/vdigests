@@ -55,7 +55,7 @@ body {
     padding: 0;
     margin: 0;
     margin-top: 22px;
-    margin-bottom: 22px;
+    margin-bottom: 35px;
 }
 .digest-title-wrap:focus {
     outline: 0;
@@ -113,8 +113,6 @@ body {
     border: none;
     overflow: hidden;
     background-color: inherit;
-    margin-left: 20px;
-    margin-top: 0.5em;
     position: relative;
     bottom: 3px;
     color: #645C6F;
@@ -124,19 +122,19 @@ body {
     opacity: 1;
 }
 
-.video-column {
-    width: 306px;
-    margin-left: 5px;
-    margin-right: 21px;
+.editing .video-wrap {
+    width: 380px;
+    height: 214px;
 }
-.video-column video {
-    box-shadow: 1px 1px 18px -1px #333333;
+
+.editing .active .video-wrap {
+    box-shadow: 0px 0px 24px rgb(97, 75, 91);
 }
 
 .summary-column {
     position: relative;
-    width: 53%;
-    padding-left: 76px;
+    display: inline-block;
+    margin-left: 10px;
 }
 
 .section-row {
@@ -144,12 +142,17 @@ body {
     position: relative;
 }
 
+.section-row.active {
+    box-shadow: 0px 0px 24px rgb(97, 75, 91);
+}
+
 .keyframe-col {
+    display: inline-block;
     width: 68px;
     height: 50px;
-    margin-left: 15px;
     border-radius: 3px;
     border: none;
+    vertical-align: top;
 }
 
 .keyframe-col:empty {
@@ -164,23 +167,27 @@ body {
 /*************************/
 /* section level css     */
 /************************/
-.blendTextarea .abs-summary {
-    width: 266px;
+.section-text-wrap {
+    display: inline-block;
+    vertical-align: text-bottom;
+}
+
+.section-text-wrap .abs-summary {
+    width: 288px;
     border: none;
     border-radius: 4px;
-    margin-left: 108px;
     font-size: 11px;
-    min-height: 55px;
-    top: 2px;
+    min-height: 52px;
+    top: -1px;
     position: relative;
     border: 1px dashed;
     border-color:  rgba(163,161,161,0);
 }
 
-.blendTextarea .abs-summary:empty, .blendTextarea .abs-summary:focus, .blendTextarea .abs-summary:hover, .blendTextarea.show-border .abs-summary, .section-row:hover .abs-summary{
+.section-text-wrap .abs-summary:empty, .section-text-wrap .abs-summary:focus, .section-text-wrap .abs-summary:hover, .section-text-wrap.show-border .abs-summary, .section-row:hover .abs-summary{
     border-color:  rgba(163,161,161,1);
 }
-.blendTextarea .abs-summary:empty {
+.section-text-wrap .abs-summary:empty {
     padding: 3px 4px;
 }
 
@@ -215,8 +222,8 @@ body {
 .remove-section {
     display: none;
     position: absolute;
-    top: -10px;
-    right: -17px;
+    top: -12px;
+    right: -4px;
     font-size: 18px;
     color: #555555;
     cursor: pointer;
@@ -276,6 +283,10 @@ body {
     font-size: 10pt;
     margin-bottom: 0;
     padding: 0 10px;
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+    user-select: none;
     cursor: default;
 }
 
@@ -390,4 +401,8 @@ input[type=file] {
     width:0;
     position: absolute;
     top: 0;
+}
+
+.floatclear {
+    clear: both;
 }

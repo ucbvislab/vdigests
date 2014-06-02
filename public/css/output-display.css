@@ -110,7 +110,7 @@
     height: inherit;
 }
 
-.active {
+.section-row.active {
     border-top: solid 1px #ddd;
     border-bottom: solid 1px #ddd;
     background: rgba(0,0,0,0.05);

@@ -5,8 +5,8 @@ block morecss
   != css("output-display")
 
 block bodycontent
-  #editing-interface
-  #viewing-interface
+  #editing-interface.editing
+  #viewing-interface.viewing
 
 block js
   != js("lib/require", {"data-main": "/js/editing-interface/main.js"})

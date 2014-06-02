@@ -7,7 +7,8 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
       return {
         sections: new SectionCollection(),
         startWord: null,
-        title: ""
+        title: "",
+        videoId: "usdJgEwMinM"
       };
     },
 
@@ -27,6 +28,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
     },
 
     getStartTime: function () {
+      // TODO cache this and flag for update when start word is changed
         return this.get("sections").models[0].getStartTime();
     },
 

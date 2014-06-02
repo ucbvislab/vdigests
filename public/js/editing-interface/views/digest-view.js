@@ -12,8 +12,8 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
 
     events: {
       "blur .digest-title-wrap h1": function (evt) {
-          var thisView = this;
-          thisView.model.set("title", $(evt.currentTarget).text());
+        var thisView = this;
+        thisView.model.set("title", $(evt.currentTarget).text());
       }
     },
 
@@ -42,6 +42,78 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
       thisView.listenTo(thisView.model, "change:title", function () {
         thisView.$el.find(".digest-title-wrap h1").text(thisView.model.get("title"));
       });
+
+      // listen to changes in the underlying videos & control/signal transcript updates accordingly
+      // TODO clean up this function
+      var curPlayingChap = null,
+          curPlayingSec = null;
+      thisView.checkPlayInterval = window.setInterval(function () {
+        // monitor chapter changes
+        if (curPlayingChap && curPlayingChap.get("active")) {
+          var curTime = curPlayingChap.ytplayer.getCurrentTime(),
+              curPlayEnd = curPlayingChap.getEndTime(),
+              curPlayStart = curPlayingChap.getStartTime();
+          if ( curTime > curPlayEnd || curTime < curPlayStart) {
+            // start the next video if it exists
+            var nextChap = null,
+                curNextEndTime = Infinity,
+                curNextStartTime = 0,
+                isEarly = curTime < curPlayStart;
+            chaps.each(function (chp) {
+              var endTime = chp.getEndTime(),
+                  startTime = chp.getStartTime();
+              if ((isEarly && curTime > startTime && startTime >= curNextStartTime)
+                  || (!isEarly && curTime < endTime && (endTime <= curNextEndTime))) {
+                nextChap = chp;
+                curNextEndTime = endTime;
+                curNextStartTime = startTime;
+              }
+            });
+
+            if (nextChap) {
+              curPlayingChap.ytplayer.pauseVideo();
+              curPlayingChap.set("active", false);
+              curPlayingChap = nextChap;
+              curPlayingChap.set("active", true);
+
+              // TODO move to chapter view
+              curPlayingChap.ytplayer.seekTo(curTime, true);
+              // TODO scroll if we're in viewing mode
+              // $.smoothScroll($(curPlayingChap.ytplayer.a.parentElement).offset().top - 300);
+              window.setTimeout(function () {
+                curPlayingChap.ytplayer.playVideo();
+              }, 100);
+            }
+          }
+
+          // make the appropriate section active
+          var curSecStart = (curPlayingSec && curPlayingSec.getStartTime()) || 0,
+              curSecEnd =  (curPlayingSec && curPlayingSec.getEndTime()) || Infinity;
+          if (!curPlayingSec || (curTime >  curSecEnd || curTime < curSecStart)) {
+            var isSecEarly = curTime < curSecStart,
+                curNextSecStart = 0,
+                curNextSecEnd = Infinity;
+            curTime += 0.1; // account for youtube irregularities
+            curPlayingSec && curPlayingSec.set("active", false);
+            curPlayingChap.get("sections").each(function (sec) {
+              var secStart = sec.getStartTime(),
+                  secEnd = sec.getEndTime();
+              if ((isSecEarly && curTime > secStart && secStart >= curNextSecStart)
+                  || (!isSecEarly && curTime < secEnd && (secEnd <= curNextSecEnd))) {
+                curPlayingSec = sec;
+              }
+            });
+            curPlayingSec && curPlayingSec.set("active", true);
+          }
+        } else {
+          thisView.model.get("chapters").each(function (chap) {
+            if (!window.preppingVideo && chap.ytplayer && chap.ytplayer.getPlayerState && chap.ytplayer.getPlayerState() === 1) {
+              curPlayingChap = chap;
+              curPlayingChap.set("active", true);
+            };
+          });
+        }
+      }, 30);
     },
 
     /**

@@ -7,7 +7,8 @@ define(["backbone", "underscore", "jquery", "text!templates/output-digest-templa
     activeClass: "active",
     activeRowClass: "active-row",
     groupRowClass: "groupRow",
-    coverClass: "cover"
+    coverClass: "cover",
+  videoWrapClass: "video-wrap"
   };
 
   return Backbone.View.extend({
@@ -26,7 +27,7 @@ define(["backbone", "underscore", "jquery", "text!templates/output-digest-templa
       thisView.$el.html(thisView.template(thisView.model.attributes));
       // now insert the youtube videos
       thisView.vplayers = {};
-      var $vids = thisView.$el.find(".video-wrap"),
+      var $vids = thisView.$el.find("." + consts.videoWrapClass),
           nvids = $vids.length;
       var inputVid = function (vel, floorStartTime, exactStartTime) {
         Player.inputVideo(vel, "usdJgEwMinM", thisView.vplayers, floorStartTime, exactStartTime);
@@ -103,7 +104,6 @@ define(["backbone", "underscore", "jquery", "text!templates/output-digest-templa
 
     addVPlayerEvents: function () {
       var thisView = this;
-      console.log( "adding vplayer events" );
 
       // listen for state changes
       _.each(thisView.vplayers, function (vp) {

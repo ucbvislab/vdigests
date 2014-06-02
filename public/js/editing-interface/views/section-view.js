@@ -2,10 +2,11 @@
 /*global define */
 define(["backbone", "underscore", "jquery", "text!templates/section-template.html"], function (Backbone, _, $, tmpl) {
   var consts = {
-    className: "row section-row",
+    className: "section-row",
     keyframeClass: "keyframe-col",
     thumbClass: "section-thumbnail",
-    summaryDivClass: "abs-summary"
+    summaryDivClass: "abs-summary",
+    activeClass: "active"
   };
 
   return Backbone.View.extend({
@@ -13,7 +14,9 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
     id: function () {
       return this.model.cid;
     },
-    className: consts.className,
+    className: function () {
+      return consts.className  + (this.model.get("active") ? " " + consts.activeClass : "");
+    },
 
     events: {
       'keyup .abs-summary': "summaryKeyUp",
@@ -34,6 +37,15 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
         $img.attr("src", mdl.get("thumbnail").get("data"));
         thisView.$el.find("." + consts.keyframeClass).html($img);
       });
+
+      thisView.listenTo(thisModel, "change:active", function (chp, val) {
+        if (val) {
+          thisView.$el.addClass(consts.activeClass);
+        } else {
+          thisView.$el.removeClass(consts.activeClass);
+        }
+      });
+
 
       thisView.listenTo(thisModel, "change:summary", function (mdl, val) {
         thisView.$el.find("." + consts.summaryDivClass).html(val);
