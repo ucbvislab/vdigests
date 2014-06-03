@@ -14,7 +14,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
     dragSecClass: "drag-section-word",
     jspTrackClass: "jspTrack",
     scrollMarkPrefix: "scrollmark-",
-    highlightClass: "word-highlight",
+    activeClass: "active",
     blinkClass: "blink-me"
   };
 
@@ -35,7 +35,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
       thisView.listenTo(words, "change:startSection", thisView.changeStartSection);
       thisView.listenTo(words, "change:startChapter", thisView.changeStartChapter);
       thisView.listenTo(words, "sectionToChapter", thisView.sectionToChapter);
-      thisView.listenTo(words, "change:highlight", thisView.changeHighlight);
+      thisView.listenTo(words, "change:active", thisView.changeHighlight);
       thisView.listenTo(words, "focus", thisView.focusOnWord);
     },
 
@@ -54,9 +54,9 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
     changeHighlight: function (wrd, val) {
       var $wrd = $("#" + wrd.cid);
       if (val) {
-        $wrd.addClass(consts.highlightClass);
+        $wrd.addClass(consts.activeClass);
       } else {
-        $wrd.removeClass(consts.highlightClass);
+        $wrd.removeClass(consts.activeClass);
       }
     },
 

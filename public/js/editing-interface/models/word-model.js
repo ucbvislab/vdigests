@@ -11,7 +11,8 @@ define(["backbone", "underscore", "jquery"], function (Backbone, _, $) {
         alignedWord: "",
         speaker: -1,
         startSection: false,
-        startChapter: false
+        startChapter: false,
+        active: false
       };
     },
 

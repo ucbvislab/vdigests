@@ -50,6 +50,13 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
       thisView.checkPlayInterval = window.setInterval(function () {
         // monitor chapter changes
         if (curPlayingChap && curPlayingChap.get("active")) {
+          if (!curPlayingChap.ytplayer || curPlayingChap.ytplayer.getPlayerState() !== 1) {
+            curPlayingChap.set("active", false);
+            curPlayingSec && curPlayingSec.set("active", false);
+            curPlayingChap = null;
+            curPlayingSec = null;
+            return;
+          }
           var curTime = curPlayingChap.ytplayer.getCurrentTime(),
               curPlayEnd = curPlayingChap.getEndTime(),
               curPlayStart = curPlayingChap.getStartTime();
@@ -105,6 +112,13 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
             });
             curPlayingSec && curPlayingSec.set("active", true);
           }
+
+          // pass a "playing" event to the underlying section
+          if (curPlayingSec && curPlayingSec.get("active")) {
+            // account for small delay
+            curPlayingSec.triggerActiveTime(curTime + 0.1);
+          }
+
         } else {
           thisView.model.get("chapters").each(function (chap) {
             if (!window.preppingVideo && chap.ytplayer && chap.ytplayer.getPlayerState && chap.ytplayer.getPlayerState() === 1) {

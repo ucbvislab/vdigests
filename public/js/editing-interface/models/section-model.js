@@ -37,6 +37,10 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
       }, 200);
     },
 
+    triggerActiveTime: function (activeTime) {
+      this.get("startWord") && this.get("startWord").trigger("activeTimeChange", activeTime);
+    },
+
     handleSectionChange: function () {
       var thisModel = this;
       thisModel.destroy();

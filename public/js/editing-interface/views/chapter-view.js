@@ -147,15 +147,6 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
 
           window.prevPlayVid = thisView.model.ytplayer;
         });
-      //   $elvid.on("timeupdate", function () {
-      //     var ct = $elvid.get(0).currentTime + 0.1, // add 0.1 so the transcript update appears instant
-      //         words = thisModel.get("startWord").collection;
-      //     // TODO this is baaad architecture
-      //     var hlWords = words.each(function (wrd) {
-      //       wrd.set("highlight", wrd.get("start") < ct && wrd.get("end") > ct);
-      //     });
-      //   });
-      // }, 300);
     },
 
     /**

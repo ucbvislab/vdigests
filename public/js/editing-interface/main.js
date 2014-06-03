@@ -17,10 +17,12 @@ requirejs.config({
     jquerySmoothScroll: "lib/jquery.smooth-scroll",
     jscrollpane: "lib/jquery.jscrollpane.min",
     filesaver: "lib/FileSaver",
-    jmousewheel: "lib/jquery.mousewheel"
+    jmousewheel: "lib/jquery.mousewheel",
+    jform: "lib/jquery.form.min"
   },
   shim: {
     jmousewheel: ["jquery"],
+    jform: ["jquery"],
     filesaver: {
       exports: ["saveAs", "Blob"]
     },
@@ -40,7 +42,7 @@ requirejs.config({
 });
 
 // launch the main application (start the router)
-requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router", "jquerySmoothScroll", "jscrollpane", "jmousewheel", "filesaver"],
+requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router", "jquerySmoothScroll", "jscrollpane", "jmousewheel", "filesaver", "jform"],
           function ($, _, Backbone, AppRouter) {
             "use strict";
             console.log("started main");
@@ -53,14 +55,22 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
             // pull in the youtube api
 
             // keep body size to the size of the viewport
-            var $body = $(document.body);
+            var $body = $(window.body),
+                $maincon= $("#main-container");
+            var setMCHeight = function (inHeight) {
+              $maincon.height(inHeight);
+            };
             var setBodyHeight = function (inHeight) {
               $body.height(inHeight);
             };
-            var $window = $(window);
+            var $window = $(window),
+                navHeight = $(".navbar").eq(0).height();
+
             $window.resize(function () {
+              setMCHeight($window.height() - navHeight);
               setBodyHeight($window.height());
             });
+            setMCHeight($window.height() - navHeight);
             setBodyHeight($window.height());
             window.onbeforeunload = function () {
               return "are you finished creating a digest?";

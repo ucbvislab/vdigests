@@ -14,11 +14,9 @@ html
     block bodycontent
       include partials/navigation
 
-      .container
-        include partials/flash
+      #main-container.container
         block content
 
-      include partials/footer
     block js
       != js('application')
       block morejs

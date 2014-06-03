@@ -14,6 +14,35 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/word-
       };
     },
 
+
+    initialize: function () {
+      var thisModel = this,
+          prevAW = null;
+      thisModel.get("words").on("activeTimeChange", function (activeTime) {
+        // linked list traversal to update the active word
+        if (!prevAW) {
+          prevAW = thisModel.get("words").models[0];
+        }
+        if (prevAW.get("start") > activeTime || prevAW.get("end") < activeTime) {
+          // update the active word
+          var isEarly = prevAW.get("start") > activeTime,
+              curWord,
+              dir = isEarly ? "prev" : "next";
+          curWord = prevAW[dir];
+          while (curWord && (curWord.get("start") > activeTime || curWord.get("end") < activeTime)) {
+            curWord = curWord[dir];
+          }
+          prevAW && prevAW.set("active", false);
+          if (curWord) {
+            curWord.set("active", true);
+            prevAW = curWord;
+          } else {
+            prevAW = null;
+          }
+        }
+      });
+    },
+
     /**
      * Parse the transcript model
      */

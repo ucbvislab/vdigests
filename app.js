@@ -60,7 +60,8 @@ var week = day * 7;
  * CSRF Whitelist
  */
 
-var whitelist = ['/url1', '/url2'];
+// TODO fix
+var whitelist = ['/newvd'];
 
 /**
  * Express configuration.
@@ -112,9 +113,9 @@ app.use(function(req, res, next) {
 /**
  * Application routes.
  */
-
 app.get('/', homeController.index);
-app.get('/editor', editorController.editor);
+app.get('/editor', editorController.getEditor);
+app.post('/newvd', editorController.postNewVD);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.logout);

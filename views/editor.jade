@@ -4,9 +4,27 @@ block morecss
   != css("jquery.jscrollpane")
   != css("output-display")
 
-block bodycontent
+block content
   #editing-interface.editing
   #viewing-interface.viewing
+  #video-form.first-form
+    .container
+      form.form-horizontal(method='POST', action='../newvd', enctype="multipart/form-data")
+        input(type='hidden', name='_csrf', value=_csrf)
+        .page-header
+          h3 Start a New Video Digest
+        .form-group.yturlgroup
+          label.col-sm-3.control-label(for='yturl') YouTube Video Url
+          .col-sm-7
+            input.form-control#yturl(type='url', name='yturl', placeholder='e.g. https://www.youtube.com/watch?v=usdJgEwMinM', autofocus)
+        .form-group.trangroup
+          label.col-sm-3.control-label(for='tranupload') We do not have a transcript for this video, please upload one:
+          .col-sm-7
+            input.form-control#tranupload(type='file', name='tranupload')
+        .form-group
+          .col-sm-offset-3.col-sm-7
+            button.btn#upload-video-stuff(type='submit') Next
+            img(src="img/loading.gif", alt="loading", class="loading-gif")
 
 block js
   != js("lib/require", {"data-main": "/js/editing-interface/main.js"})

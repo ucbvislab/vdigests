@@ -1,6 +1,6 @@
 
 /*global define */
-define(["backbone", "underscore", "jquery", "editing-interface/models/editor-model", "editing-interface/views/editor-view", "editing-interface/views/output-digest-view"], function (Backbone, _, $, EditorModel, EditorView, OutputView) {
+define(["backbone", "underscore", "jquery", "editing-interface/models/editor-model", "editing-interface/views/editor-view", "editing-interface/views/output-digest-view", "editing-interface/views/video-form-view", "editing-interface/models/video-form-model"], function (Backbone, _, $, EditorModel, EditorView, OutputView, VideoFormView, VideoFormModel) {
   "use strict";
 
   /**
@@ -9,9 +9,23 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
   return (function () {
     var consts = {
       editingId: "editing-interface",
-      viewingId: "viewing-interface"
+      viewingId: "viewing-interface",
+      videoFormId: "video-form"
     };
+
+    var pvt = {};
+
+    pvt.hideAllViews = function () {
+      $("#" + consts.editingId).hide();
+      $("#" + consts.viewingId).hide();
+      $("#" + consts.videoFormId).hide();
+    };
+
     return Backbone.Router.extend({
+
+      navVideoId: function (vid) {
+        this.navigate("edit/" + vid, {trigger: true, replace: false});
+      },
 
       routes: {
         "": "noParams",
@@ -20,7 +34,13 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
       },
 
       noParams: function () {
-        alert("you must set the desired data after the hashbang, e.g. #edit/skhci");
+        var thisRoute = this;
+        if (!thisRoute.videoFormView) {
+          thisRoute.videoFormView = new VideoFormView({model: new VideoFormModel(), router: thisRoute});
+          thisRoute.videoFormView.render();
+        }
+        pvt.hideAllViews();
+        thisRoute.videoFormView.$el.show();
       },
 
       /**
@@ -33,14 +53,10 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
           return;
         }
         thisRoute.outputView = new OutputView({model: thisRoute.editorModel});
-        $("#" + consts.viewingId).html(thisRoute.outputView.render().el);
-        thisRoute.$editingInterface = thisRoute.$editingInterface || $("#" + consts.editingId);
-        // pause any playing videos
-          thisRoute.$editingInterface.find("video").each(function (i, vid) {
-            vid.pause();
-          });
-         thisRoute.$editingInterface.hide();
         thisRoute.$viewingView = thisRoute.$viewingView || $("#" + consts.viewingId);
+        thisRoute.$viewingView.html(thisRoute.outputView.render().el);
+        thisRoute.$editingInterface = thisRoute.$editingInterface || $("#" + consts.editingId);
+        pvt.hideAllViews();
         thisRoute.$viewingView.show();
       },
 
@@ -56,10 +72,9 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
         window.dataname = dataname;
 
         var showCallback = function () {
-          thisRoute.$viewingView = thisRoute.$viewingView || $("#" + consts.viewingId);
           thisRoute.$editingView = thisRoute.$editingView || $("#" + consts.editingId);
+          pvt.hideAllViews();
           thisRoute.$editingView.show();
-          thisRoute.$viewingView.hide();
         };
 
         if (!thisRoute.editorModel) {
@@ -70,7 +85,6 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
             // now  show the editor view
             $("#" + consts.editingId).html(thisRoute.editorView.render().el);
             thisRoute.editorModel.postInit();
-            showCallback();
             if (toView) {
               window.setTimeout(function () {
                 thisRoute.editorModel.get("digest").set("title", "The best stats you've ever seen - Hans Rosling");
@@ -79,8 +93,9 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
                 thisRoute.viewRoute(dataname);
                 return;
               }, 500);
+            } else {
+              showCallback();
             }
-
           }});
         } else {
           showCallback();
