@@ -4,8 +4,9 @@
 *.wav
 config
 public/content
-videos
+ffdata
 node_modules
+
 
 *~
 .tern-port

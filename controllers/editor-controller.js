@@ -3,15 +3,11 @@
  * Video digest editing interface
  */
 /*global require exports*/
-var secrets = require('../config/secrets');
-var User = require('../models/User');
-var async = require('async');
 var fs = require('fs');
-var youtubedl = require('youtube-dl');
+var ytdl = require('ytdl');
 var formidable = require('formidable');
-var tmpDir = "/tmp/fsuploads";
+var tmpDir = "/tmp/";
 var util = require('util');
-
 
 
 exports.getEditor = function(req, res) {
@@ -32,14 +28,11 @@ exports.postNewVD = function(req, res) {
       // TODO -- don't download until we need a screenshot
 
       debugger;
-      var video = youtubedl(fields.yturl,
-                            // Optional arguments passed to youtube-dl.
-                            ['--max-quality=12'],
-                            // Additional options can be given for calling `child_process.execFile()`.
-                            { cwd: tmpDir});
 
       // Will be called when the download starts.
       if (files.tranupload) {
+        var video = ytdl(fields.yturl,  { filter: function(format) { return format.container === 'mp4'; } });
+        debugger;
         video.pipe(fs.createWriteStream(tmpDir + '/tmpvid.mp4'));
         res.writeHead(200, {'content-type': 'application/json'});
         res.write('{"contentid": "HansRosling"}');
@@ -48,7 +41,7 @@ exports.postNewVD = function(req, res) {
         // TODO check for existing transcript
         // obtain video info and save to DB if video does not exist
         // TODO handle incorrect urls
-        video.on('info', function(info) {
+        ytdl.getInfo(fields.yturl, function(err, info) {
           res.writeHead(200, {'content-type': 'application/json'});
           res.write(JSON.stringify(info));
           res.end();

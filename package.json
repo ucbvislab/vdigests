@@ -25,6 +25,7 @@
     "express-flash": "^0.0.2",
     "express-session": "^1.2.0",
     "express-validator": "^2.1.2",
+    "formidable": "^1.0.14",
     "fbgraph": "^0.2.10",
     "github-api": "^0.7.0",
     "instagram-node": "^0.4.0",
@@ -55,6 +56,7 @@
     "uglify-js": "^2.4.13",
     "underscore": "^1.6.0",
     "validator": "^3.12.0",
+    "ytdl": "^0.2.8",
     "yui": "^3.17.1"
   },
   "devDependencies": {

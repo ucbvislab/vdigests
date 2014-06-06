@@ -121,8 +121,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
 
       // listen for screenshot capture requests from sections
       thisView.listenTo(secs, "captureThumbnail", function (secModel) {
-      // YTFIX
-        var time = thisView.$el.find("video")[0].currentTime;
+        var time = thisModel.ytplayer && thisModel.ytplayer.getCurrentTime && thisModel.ytplayer.getCurrentTime();
         thisView.placeThumbnailInSec(secModel, time);
       });
 
@@ -143,10 +142,10 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
           if (!window.startFromTran) {
             window.vdstats.nVideoStartsFromVideo.push((new Date()).getTime());
           }
-          });
-
-          window.prevPlayVid = thisView.model.ytplayer;
         });
+
+        window.prevPlayVid = thisView.model.ytplayer;
+      });
     },
 
     /**
@@ -154,13 +153,12 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
      */
     placeThumbnailInSec: function (sec, time) {
       var thisView = this;
-      time = time || sec.get("startWord").get("start");
+      time = time || sec.getStartTime();
       window.setTimeout(function () {
         thisView.$el.find("#" + sec.cid + " ." + consts.absSummaryClass).focus();
       }, 200);
-      var $vid = thisView.$el.find("video");
 
-      Utils.seekThenCaptureImgTime($vid, time, function (newImgData) {
+      Utils.getScreenShot(thisView.model.get("videoId"), time, function (newImgData) {
         sec.set("thumbnail", new ThumbnailModel({data: newImgData, image_time: time}));
       }, consts.imgWidth, consts.imgHeight);
     },
@@ -184,9 +182,9 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
     },
 
     startVideo: function (stTime) {
-        var thisView = this;
-        thisView.model.ytplayer.seekTo(stTime);
-        thisView.model.ytplayer.playVideo();
-      }
+      var thisView = this;
+      thisView.model.ytplayer.seekTo(stTime);
+      thisView.model.ytplayer.playVideo();
+    }
   });
 });

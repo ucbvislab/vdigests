@@ -29,6 +29,7 @@ var userController = require('./controllers/user');
 var apiController = require('./controllers/api');
 var contactController = require('./controllers/contact');
 var editorController = require('./controllers/editor');
+var screenShotController = require('./controllers/screenshot');
 
 /**
  * API keys + Passport configuration.
@@ -115,6 +116,7 @@ app.use(function(req, res, next) {
  */
 app.get('/', homeController.index);
 app.get('/editor', editorController.getEditor);
+app.get('/screenshot', screenShotController.getScreenShot);
 app.post('/newvd', editorController.postNewVD);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
