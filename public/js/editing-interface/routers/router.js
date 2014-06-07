@@ -1,6 +1,6 @@
 
 /*global define */
-define(["backbone", "underscore", "jquery", "editing-interface/models/editor-model", "editing-interface/views/editor-view", "editing-interface/views/output-digest-view", "editing-interface/views/video-form-view", "editing-interface/models/video-form-model"], function (Backbone, _, $, EditorModel, EditorView, OutputView, VideoFormView, VideoFormModel) {
+define(["backbone", "underscore", "jquery", "editing-interface/models/editor-model", "editing-interface/views/editor-view", "editing-interface/views/output-digest-view", "editing-interface/views/video-form-view", "editing-interface/models/video-form-model", "toastr"], function (Backbone, _, $, EditorModel, EditorView, OutputView, VideoFormView, VideoFormModel, toastr) {
   "use strict";
 
   /**
@@ -29,7 +29,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
 
       routes: {
         "": "noParams",
-        "edit/:params": "editRoute",
+        ":params": "editRoute",
         "view/:params": "viewRoute"
       },
 
@@ -78,13 +78,15 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
         };
 
         if (!thisRoute.editorModel) {
-          thisRoute.editorModel = new EditorModel();
+          thisRoute.editorModel = new EditorModel({id: dataname});
           thisRoute.editorView =  new EditorView({model: thisRoute.editorModel});
-          thisRoute.editorModel.get("transcript").fetch({success: function () {
+          thisRoute.editorModel.fetch({success: function () {
             // create the editor view
             // now  show the editor view
             $("#" + consts.editingId).html(thisRoute.editorView.render().el);
             thisRoute.editorModel.postInit();
+
+
             if (toView) {
               window.setTimeout(function () {
                 thisRoute.editorModel.get("digest").set("title", "The best stats you've ever seen - Hans Rosling");
@@ -96,7 +98,13 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
             } else {
               showCallback();
             }
-          }});
+          }, // end success
+          error: function (data, resp) {
+            toastr.error((resp.responseJSON && resp.responseJSON.error) || "unable to load the video digest");
+            console.log( "error fetching data" );
+            console.log(resp);
+          } // end error
+          });
         } else {
           showCallback();
         }

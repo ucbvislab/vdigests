@@ -2,22 +2,22 @@
 /*global define YT*/
 define(['jquery'], function($) {
   var player = {
-    inputVideo: function(container, videoId, vplayerObj, startTime, exactStartTime, setAttr) {
+    inputVideo: function(container, ytid, vplayerObj, startTime, exactStartTime, setAttr) {
       if (typeof(window.YT) == 'undefined' || typeof(window.YT.Player) == 'undefined') {
         window.onYouTubeIframeAPIReady = function() {
-          player.loadPlayer(container, videoId, vplayerObj, startTime, exactStartTime, setAttr);
+          player.loadPlayer(container, ytid, vplayerObj, startTime, exactStartTime, setAttr);
         };
 
         $.getScript('//www.youtube.com/iframe_api');
       } else {
-          player.loadPlayer(container, videoId, vplayerObj, startTime, exactStartTime, setAttr);
+          player.loadPlayer(container, ytid, vplayerObj, startTime, exactStartTime, setAttr);
       }
     },
 
-    loadPlayer: function(container, videoId, vplayerObj, startTime, exactStartTime, setAttr) {
+    loadPlayer: function(container, ytid, vplayerObj, startTime, exactStartTime, setAttr) {
 
       var pobj = new window.YT.Player(container, {
-        videoId: videoId,
+        videoId: ytid,
         playerVars: {
           controls: 1,
           autohide: 1,

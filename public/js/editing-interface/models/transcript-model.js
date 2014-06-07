@@ -3,17 +3,12 @@
 define(["backbone", "underscore", "jquery", "editing-interface/collections/word-collection"], function (Backbone, _, $, WordCollection) {
 
   return Backbone.Model.extend({
-    // TODO fix hardcoding
-    url: function () {
-      return "content/" + window.dataname + "_aligned.json";
-    },
 
     defaults: function () {
       return {
         words: new WordCollection()
       };
     },
-
 
     initialize: function () {
       var thisModel = this,

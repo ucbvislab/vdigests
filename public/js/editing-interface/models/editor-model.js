@@ -27,16 +27,17 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
     defaults: function () {
       return {
         digest: new DigestModel(),
-        transcript: new TranscriptModel()
+        transcript: new TranscriptModel(),
+        ytid: ""
       };
+    },
+
+    url: function () {
+      return "/digestdata?id=" + this.id;
     },
 
     initialize: function () {
       var thisModel = this;
-      thisModel.listenTo(thisModel.get("transcript").get("words"),
-                        "change:startSection", thisModel.handleSectionChange);
-      thisModel.listenTo(thisModel.get("transcript").get("words"),
-                         "change:startChapter", thisModel.handleChapterChange);
 
       // USE STATS
       window.editorModel = thisModel;
@@ -47,6 +48,13 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
      */
     postInit: function () {
       var thisModel = this;
+
+      // setup appropriate event listeners
+      thisModel.listenTo(thisModel.get("transcript").get("words"),
+                         "change:startSection", thisModel.handleSectionChange);
+      thisModel.listenTo(thisModel.get("transcript").get("words"),
+                         "change:startChapter", thisModel.handleChapterChange);
+
       // mark the first chapter if no chapters are present
       var chaps = thisModel.get("digest").get("chapters");
       if (!chaps.length) {
@@ -75,7 +83,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
         console.log( "new chapter in editor model" );
         var sec2Chap = chWord.get("startSection");
         // we're creating a new chapter
-        var newChap = new ChapterModel({startWord: chWord, sec2Chap: sec2Chap}),
+        var newChap = new ChapterModel({ytid: thisModel.get("ytid"), startWord: chWord, sec2Chap: sec2Chap}),
             prevChWord = chWord.getPrevChapterStart();
 
         if (prevChWord) {
@@ -132,14 +140,20 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
       }
     },
 
-    useJSONData: function (inpData) {
+    parse: function (inpData) {
+      var thisModel = this,
+          output = _.extend(thisModel.defaults(), thisModel.attributes);
+      output["transcript"] = new TranscriptModel({words: inpData.transcript.words}, {parse: true});
+      output["ytid"] = inpData.ytid;
+      return output;
+    },
 
+    useJSONData: function (inpData) {
       // parse the segment data
       var thisModel = this,
           words = thisModel.get("transcript").get("words"),
           chaps = {};
 
-      // set the thumbnail TODO FIXME BAD this is soooo bad, the model shouldn't access the html,
       // but Colorado is on a deadline =\
       var vid = $("video").get(0),
           $vid = $(vid);

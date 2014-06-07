@@ -18,7 +18,8 @@ requirejs.config({
     jscrollpane: "lib/jquery.jscrollpane.min",
     filesaver: "lib/FileSaver",
     jmousewheel: "lib/jquery.mousewheel",
-    jform: "lib/jquery.form.min"
+    jform: "lib/jquery.form.min",
+    toastr: "lib/toastr"
   },
   shim: {
     jmousewheel: ["jquery"],
@@ -105,15 +106,15 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
               }
             });
 
-            var saveToLocalStorage = function () {
-              window.setTimeout(function () {
-                var jvd = window.JSON.stringify(window.vdstats),
-                    jdm = window.JSON.stringify(window.editorModel.getOutputJSON());
-                window.localStorage["vdstats"] = jvd;
-                window.localStorage["editorData"] = jdm;
-                console.log("saved to local");
-              }, 30000);
-            };
-            saveToLocalStorage();
+            // var saveToLocalStorage = function () {
+            //   window.setTimeout(function () {
+            //     var jvd = window.JSON.stringify(window.vdstats),
+            //         jdm = window.JSON.stringify(window.editorModel.getOutputJSON());
+            //     window.localStorage["vdstats"] = jvd;
+            //     window.localStorage["editorData"] = jdm;
+            //     console.log("saved to local");
+            //   }, 30000);
+            // };
+            // saveToLocalStorage();
           }
          );

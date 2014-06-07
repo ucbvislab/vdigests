@@ -1,11 +1,15 @@
 /*global define*/
-define(["backbone", "underscore", "jquery", "text!templates/ytinfo-template.html"], function (Backbone, _, $, ytinfoTemplate) {
+define(["backbone", "underscore", "jquery", "toastr", "text!templates/ytinfo-template.html"], function (Backbone, _, $, toastr, ytinfoTemplate) {
     var consts = {
       viewId: "video-form",
       pageHeaderClass: "page-header",
       firstFormClass: "first-form",
       secondFormClass: "second-form",
-      loadingClass: "loading"
+      thirdFormClass: "third-form",
+      loadingClass: "loading",
+      tranUploadId: "tranupload",
+      finalUrlId: "finalurl",
+      intrmId: "intrmid"
     };
     return Backbone.View.extend({
       el: document.getElementById(consts.viewId),
@@ -33,21 +37,36 @@ define(["backbone", "underscore", "jquery", "text!templates/ytinfo-template.html
       },
 
       handleFormSuccess: function (resobj) {
-        var thisView = this;
-        if (thisView.$el.hasClass(consts.firstFormClass)) {
+        var thisView = this,
+            $el = thisView.$el;
+        if ($el.hasClass(consts.firstFormClass)) {
           var ytinfoHtml = _.template(ytinfoTemplate, resobj);
           thisView.$el.find("." + consts.pageHeaderClass).html(ytinfoHtml);
           thisView.$el.removeClass(consts.firstFormClass);
           thisView.$el.addClass(consts.secondFormClass);
+        } else if ($el.hasClass(consts.secondFormClass)){
+          if (resobj.intrmid) {
+            thisView.$el.removeClass(consts.secondFormClass);
+            thisView.$el.addClass(consts.thirdFormClass);
+            var $finalUrl = thisView.$el.find("#" + consts.finalUrlId),
+            finalHref = window.location.href + "#" + resobj.intrmid;
+            $finalUrl.text(finalHref);
+            $finalUrl.attr("href", finalHref);
+            $("#" + consts.tranUploadId).val("");
+            $("#" + consts.intrmId).val(resobj.intrmid);
+          } else {
+            toastr.error("unable to process request correctly: try resubmitting");
+          }
+          // thisView.router.navVideoId(resobj.contentid);
         } else {
-          thisView.router.navVideoId(resobj.contentid);
+          // final class
         }
         console.log( "form success" );
       },
 
-      handleFormError: function () {
+      handleFormError: function (errResp) {
         var thisView = this;
-        console.log( "form error" );
+        toastr.error( (errResp.responseJSON && errResp.responseJSON.error) || "error processing the form" );
       }
     });
 });

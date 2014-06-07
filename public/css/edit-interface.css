@@ -6,7 +6,6 @@
 
 * {
     box-sizing: border-box;
-    color: #564358;
 }
 
 body {
@@ -14,6 +13,7 @@ body {
     width: 100%;
     min-width: 1250px;
     overflow-y: hidden;
+    color: #564358;
 }
 
 #main-container.container {
@@ -36,6 +36,10 @@ body {
 /********************/
 /* video form css   */
 /********************/
+#video-form {
+    display: none;
+}
+
 #yturl, #tranupload {
     display: block;
     height: 30px;
@@ -43,12 +47,20 @@ body {
     position: static;
 }
 
-.first-form .trangroup {
+.yturlgroup, .trangroup, .confirmgroup {
     display: none;
 }
 
-.second-form .yturlgroup {
-    display: none;
+.first-form .yturlgroup {
+    display: block;
+}
+
+.second-form .trangroup {
+    display: block;
+}
+
+.third-form .confirmgroup {
+    display: block;
 }
 
 .yt-header-thumb {

@@ -8,7 +8,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
         sections: new SectionCollection(),
         startWord: null,
         title: "",
-        videoId: "usdJgEwMinM"
+        ytid: ""
       };
     },
 

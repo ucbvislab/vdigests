@@ -28,7 +28,7 @@ var homeController = require('./controllers/home');
 var userController = require('./controllers/user');
 var apiController = require('./controllers/api');
 var contactController = require('./controllers/contact');
-var editorController = require('./controllers/editor');
+var editorController = require('./controllers/editor-controller');
 var screenShotController = require('./controllers/screenshot');
 
 /**
@@ -111,11 +111,18 @@ app.use(function(req, res, next) {
   next();
 });
 
+// TODO: make this more informative
+app.use(function(err, req, res, next){
+  console.error(err.stack);
+  res.send(500, 'Sorry, something broke!');
+});
+
 /**
  * Application routes.
  */
 app.get('/', homeController.index);
 app.get('/editor', editorController.getEditor);
+app.get('/digestdata', editorController.getDigestData);
 app.get('/screenshot', screenShotController.getScreenShot);
 app.post('/newvd', editorController.postNewVD);
 app.get('/login', userController.getLogin);
