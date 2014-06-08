@@ -15,7 +15,9 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
       return this.model.cid;
     },
     className: function () {
-      return consts.className  + (this.model.get("active") ? " " + consts.activeClass : "");
+      var retName =  consts.className  + (this.model.get("active") ? " " + consts.activeClass : "");
+      retName += this.model.get("summary").length ? "" : " empty";
+      return retName;
     },
 
     events: {
@@ -23,7 +25,8 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
       "click .remove-section": "removeSection",
       "click .take-thumbnail-image": "takeThumbnailImage",
       "click .keyframe-col": "startVideo",
-      "click .abs-summary": "clickSummary"
+      "blur .abs-summary": "blurSummary",
+      "click" : "clickSection"
     },
 
     initialize: function () {
@@ -35,7 +38,9 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
         var $img = $("<img>");
         $img.addClass(consts.thumbClass);
         $img.attr("src", mdl.get("thumbnail").get("data"));
-        thisView.$el.find("." + consts.keyframeClass).html($img);
+        var $kfel = thisView.$el.find("." + consts.keyframeClass);
+        $kfel.find('img').remove();
+        $kfel.prepend($img);
       });
 
       thisView.listenTo(thisModel, "change:active", function (chp, val) {
@@ -66,7 +71,13 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
     render: function () {
       var thisView = this;
       thisView.$el.html(thisView.template(thisView.model.toJSON()));
+      // apply the dynamic classname
+      thisView.$el.attr('class', _.result(this, 'className'));
       return thisView;
+    },
+
+    blurSummary: function () {
+      this.$el.attr('class', _.result(this, 'className'));
     },
 
     summaryKeyUp: function (evt) {
@@ -94,10 +105,10 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
       var thisView = this,
           thisModel = thisView.model;
       thisModel.trigger("captureThumbnail", thisModel);
+      evt.stopPropagation();
 
       // USE STATS
       window.vdstats.nKeyFrameChanges.push((new Date()).getTime());
-
     },
 
     startVideo: function () {
@@ -106,10 +117,13 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
       thisModel.trigger("startVideo", thisModel.get("startWord").get("start"));
     },
 
-    clickSummary: function () {
+
+
+    clickSection: function () {
       var thisView = this,
           startWord = thisView.model.get("startWord");
       startWord.trigger("focus", startWord);
+      thisView.$el.find("." + consts.summaryDivClass).focus();
     }
   });
 });
