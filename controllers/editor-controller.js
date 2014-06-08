@@ -1,9 +1,12 @@
+
 /**
  * GET /editing-interface
  * Video digest editing interface
  */
 /*global require exports*/
+
 var fs = require('fs'),
+    mkdirp = require('mkdirp'),
     ytdl = require('ytdl'),
     multiparty = require('multiparty'),
     url = require('url'),
@@ -12,16 +15,11 @@ var fs = require('fs'),
     util = require('util'),
     querystring = require('querystring'),
     path = require('path'),
-    settings = require('../config/settings'),
     VDigest = require('../models/VDigest'),
-    spaths = settings.paths;
-
-var returnError = function (res, errMsg, errCode) {
-  errCode = errCode || 400;
-  res.writeHead(errCode, {'content-type': 'application/json'});
-  res.end('{"error":"' + errMsg + '"}' );
-  return;
-};
+    settings = require('../config/settings'),
+    spaths = settings.paths,
+    pathUtils = require('../utils/fpaths'),
+    returnError = require('../utils/errors').returnError;
 
 /**
  * Returns the editor js template (TODO consider bootstraping data)
@@ -35,15 +33,18 @@ exports.getEditor = function(req, res) {
 /**
  * Returns the digest data needed for the editor
  */
-exports.getDigestData = function (req, res) {
+exports.getDigestData = function (req, res, next) {
   var uparsed = url.parse(req.url),
       did = uparsed.query && querystring.parse(uparsed.query).id;
   VDigest.findById(did, function (err, vd) {
     if (err || !vd) {
-      returnError(res, "unable to load the specified video digest data");
+      returnError(res, "unable to load the specified video digest data", next);
     }
-    else if (vd.state !== 1) {
-      returnError(res, "the video digest is currently processing");
+    else if (vd.isProcessing()) {
+      returnError(res, "the video digest is currently processing", next);
+    }
+    else if (!vd.isReady()) {
+      returnError(res, "the transcript did not upload correctly: please create the video digest from scratch", next);
     } else {
       res.writeHead(200, {"content-type": "application/json"});
       debugger;
@@ -52,7 +53,7 @@ exports.getDigestData = function (req, res) {
   });
 };
 
-exports.postNewVD = function(req, res) {
+exports.postNewVD = function(req, res, next) {
   req.assert('yturl', 'YouTube URL is not a valid URL').isURL();
   var form = new multiparty.Form({
     maxFilesSize: settings.maxTransUploadSize,
@@ -61,7 +62,7 @@ exports.postNewVD = function(req, res) {
 
   form.parse(req, function (err, fields, files) {
     if (err) {
-      returnError(res, err.message);
+      returnError(res, err.message, next);
       return;
     }
 
@@ -70,49 +71,67 @@ exports.postNewVD = function(req, res) {
         ytid = ytparsed.query && querystring.parse(ytparsed.query).v;
     if (!(ytparsed.hostname === "youtube.com" || ytparsed.hostname === "www.youtube.com") || !ytid) {
       //  TODO return informative messages to the user (how to do this?)
-      returnError(res, "you must proivde a YouTube url in the format: http://www.youtube.com/watch?v=someIdValue");
+      returnError(res, "you must proivde a YouTube url in the format: http://www.youtube.com/watch?v=someIdValue", next);
       return;
     }
     var ytaddr = "http://www.youtube.com/watch?v=" + ytid;
 
     if (files.tranupload) {
+
+      var vidFile = pathUtils.getVideoFile(ytid);
       var sendGoodResponse = function () {
         // TODO add user to the model
         // read the text so we can store it into
-        var fp = files.tranupload[0].path.split(path.sep),
-            tfname = fp[fp.length - 1];
-        var vd = new VDigest({ytid: ytid, rawTransName: tfname, videoName: ytid});
-        vd.save(function (err) {
+        var vlencmd = "ffprobe -loglevel error -show_streams " + vidFile + " | grep duration= | cut -f2 -d= | head -n 1";
+        exec(vlencmd, function (err, vlen) {
+          debugger;
           if (err) {
-            returnError(res, "problem saving video digest to the database -- please try again");
-            return;
-          } else {
-            res.writeHead(200, {'content-type': 'application/json'});
-            res.write('{"intrmid":"' + vd._id +'"}');
-            res.end();
+            returnError(res, "unable to determine video length", next);
             return;
           }
+
+          var fp = files.tranupload[0].path.split(path.sep),
+              tfname = fp[fp.length - 1];
+          var vd = new VDigest({ytid: ytid, rawTransName: tfname, videoName: ytid, videoLength: vlen});
+          vd.save(function (err) {
+            if (err) {
+              returnError(res, "problem saving video digest to the database -- please try again", next);
+              return;
+            } else {
+              res.writeHead(200, {'content-type': 'application/json'});
+              res.write('{"intrmid":"' + vd._id +'"}');
+              res.end();
+              return;
+            }
+          });
         });
       };
 
       // download the yt video
-      fs.exists(path.join(spaths.videos, ytid + ".mp4"), function (exists) {
+      fs.exists(vidFile, function (exists) {
         if (exists) {
           sendGoodResponse();
         } else {
-          var video = ytdl(ytaddr, {filter: function(format) { return format.container === 'mp4'; } }),
-              vidWS = fs.createWriteStream(path.join(spaths.videos, ytid + '.mp4'));
-          vidWS.on("close", sendGoodResponse);
-          vidWS.on("error", function () {
-            returnError(res, "unable to load the YouTube video properly");
+          var vidWS = fs.createWriteStream(vidFile);
+          ytdl.getInfo(ytaddr, function(err, info) {
+            if (info.length_seconds > settings.max_yt_length || err) {
+              returnError(res, (err && err.message) || ("Video length exceeds " + Math.floor(settings.max_yt_length/60) + " minutes"), next);
+              return;
+            }
+            debugger;
+            var video = ytdl(ytaddr, {filter: function(format) { return format.container === 'mp4'; } });
+            vidWS.on("close", sendGoodResponse);
+            vidWS.on("error", function () {
+              returnError(res, "unable to load the YouTube video properly", next);
+            });
+            video.pipe(vidWS);
           });
-          video.pipe(vidWS);
         }
       });
 
     } else if (fields.intrmid && fields.intrmid[0]) {
       if (!Number(fields.createdigest[0])) {
-        returnError(res, "you must select 'yes' to continue");
+        returnError(res, "you must select 'yes' to continue", next);
         return;
       }
       var intrmid = fields.intrmid[0];
@@ -120,7 +139,7 @@ exports.postNewVD = function(req, res) {
       // first clean the text
       VDigest.findById(intrmid, function (err1, vdigest) {
         if (err1 || !vdigest || !vdigest.rawTransName || ! vdigest.videoName) {
-          returnError(res, "encountered a problem loading the video digest data: please try resubmitting");
+          returnError(res, "encountered a problem loading the video digest data: please try resubmitting", next);
           return;
         }
         vdigest.state = 2;
@@ -128,17 +147,18 @@ exports.postNewVD = function(req, res) {
 
         var vname = vdigest.videoName,
             aname = vname,
-            inVideoFile = path.join(spaths.videos, vname + ".mp4"),
-            outAudioFile = path.join(spaths.audio, aname + ".wav"),
+            inVideoFile = vdigest.getVideoFile(),
+            outAudioFile = pathUtils.getAudioFile(aname),
             outAlignTrans = path.join(spaths.tmp, aname + "_aligned.json"),
             state = 0;
+
         //
         // Clean up the text
         //
         var rtxtfile = path.join(spaths.rawTrans, vdigest.rawTransName);
         fs.readFile(rtxtfile, 'utf8', function (err2, data) {
           if (err2) {
-            returnError(res, "encountered a problem processing the transcript: is it a plain text file?");
+            returnError(res, "encountered a problem processing the transcript: is it a plain text file?", next);
             return;
           }
 
@@ -163,7 +183,7 @@ exports.postNewVD = function(req, res) {
           vdigest.preAlignTrans = out;
           vdigest.save(function (err) {
             if (err) {
-              returnError(res, "encountered a problem processing the transcript: is it a plain text file?");
+              returnError(res, "encountered a problem processing the transcript: is it a plain text file?", next);
               return;
             }
             console.log("transcript is finished");
@@ -187,7 +207,7 @@ exports.postNewVD = function(req, res) {
         // executes `pwd`
         child = exec(cmd, function (error, stdout, stderr) {
           if (error !== null) {
-            returnError(res, "error processing the video");
+            returnError(res, "error processing the video", next);
             console.log('exec error: ' + error);
             return;
           }
@@ -201,52 +221,58 @@ exports.postNewVD = function(req, res) {
             vdigest.state = state;
             vdigest.save();
           }
+
         });
+
 
         var alignTranscript = function () {
           var outPreFile = path.join(spaths.tmp, vdigest.videoName + ".json");
           fs.writeFile(outPreFile, JSON.stringify(vdigest.preAlignTrans), function (err) {
             if (err) {
-              returnError(res, "error parsing video transcript");
+              returnError(res, "error parsing video transcript", next);
               return;
             }
 
-            // TODO htk creates a local dir: could conflict with itself (need to cd into a sandbox first)
-            var alignCmd = "python " + spaths.alignpy + " "
-                  + outAudioFile + " " + outPreFile + " " + outAlignTrans;
-            console.log("starting alignment command");
-            console.log(alignCmd);
-            child = exec(alignCmd, function (error, stdout, stderr) {
-              if (error !== null) {
-                console.log('exec error: ' + error);
-                returnError(res, "error creating the aligned transcript");
+            // make a temporary working dir for the alignment process
+            var tmpAlignDir = path.join(spaths.tmp, vname);
+            mkdirp(tmpAlignDir, function (err0) {
+              if (err0 !== null) {
+                console.log('exec error: ' + err0);
+                returnError(res, "system error creating the aligned transcript", next);
                 return;
               }
-              console.log("finished processing vdigest");
-              fs.readFile(outAlignTrans, 'utf8', function (err2, data) {
-                console.log("done reading the aligned transcript");
-                vdigest.alignTrans = JSON.parse(data);
-                vdigest.state = 1;
-                vdigest.save(function (err) {
-                  if (err) {
-                    console.log(err);
-                    returnError(res, "unable to open aligned transcript");
-                    return;
-                  }
-                  res.writeHead(200, {'content-type': 'application/json'});
-                  res.write('{"readyid":"' + vdigest._id +'"}');
-                  res.end();
+
+              var alignCmd = "python " + spaths.alignpy + " "
+                    + outAudioFile + " " + outPreFile + " " + outAlignTrans;
+              console.log("starting alignment command");
+              console.log(alignCmd);
+              child = exec(alignCmd, {cwd: tmpAlignDir}, function (error, stdout, stderr) {
+                if (error !== null) {
+                  console.log('exec error: ' + error);
+                  returnError(res, "error creating the aligned transcript", next);
+                  return;
+                }
+                console.log("finished processing vdigest");
+                fs.readFile(outAlignTrans, 'utf8', function (err2, data) {
+                  console.log("done reading the aligned transcript");
+                  vdigest.alignTrans = JSON.parse(data);
+                  vdigest.state = 1;
+                  vdigest.save(function (err) {
+                    if (err) {
+                      console.log(err);
+                      returnError(res, "unable to open aligned transcript", next);
+                      return;
+                    }
+                    res.writeHead(200, {'content-type': 'application/json'});
+                    res.write('{"readyid":"' + vdigest._id +'"}');
+                    res.end();
+                  });
                 });
-              });
-            });
+              });// end align command
+            }); // end make temporary directory
           });
         };
       });
-      // also extract the audio from the video
-      // then make the aligned json!
-      // convert raw to ready text
-      // extract audio from video in the appropriate format
-      // combined ready text and audio to create the aligned transcript
     } else {
       // No files: first upload
       // TODO check/handle for existing transcript
@@ -254,7 +280,7 @@ exports.postNewVD = function(req, res) {
       // TODO handle incorrect urls ? what happens?
       ytdl.getInfo(ytaddr, function(err, info) {
         if (err && err.message) {
-          returnError(res, "unable to find a YouTube Video with the given URL");
+          returnError(res, "unable to find a YouTube Video with the given URL", next);
           return;
         }
         res.writeHead(200, {'content-type': 'application/json'});

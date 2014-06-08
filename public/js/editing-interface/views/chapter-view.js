@@ -158,7 +158,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
         thisView.$el.find("#" + sec.cid + " ." + consts.absSummaryClass).focus();
       }, 200);
 
-      Utils.getScreenShot(thisView.model.get("ytid"), time, function (newImgData) {
+      Utils.getScreenShot(window.dataname, time, function (newImgData) {
         sec.set("thumbnail", new ThumbnailModel({data: newImgData, image_time: time}));
       }, consts.imgWidth, consts.imgHeight);
     },
