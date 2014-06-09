@@ -5,6 +5,7 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
     className: "section-row",
     keyframeClass: "keyframe-col",
     thumbClass: "section-thumbnail",
+    takeThumbClass: "take-thumbnail-image",
     summaryDivClass: "abs-summary",
     activeClass: "active"
   };
@@ -21,11 +22,9 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
     },
 
     events: {
-      'keyup .abs-summary': "summaryKeyUp",
-      "click .remove-section": "removeSection",
-      "click .take-thumbnail-image": "takeThumbnailImage",
-      "click .keyframe-col": "startVideo",
-      "blur .abs-summary": "blurSummary",
+      'keyup .editing .abs-summary': "summaryKeyUp",
+      "click .editing .remove-section": "removeSection",
+      "blur  .editing .abs-summary": "blurSummary",
       "click" : "clickSection"
     },
 
@@ -117,13 +116,19 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
       thisModel.trigger("startVideo", thisModel.get("startWord").get("start"));
     },
 
-
-
-    clickSection: function () {
+    clickSection: function (evt) {
       var thisView = this,
-          startWord = thisView.model.get("startWord");
-      startWord.trigger("focus", startWord);
-      thisView.$el.find("." + consts.summaryDivClass).focus();
+          startWord = thisView.model.get("startWord"),
+          $tar = $(evt.target);
+
+      if ($tar.hasClass(consts.takeThumbClass)) {
+        thisView.takeThumbnailImage(evt);
+      } else if ($tar.hasClass(consts.thumbClass)) {
+        thisView.startVideo();
+      } else {
+        startWord.trigger("focus", startWord);
+        thisView.$el.find("." + consts.summaryDivClass).focus();
+      }
     }
   });
 });

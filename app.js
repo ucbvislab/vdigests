@@ -123,6 +123,7 @@ app.use(function(err, req, res, next){
 app.get('/', homeController.index);
 app.get('/editor', editorController.getEditor);
 app.get('/digestdata', editorController.getDigestData);
+app.get('/checkstatus', editorController.getStatus);
 app.get('/screenshot', screenShotController.getScreenShot);
 app.post('/newvd', editorController.postNewVD);
 app.get('/login', userController.getLogin);

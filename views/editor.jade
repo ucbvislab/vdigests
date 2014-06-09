@@ -5,8 +5,7 @@ block morecss
   != css("output-display")
 
 block content
-  #editing-interface.editing
-  #viewing-interface.viewing
+  #editing-interface
   #video-form.first-form
     .container
       form.form-horizontal(method='POST', action='../newvd', enctype="multipart/form-data")
@@ -24,7 +23,7 @@ block content
             input.form-control#tranupload(type='file', name='tranupload')
         .form-group.confirmgroup
           p.col-sm-9 We must sync the video's audio with the transcript, this will take some time (probably <strong>1-3 hours</strong>). We'll email your account when it is finished.
-          p.col-sm-9 Once finished syncing, you can access the video digest editor at: <a href="", id="finalurl"></a>. Would you still like to create a video digest?
+          p.col-sm-9 Once finished syncing, you can access the video digest editor at: <a href="", class="finalurl"></a>. Would you still like to create a video digest?
           .col-sm-7
             input(type="radio", name="createdigest", value="1")
             | Yes
@@ -34,6 +33,10 @@ block content
           .col-sm-offset-3.col-sm-7
             button.btn#upload-video-stuff(type='submit') Next
             img(src="img/loading.gif", alt="loading", class="loading-gif")
+        .form-group.processinggroup
+          p.col-sm-9 Video digest is currently processing. We will email your account when it is finished. The digest editor will be available at: <a href="", class="finalurl"></a>
+          .col-sm-9
+            img(src="img/loading.gif", alt="loading", class="loading-gif", style="display: inline-block;")
 
 block js
   != js("lib/require", {"data-main": "/js/editing-interface/main.js"})

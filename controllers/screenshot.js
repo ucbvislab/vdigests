@@ -34,7 +34,7 @@ exports.getScreenShot = function (req, res, next) {
     usetime = Math.min(usetime, vd.videoLength - 0.3); // TODO fix the screenshot edge case
     var videoFile = vd.getVideoFile(),
         outssFile = pathUtils.getScreenShotFile(vd.videoName, usetime),
-        cmd = "ffmpeg -i " + videoFile + " -ss " + usetime + " -f image2 -vframes 1 -y " + outssFile;
+        cmd = "ffmpeg -ss " + usetime + " -i " + videoFile + " -f image2 -vframes 1 -y " + outssFile;
     console.log( cmd );
 
     exec(cmd, function (err2) {

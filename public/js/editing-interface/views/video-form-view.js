@@ -8,7 +8,8 @@ define(["backbone", "underscore", "jquery", "toastr", "text!templates/ytinfo-tem
       thirdFormClass: "third-form",
       loadingClass: "loading",
       tranUploadId: "tranupload",
-      finalUrlId: "finalurl",
+      processingFormClass: "processing-form",
+      finalUrlClass: "finalurl",
       intrmId: "intrmid"
     };
     return Backbone.View.extend({
@@ -46,12 +47,16 @@ define(["backbone", "underscore", "jquery", "toastr", "text!templates/ytinfo-tem
           thisView.$el.addClass(consts.secondFormClass);
         } else if ($el.hasClass(consts.secondFormClass)){
           if (resobj.intrmid) {
+            thisView.intrmid = resobj.intrmid;
             thisView.$el.removeClass(consts.secondFormClass);
             thisView.$el.addClass(consts.thirdFormClass);
-            var $finalUrl = thisView.$el.find("#" + consts.finalUrlId),
-            finalHref = window.location.href + "#" + resobj.intrmid;
-            $finalUrl.text(finalHref);
-            $finalUrl.attr("href", finalHref);
+            var $finalUrls = thisView.$el.find("." + consts.finalUrlClass),
+            finalHref = window.location.href + "#edit/" + resobj.intrmid;
+            thisView.finalHref = finalHref;
+            $finalUrls.each(function (i, el) {
+                el.innerHTML = finalHref;
+                el.href = finalHref;
+            });
             $("#" + consts.tranUploadId).val("");
             $("#" + consts.intrmId).val(resobj.intrmid);
           } else {
@@ -59,7 +64,24 @@ define(["backbone", "underscore", "jquery", "toastr", "text!templates/ytinfo-tem
           }
           // thisView.router.navVideoId(resobj.contentid);
         } else {
-          // final class
+          thisView.$el.removeClass(consts.thirdFormClass);
+          thisView.$el.addClass(consts.processingFormClass);
+          // final class -- check the status until it is finished
+          var checkStatus = function () {
+            window.setTimeout(function () {
+              $.get("/checkstatus?id=" + thisView.intrmid, function (resp) {
+                if (resp.status == 1) {
+                  thisView.$el.removeClass(consts.processingFormClass);
+                  thisView.$el.hide();
+                  window.location = thisView.finalHref;
+                } else {
+                  //still waiting
+                  checkStatus();
+                }
+              });
+            }, 10000);
+          };
+          checkStatus();
         }
         console.log( "form success" );
       },

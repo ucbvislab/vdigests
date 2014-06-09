@@ -53,8 +53,10 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
           if (!curPlayingChap.ytplayer || curPlayingChap.ytplayer.getPlayerState() !== 1) {
             curPlayingChap.set("active", false);
             curPlayingSec && curPlayingSec.set("active", false);
-            curPlayingChap = null;
-            curPlayingSec = null;
+            if (!thisView.chapTrans) {
+              curPlayingChap = null;
+              curPlayingSec = null;
+            }
             return;
           }
           var curTime = curPlayingChap.ytplayer.getCurrentTime(),
@@ -86,10 +88,15 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
               // TODO move to chapter view
               curPlayingChap.ytplayer.seekTo(curTime, true);
               // TODO scroll if we're in viewing mode
-              // $.smoothScroll($(curPlayingChap.ytplayer.a.parentElement).offset().top - 300);
+              $.smoothScroll({
+                scrollElement: $('.digest-wrap'),
+                scrollTarget: $(curPlayingChap.ytplayer.a.parentElement.parentElement)
+              });
+              // $.smoothScroll($(curPlayingChap.ytplayer.a.parentElement.parentElement).offset().top - 300);
+              thisView.chapTrans = true;
               window.setTimeout(function () {
                 curPlayingChap.ytplayer.playVideo();
-              }, 100);
+              }, 200);
             }
           }
 

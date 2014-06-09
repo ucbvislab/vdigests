@@ -33,6 +33,8 @@ body {
   font-size: 0.95em;
 }
 
+
+
 /********************/
 /* video form css   */
 /********************/
@@ -47,7 +49,7 @@ body {
     position: static;
 }
 
-.yturlgroup, .trangroup, .confirmgroup {
+.yturlgroup, .trangroup, .confirmgroup, .processinggroup {
     display: none;
 }
 
@@ -61,6 +63,14 @@ body {
 
 .third-form .confirmgroup {
     display: block;
+}
+
+.processing-form .processinggroup {
+    display: block;
+}
+
+.processing-form #upload-video-stuff {
+    display: none;
 }
 
 .yt-header-thumb {
@@ -123,11 +133,14 @@ body {
     display: inline-block;
 }
 
+.viewing .digest-wrap {
+    width: 100%;
+}
+
 .digest-wrap {
     overflow-y: auto;
     overflow-x: hidden;
     float: left;
-    /* width: 780px; */
     width: 60%;
     min-width: 840px;
     height: inherit;
@@ -174,29 +187,15 @@ body {
 }
 
 .aspect-wrap {
-	/* position: absolute; */
 	padding-bottom: 25.3125%; /* 16:9 */
-	/* padding-top: 25px; */
 	width: 45%;
 	height: 0;
 	float: left;
-	/* position: relative; */
-	/* display: inline-block; */
 }
 
 .aspect-wrap .video-wrap {
-	/* position: absolute; */
-	/* top: 0; */
-	/* left: 0; */
 	width: 100%;
 	height: 100%;
-}
-
-.editing .video-wrap {
-    /* width: 45%; */
-    /* height: 262px; */
-    /* height: auto; */
-    /* height: 214px; */
 }
 
 .editing .active .video-wrap {
@@ -301,6 +300,10 @@ body {
     display: block;
 }
 
+body .viewing .section-row .take-thumbnail-image {
+    display: none;
+}
+
 .remove-section {
     display: none;
     position: absolute;
@@ -317,10 +320,18 @@ body {
     display: block;
 }
 
+body .viewing .section-row .remove-section {
+    display: none;
+}
+
 
 /*************************/
 /* transcript-level css */
 /************************/
+
+.viewing .transcript-wrap {
+    display: none;
+}
 
 .transcript-wrap {
     padding-top: 5px;

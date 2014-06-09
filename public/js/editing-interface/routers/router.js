@@ -9,7 +9,8 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
   return (function () {
     var consts = {
       editingId: "editing-interface",
-      viewingId: "viewing-interface",
+      editingClass: "editing",
+      viewingClass: "viewing",
       videoFormId: "video-form"
     };
 
@@ -29,7 +30,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
 
       routes: {
         "": "noParams",
-        ":params": "editRoute",
+        "edit/:params": "editRoute",
         "view/:params": "viewRoute"
       },
 
@@ -52,12 +53,15 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
           thisRoute.editRoute(dataname, true);
           return;
         }
-        thisRoute.outputView = new OutputView({model: thisRoute.editorModel});
-        thisRoute.$viewingView = thisRoute.$viewingView || $("#" + consts.viewingId);
-        thisRoute.$viewingView.html(thisRoute.outputView.render().el);
-        thisRoute.$editingInterface = thisRoute.$editingInterface || $("#" + consts.editingId);
-        pvt.hideAllViews();
-        thisRoute.$viewingView.show();
+        thisRoute.editorView.$el.removeClass(consts.editingClass);
+        thisRoute.editorView.$el.addClass(consts.viewingClass);
+
+        // thisRoute.outputView = new OutputView({model: thisRoute.editorModel});
+        // thisRoute.$viewingView = thisRoute.$viewingView || $("#" + consts.viewingId);
+        // thisRoute.$viewingView.html(thisRoute.outputView.render().el);
+        // thisRoute.$editingInterface = thisRoute.$editingInterface || $("#" + consts.editingId);
+        // pvt.hideAllViews();
+        // thisRoute.$viewingView.show();
       },
 
       /**
@@ -69,11 +73,14 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
             reloadTrans = true;
         // create the editor model which has the trans and digest views
 
+
         window.dataname = dataname;
 
         var showCallback = function () {
           thisRoute.$editingView = thisRoute.$editingView || $("#" + consts.editingId);
-          pvt.hideAllViews();
+          thisRoute.editorView.$el.removeClass(consts.viewingClass);
+          thisRoute.editorView.$el.addClass(consts.editingClass);
+          // pvt.hideAllViews();
           thisRoute.$editingView.show();
         };
 
@@ -86,7 +93,6 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
             $("#" + consts.editingId).html(thisRoute.editorView.render().el);
             thisRoute.editorModel.postInit();
 
-
             if (toView) {
               window.setTimeout(function () {
                 thisRoute.editorModel.get("digest").set("title", "The best stats you've ever seen - Hans Rosling");
@@ -95,9 +101,8 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
                 thisRoute.viewRoute(dataname);
                 return;
               }, 500);
-            } else {
-              showCallback();
             }
+            showCallback();
           }, // end success
           error: function (data, resp) {
             toastr.error((resp.responseJSON && resp.responseJSON.error) || "unable to load the video digest");

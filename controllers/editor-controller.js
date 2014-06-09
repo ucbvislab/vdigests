@@ -30,6 +30,35 @@ exports.getEditor = function(req, res) {
   });
 };
 
+
+/**
+ * Returns the readyness/processing status of the video digest
+ */
+exports.getStatus = function(req, res) {
+  var uparsed = url.parse(req.url),
+      did = uparsed.query && querystring.parse(uparsed.query).id;
+
+  VDigest.findById(did, function (err, vd) {
+    var vstatus = 0;
+    var msg = "";
+    console.log(vd.state);
+    if (err || !vd) {
+      msg = "unable to load the video digest";
+    }
+    else if (vd.isProcessing()) {
+      vstatus = 3;
+      msg = "video digest is processing";
+    }
+    else if (vd.isReady()) {
+      vstatus = 1;
+      msg = "video digest is ready for editing";
+    }
+    res.writeHead(200, {"content-type": "application/json"});
+    res.end(JSON.stringify({"status": vstatus, "message": msg}));
+  });
+};
+
+
 /**
  * Returns the digest data needed for the editor
  */
@@ -47,7 +76,6 @@ exports.getDigestData = function (req, res, next) {
       returnError(res, "the transcript did not upload correctly: please create the video digest from scratch", next);
     } else {
       res.writeHead(200, {"content-type": "application/json"});
-      debugger;
       res.end(JSON.stringify({"transcript": vd.alignTrans, "ytid": vd.ytid}));
     }
   });
@@ -107,9 +135,14 @@ exports.postNewVD = function(req, res, next) {
         });
       };
 
+      debugger;
       // download the yt video
+      var downloading = false;
       fs.exists(vidFile, function (exists) {
-        if (exists) {
+        if (downloading) {
+          return;
+        }
+        else if (exists) {
           sendGoodResponse();
         } else {
           var vidWS = fs.createWriteStream(vidFile);
@@ -118,12 +151,17 @@ exports.postNewVD = function(req, res, next) {
               returnError(res, (err && err.message) || ("Video length exceeds " + Math.floor(settings.max_yt_length/60) + " minutes"), next);
               return;
             }
-            debugger;
+
             var video = ytdl(ytaddr, {filter: function(format) { return format.container === 'mp4'; } });
-            vidWS.on("close", sendGoodResponse);
+            vidWS.on("close", function () {
+              downloading = false;
+              sendGoodResponse();
+            });
             vidWS.on("error", function () {
+              downloading = false;
               returnError(res, "unable to load the YouTube video properly", next);
             });
+            downloading = true;
             video.pipe(vidWS);
           });
         }
@@ -162,24 +200,27 @@ exports.postNewVD = function(req, res, next) {
             return;
           }
 
-          var paragraphs = data.split("\n\n"),
+          var paragraphs = data.split("\n"),
               out = [],
-              line;
+              line,
+              spkct = 0;
           paragraphs.forEach(function (para, i) {
+            if ((i + 1) % 4 == 0) {
+              spkct += 1;
+            }
             para = para.replace("\n", " ");
-            para = para.replace(/\(laughter\)/ig, "");
-            para = para.replace(/\(applause\)/ig, "");
-            para = para.replace(/[^-\w,.?!' ]/g, "");
+            para = para.replace(/[^-\w,.?!\(\)' ]/g, "");
             para = para.replace(/\s+[^\w]\s+/g, "");
             para = para.replace(/\s+/g, " ");
-            if (para !== "") {
+            if (para.replace(/\s+/g, "") !== "") {
               line = {
-                speaker: "1",
+                speaker: "" + spkct,
                 "line": para
               };
               out.push(line);
             }
           });
+          debugger;
           vdigest.preAlignTrans = out;
           vdigest.save(function (err) {
             if (err) {
@@ -221,7 +262,6 @@ exports.postNewVD = function(req, res, next) {
             vdigest.state = state;
             vdigest.save();
           }
-
         });
 
 
@@ -242,8 +282,13 @@ exports.postNewVD = function(req, res, next) {
                 return;
               }
 
+              res.writeHead(200, {'content-type': 'application/json'});
+              res.write('{"readyid":"' + vdigest._id +'"}');
+              res.end();
+
               var alignCmd = "python " + spaths.alignpy + " "
-                    + outAudioFile + " " + outPreFile + " " + outAlignTrans;
+                    + outAudioFile + " " + outPreFile + " " + outAlignTrans
+                    + " > " + outAlignTrans + "-output";
               console.log("starting alignment command");
               console.log(alignCmd);
               child = exec(alignCmd, {cwd: tmpAlignDir}, function (error, stdout, stderr) {
@@ -255,7 +300,10 @@ exports.postNewVD = function(req, res, next) {
                 console.log("finished processing vdigest");
                 fs.readFile(outAlignTrans, 'utf8', function (err2, data) {
                   console.log("done reading the aligned transcript");
-                  vdigest.alignTrans = JSON.parse(data);
+                  var alignTrans = JSON.parse(data);
+                  // TODO why do we have this first word error?
+                  alignTrans.words[0].speaker = "0";
+                  vdigest.alignTrans = alignTrans;
                   vdigest.state = 1;
                   vdigest.save(function (err) {
                     if (err) {
@@ -263,9 +311,9 @@ exports.postNewVD = function(req, res, next) {
                       returnError(res, "unable to open aligned transcript", next);
                       return;
                     }
-                    res.writeHead(200, {'content-type': 'application/json'});
-                    res.write('{"readyid":"' + vdigest._id +'"}');
-                    res.end();
+                    // res.writeHead(200, {'content-type': 'application/json'});
+                    // res.write('{"readyid":"' + vdigest._id +'"}');
+                    // res.end();
                   });
                 });
               });// end align command
