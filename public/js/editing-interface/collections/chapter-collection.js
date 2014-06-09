@@ -3,6 +3,14 @@
 define(["backbone", "editing-interface/models/chapter-model"], function(Backbone, ChapterModel){
   return Backbone.Collection.extend({
     model: ChapterModel,
+
+    initialize: function () {
+      var thisModel = this;
+      thisModel.on("change:state", function () {
+        thisModel.trigger.apply("change:state", arguments);
+      });
+    },
+
     comparator: function (ch1, ch2) {
       var c1sw = ch1.get("startWord"),
           c2sw = ch2.get("startWord");

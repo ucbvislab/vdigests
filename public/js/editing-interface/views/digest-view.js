@@ -4,7 +4,8 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
 
   var consts = {
     chapterWrapClass: "digest-chapters-wrap",
-    chapterClass: "chapter"
+    chapterClass: "chapter",
+    digestWrapClass: "digest-wrap"
   };
 
   return CompoundBackboneView.extend({
@@ -43,20 +44,33 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
         thisView.$el.find(".digest-title-wrap h1").text(thisView.model.get("title"));
       });
 
+      thisView.listenTo(chaps, "change:state", function (chp, val) {
+        if (val === 1) {
+          // only let one video play at a time
+          chaps.each(function (comChap) {
+            if (comChap.cid !== chp.cid) {
+              comChap.ytplayer && comChap.ytplayer.pauseVideo();
+            }
+          });
+        }
+      });
+
       // listen to changes in the underlying videos & control/signal transcript updates accordingly
       // TODO clean up this function
       var curPlayingChap = null,
           curPlayingSec = null;
       thisView.checkPlayInterval = window.setInterval(function () {
         // monitor chapter changes
+        if (thisView.chapTrans) {
+          return;
+        }
+
         if (curPlayingChap && curPlayingChap.get("active")) {
           if (!curPlayingChap.ytplayer || curPlayingChap.ytplayer.getPlayerState() !== 1) {
             curPlayingChap.set("active", false);
             curPlayingSec && curPlayingSec.set("active", false);
-            if (!thisView.chapTrans) {
-              curPlayingChap = null;
-              curPlayingSec = null;
-            }
+            curPlayingChap = null;
+            curPlayingSec = null;
             return;
           }
           var curTime = curPlayingChap.ytplayer.getCurrentTime(),
@@ -89,14 +103,14 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
               curPlayingChap.ytplayer.seekTo(curTime, true);
               // TODO scroll if we're in viewing mode
               $.smoothScroll({
-                scrollElement: $('.digest-wrap'),
+                scrollElement: $('.' + consts.digestWrapClass),
                 scrollTarget: $(curPlayingChap.ytplayer.a.parentElement.parentElement)
               });
-              // $.smoothScroll($(curPlayingChap.ytplayer.a.parentElement.parentElement).offset().top - 300);
               thisView.chapTrans = true;
               window.setTimeout(function () {
                 curPlayingChap.ytplayer.playVideo();
-              }, 200);
+                thisView.chapTrans = false;
+              }, 30);
             }
           }
 
@@ -107,7 +121,7 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
             var isSecEarly = curTime < curSecStart,
                 curNextSecStart = 0,
                 curNextSecEnd = Infinity;
-            curTime += 0.1; // account for youtube irregularities
+            curTime += 0.05; // account for youtube irregularities
             curPlayingSec && curPlayingSec.set("active", false);
             curPlayingChap.get("sections").each(function (sec) {
               var secStart = sec.getStartTime(),

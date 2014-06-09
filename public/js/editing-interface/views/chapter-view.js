@@ -37,6 +37,20 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
           vel = thisView.$el.find("." + consts.videoWrapClass)[0],
           startTime = thisView.model.getStartTime();
       Player.inputVideo(vel, thisView.model.get("ytid"), thisView.model, Math.floor(startTime), startTime, "ytplayer");
+      var thisInterval = window.setInterval(function () {
+        if (thisView.model.ytplayer) {
+          window.clearInterval(thisInterval);
+          thisView.addVPlayerEvents();
+        }
+      }, 500);
+    },
+
+    addVPlayerEvents: function () {
+      var thisView = this;
+      // listen for state changes & propagate to the model
+      thisView.model.ytplayer.addEventListener("onStateChange", function (stobj) {
+        thisView.model.set("state", stobj.data);
+      });
     },
 
     /**
@@ -125,27 +139,27 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
         thisView.placeThumbnailInSec(secModel, time);
       });
 
-      // listen to transcript progression from the video
-      window.setTimeout(function () {
-        var $elvid = thisView.$el.find("video"),
-            elvid = $elvid[0];
+      // // listen to transcript progression from the video
+      // window.setTimeout(function () {
+      //   var $elvid = thisView.$el.find("video"),
+      //       elvid = $elvid[0];
 
-        // USE  STATS
-        $elvid.on("seeked", function () {
-          if (!window.startFromTran && !window.imgSeek) {
-            window.vdstats.nVideoStartsFromVideo.push((new Date()).getTime());
-          }
-        });
-        $elvid.on("play", function () {
+      //   // USE  STATS
+      //   $elvid.on("seeked", function () {
+      //     if (!window.startFromTran && !window.imgSeek) {
+      //       window.vdstats.nVideoStartsFromVideo.push((new Date()).getTime());
+      //     }
+      //   });
+      //   $elvid.on("play", function () {
 
-          // USE STATS
-          if (!window.startFromTran) {
-            window.vdstats.nVideoStartsFromVideo.push((new Date()).getTime());
-          }
-        });
+      //     // USE STATS
+      //     if (!window.startFromTran) {
+      //       window.vdstats.nVideoStartsFromVideo.push((new Date()).getTime());
+      //     }
+      //   });
 
-        window.prevPlayVid = thisView.model.ytplayer;
-      });
+      //   window.prevPlayVid = thisView.model.ytplayer;
+      // });
     },
 
     /**
@@ -183,7 +197,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
 
     startVideo: function (stTime) {
       var thisView = this;
-      thisView.model.ytplayer.seekTo(stTime);
+      thisView.model.ytplayer.seekTo(stTime, true);
       thisView.model.ytplayer.playVideo();
     }
   });
