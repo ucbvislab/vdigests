@@ -100,7 +100,7 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
               curPlayingChap.set("active", true);
 
               // TODO move to chapter view
-              curPlayingChap.ytplayer.seekTo(curTime, true);
+              curPlayingChap.ytplayer.seekTo && curPlayingChap.ytplayer.seekTo(curTime, true);
               // TODO scroll if we're in viewing mode
               $.smoothScroll({
                 scrollElement: $('.' + consts.digestWrapClass),

@@ -22,9 +22,9 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
     },
 
     events: {
-      'keyup .editing .abs-summary': "summaryKeyUp",
-      "click .editing .remove-section": "removeSection",
-      "blur  .editing .abs-summary": "blurSummary",
+      'keyup .abs-summary': "summaryKeyUp",
+      "click .remove-section": "removeSection",
+      "blur .abs-summary": "blurSummary",
       "click" : "clickSection"
     },
 

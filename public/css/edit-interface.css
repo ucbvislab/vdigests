@@ -34,7 +34,6 @@ body {
 }
 
 
-
 /********************/
 /* video form css   */
 /********************/
@@ -101,6 +100,9 @@ body {
 /********************/
 #editing-interface {
     height: inherit;
+    /* max-width: 1850px; */
+    /* width: 95%; */
+    /* margin: auto; */
 }
 
 .editor-wrap {
@@ -147,6 +149,8 @@ body {
     padding-left: 10px;
     border-right: 1px solid #E0E0E0;
     background: white;
+    max-width: 1088px;
+    margin-left: 1%;
 }
 
 .digest-chapters-wrap {
@@ -161,7 +165,6 @@ body {
 .chapter {
     position: relative;
     margin-bottom: 50px;
-    /* height: inherit; */
 }
 
 .chapter-header {
@@ -186,7 +189,19 @@ body {
     opacity: 1;
 }
 
+.cover {
+    top: 0;
+    position: absolute;
+    background: black;
+}
+
+.cover img {
+    height: inherit;
+    width: inherit;
+}
+
 .aspect-wrap {
+  position: relative;
 	padding-bottom: 25.3125%; /* 16:9 */
 	width: 45%;
 	height: 0;

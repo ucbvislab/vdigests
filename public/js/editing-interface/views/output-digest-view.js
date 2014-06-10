@@ -81,7 +81,11 @@ define(["backbone", "underscore", "jquery", "text!templates/output-digest-templa
           $curGroup = $($curTar.closest("." + consts.groupRowClass)),
           $curCover = $curGroup.find("." + consts.coverClass);
       if (!$curGroup.hasClass(consts.activeRowClass)) {
-        $curCover.html($curTar.find("img").clone());
+        var imgClone = $curTar.find("img").clone();
+        $curCover.html(imgClone);
+
+        $curCover.height();
+        $curCover.width();
         $curCover.show();
       }
     },

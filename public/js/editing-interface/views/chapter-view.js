@@ -9,6 +9,8 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
     absSummaryClass: "abs-summary",
     chapHeaderClass: "chapter-header",
     videoWrapClass: "video-wrap",
+    aspectWrapClass: "aspect-wrap",
+    coverClass: "cover",
     imgHeight: 312,
     imgWidth: 566
   };
@@ -26,7 +28,9 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
         // USE STATS
         window.vdstats.nSubtitleEdits.push((new Date()).getTime());
         thisView.typing = false;
-      }
+      },
+      'mouseover .section-row': "sectionMouseOver",
+      'mouseout .section-row': "sectionMouseOut"
     },
 
     /**
@@ -97,6 +101,12 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
         }
       });
 
+      thisView.listenTo(thisModel, "change:state", function (val) {
+        if (val === 1) {
+          thisView.hideCover();
+        }
+      });
+
       // 'add' section listener
       thisView.listenTo(secs, "add", function (newSec) {
         thisView.assign(thisView.getAssignedObject());
@@ -138,28 +148,42 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
         var time = thisModel.ytplayer && thisModel.ytplayer.getCurrentTime && thisModel.ytplayer.getCurrentTime();
         thisView.placeThumbnailInSec(secModel, time);
       });
+    },
 
-      // // listen to transcript progression from the video
-      // window.setTimeout(function () {
-      //   var $elvid = thisView.$el.find("video"),
-      //       elvid = $elvid[0];
+    sectionMouseOver: function (evt) {
+      var thisView = this;
+      if (thisView.model.get("state") !== 1) {
+        // extract the cover dimensions
+        var $curTar = $(evt.currentTarget),
+            $curCover = thisView.$el.find("." + consts.coverClass),
+            $aspectWrap = thisView.$el.find("." + consts.aspectWrapClass),
+            $img = $curTar.find("img"),
+            aspectWidth =  $aspectWrap.outerWidth(),
+            dispH = $aspectWrap.outerHeight(),
+            dispW = Math.min(dispH/$img.height() * $img.width(), aspectWidth),
+            marginLeft = Math.abs((dispW - aspectWidth)/2.0); // center the image
+        // set the cover dimensions
+        var $imgClone = $img.clone();
+        $curCover.html($imgClone);
+        $curCover.height(dispH);
+        $curCover.width(aspectWidth);
+        $imgClone.width(dispW);
+        $imgClone.css("left", marginLeft);
+        $curCover.show();
+      }
+    },
 
-      //   // USE  STATS
-      //   $elvid.on("seeked", function () {
-      //     if (!window.startFromTran && !window.imgSeek) {
-      //       window.vdstats.nVideoStartsFromVideo.push((new Date()).getTime());
-      //     }
-      //   });
-      //   $elvid.on("play", function () {
+    /**
+     * Mouseover the keyframe element: show the keyframe over the video
+     */
+    sectionMouseOut: function (evt) {
+      this.hideCover();
+    },
 
-      //     // USE STATS
-      //     if (!window.startFromTran) {
-      //       window.vdstats.nVideoStartsFromVideo.push((new Date()).getTime());
-      //     }
-      //   });
-
-      //   window.prevPlayVid = thisView.model.ytplayer;
-      // });
+    hideCover: function () {
+      var thisView = this,
+          $curCover = thisView.$el.find("." + consts.coverClass);
+      $curCover.hide();
     },
 
     /**
