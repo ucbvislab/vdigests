@@ -53,15 +53,12 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
           thisRoute.editRoute(dataname, true);
           return;
         }
+        window.viewing = true;
+        window.editing = false;
+
+        $("[data-ph]").attr("contenteditable", false);
         thisRoute.editorView.$el.removeClass(consts.editingClass);
         thisRoute.editorView.$el.addClass(consts.viewingClass);
-
-        // thisRoute.outputView = new OutputView({model: thisRoute.editorModel});
-        // thisRoute.$viewingView = thisRoute.$viewingView || $("#" + consts.viewingId);
-        // thisRoute.$viewingView.html(thisRoute.outputView.render().el);
-        // thisRoute.$editingInterface = thisRoute.$editingInterface || $("#" + consts.editingId);
-        // pvt.hideAllViews();
-        // thisRoute.$viewingView.show();
       },
 
       /**
@@ -73,13 +70,15 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
             reloadTrans = true;
         // create the editor model which has the trans and digest views
 
-
         window.dataname = dataname;
 
         var showCallback = function () {
           thisRoute.$editingView = thisRoute.$editingView || $("#" + consts.editingId);
           thisRoute.editorView.$el.removeClass(consts.viewingClass);
           thisRoute.editorView.$el.addClass(consts.editingClass);
+          window.viewing = false;
+          window.editing = true;
+          $("[data-ph]").attr("contenteditable", true);
           // pvt.hideAllViews();
           thisRoute.$editingView.show();
         };

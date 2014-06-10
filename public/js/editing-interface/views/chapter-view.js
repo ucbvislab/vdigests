@@ -20,17 +20,22 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
     className: consts.viewClass,
 
     events: {
-      'keyup .chapter-header input': function (evt) {
+      'keyup .chapter-header': function (evt) {
         var thisView = this,
             $curTar = $(evt.currentTarget);
         thisView.typing = true;
-        thisView.model.set("title", $curTar.val());
+        thisView.model.set("title", $curTar.text());
+
         // USE STATS
         window.vdstats.nSubtitleEdits.push((new Date()).getTime());
         thisView.typing = false;
       },
       'mouseover .section-row': "sectionMouseOver",
-      'mouseout .section-row': "sectionMouseOut"
+      'mouseout .section-row': "sectionMouseOut",
+      "click .cover": function () {
+        var thisView = this;
+        thisView.model.ytplayer && thisView.model.ytplayer.playVideo();
+      }
     },
 
     /**
@@ -45,6 +50,9 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
         if (thisView.model.ytplayer) {
           window.clearInterval(thisInterval);
           thisView.addVPlayerEvents();
+          window.setTimeout(function () {
+            thisView.showCover();
+          }, 2000);
         }
       }, 500);
     },
@@ -72,7 +80,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
 
       thisView.listenTo(thisModel, "change:title", function (mdl, val) {
         if (!thisView.typing) {
-          thisView.$el.find("." + consts.chapHeaderClass + " input").val(val);
+          thisView.$el.find("." + consts.chapHeaderClass).text(val);
         }
       });
 
@@ -93,18 +101,18 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
         thisView.remove();
       });
 
-      thisView.listenTo(thisModel, "change:active", function (chp, val) {
-        if (val) {
+      thisView.listenTo(thisModel, "change:state", function (mdl, val) {
+        if (val === 1) {
           thisView.$el.addClass(consts.activeClass);
+          thisView.hideCover();
         } else {
           thisView.$el.removeClass(consts.activeClass);
         }
       });
 
-      thisView.listenTo(thisModel, "change:state", function (val) {
-        if (val === 1) {
-          thisView.hideCover();
-        }
+      thisView.listenTo(thisModel, "showCover", function (mdl, val) {
+        thisModel.ytplayer && thisModel.ytplayer.seekTo(thisModel.getStartTime());
+        thisView.showCover();
       });
 
       // 'add' section listener
@@ -153,31 +161,41 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
     sectionMouseOver: function (evt) {
       var thisView = this;
       if (thisView.model.get("state") !== 1) {
-        // extract the cover dimensions
-        var $curTar = $(evt.currentTarget),
-            $curCover = thisView.$el.find("." + consts.coverClass),
-            $aspectWrap = thisView.$el.find("." + consts.aspectWrapClass),
-            $img = $curTar.find("img"),
-            aspectWidth =  $aspectWrap.outerWidth(),
-            dispH = $aspectWrap.outerHeight(),
-            dispW = Math.min(dispH/$img.height() * $img.width(), aspectWidth),
-            marginLeft = Math.abs((dispW - aspectWidth)/2.0); // center the image
-        // set the cover dimensions
-        var $imgClone = $img.clone();
-        $curCover.html($imgClone);
-        $curCover.height(dispH);
-        $curCover.width(aspectWidth);
-        $imgClone.width(dispW);
-        $imgClone.css("left", marginLeft);
-        $curCover.show();
+        var $curTar = $(evt.currentTarget);
+        thisView.showCover($curTar.find("img"));
       }
+    },
+
+    showCover: function ($img) {
+      var thisView = this;
+          $img =  $img || thisView.$el.find("." + consts.sectionWrapClass).first().find("img").first();
+      var $curCover = thisView.$curCover || thisView.$el.find("." + consts.coverClass),
+          $imgClone = $img.clone(),
+          // extract the cover dimensions
+          $aspectWrap = thisView.$aspectWrap || thisView.$el.find("." + consts.aspectWrapClass),
+          aspectWidth =  $aspectWrap.outerWidth(),
+          dispH = $aspectWrap.outerHeight(),
+          dispW = Math.min((dispH/$img.height() * $img.width() / aspectWidth) * 100, 100);
+
+      // set the cover dimensions
+      $curCover.html($imgClone);
+      $imgClone.width(dispW + "%");
+      $curCover.show();
+
+      // memoize the view els
+      thisView.$curCover = $curCover;
+      thisView.$aspectWrap = $aspectWrap;
     },
 
     /**
      * Mouseover the keyframe element: show the keyframe over the video
      */
     sectionMouseOut: function (evt) {
-      this.hideCover();
+      var thisView = this;
+      thisView.hideCover();
+      if (!thisView.model.get("prevplay")) {
+        thisView.showCover();
+      }
     },
 
     hideCover: function () {

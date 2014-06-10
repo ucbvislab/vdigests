@@ -123,7 +123,7 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
 
       if ($tar.hasClass(consts.takeThumbClass)) {
         thisView.takeThumbnailImage(evt);
-      } else if ($tar.hasClass(consts.thumbClass)) {
+      } else if ($tar.hasClass(consts.thumbClass) || window.viewing) {
         thisView.startVideo();
       } else {
         startWord.trigger("focus", startWord);
