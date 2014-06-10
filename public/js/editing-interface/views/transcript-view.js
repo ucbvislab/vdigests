@@ -181,7 +181,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
             window.vdstats.nSec2Chap.push((new Date()).getTime());
             window.changingSecChap = true;
 
-            thisView.changeStartSection (stWordModel, false);
+            thisView.changeStartSection(stWordModel, false);
             stWordModel.set("startChapter", true);
 
             // USE STATS

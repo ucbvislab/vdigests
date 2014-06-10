@@ -56,8 +56,25 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
     },
 
     getEndTime: function () {
-      var nexSS = this.get("startWord").getNextSectionStart(false);
-      return (nexSS && nexSS.get("start")) || window.Infinity;
+      return this.getEndWord().get("end");
+    },
+
+    getEndWord: function () {
+      var sw = this.get("startWord"),
+          curWord;
+      if (sw.next) {
+        curWord = this.get("startWord").next;
+        while (curWord.next) {
+          if (curWord.get("startSection")) {
+            break;
+          } else {
+            curWord = curWord.next;
+          }
+        }
+      } else {
+        curWord = sw;
+      }
+      return curWord;
     }
   });
 });

@@ -176,9 +176,10 @@ body {
 }
 
 .chapter-header:after {
-    content: "";
-    font-size: 0.9em;
+    content: attr(data-content);
+    font-size: 0.6em;
     margin-left: 10px;
+    color: #999999;
 }
 
 .cover {

@@ -135,8 +135,8 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
         prevChap.get("sections").add(newSection);
 
       } else {
+          // we're removing a section TODO FIXME
           console.log("editor model false section");
-        // we're removing a section
       }
     },
 
@@ -154,7 +154,6 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
           words = thisModel.get("transcript").get("words"),
           chaps = {};
 
-      // but Colorado is on a deadline =\
       var vid = $("video").get(0),
           $vid = $(vid);
 

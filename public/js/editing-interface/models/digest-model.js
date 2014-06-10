@@ -15,6 +15,18 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/chapt
       var thisModel = this,
           chaps = thisModel.get("chapters");
 
+      // add remove and move events on chapters should recompute all start and stop times
+
+      thisModel.listenTo(chaps, "add", function (chp) {
+        // recompute the ends of all chapters
+        thisModel.recomputeChapEnds();
+      });
+
+      thisModel.listenTo(chaps, "change:start", function () {
+        // recompute the ends of all chapters
+        thisModel.recomputeChapEnds();
+      });
+
       thisModel.listenTo(chaps, "remove", function (chp) {
 
         // move section of the chapter to the preceding chapter if it exists
@@ -44,6 +56,15 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/chapt
         } else {
           console.log("chapter removed with no preceeding chapter");
         }
+        // recompute the ends of all chapters
+        thisModel.recomputeChapEnds();
+      });
+    },
+
+    recomputeChapEnds: function () {
+      var thisModel = this;
+      thisModel.get("chapters").each(function (chap) {
+        chap.recomputeEndTime();
       });
     }
   });

@@ -43,11 +43,12 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
      */
     postRender: function () {
       var thisView = this,
+          thisModel = thisView.model,
           vel = thisView.$el.find("." + consts.videoWrapClass)[0],
           startTime = thisView.model.getStartTime();
       Player.inputVideo(vel, thisView.model.get("ytid"), thisView.model, Math.floor(startTime), startTime, "ytplayer");
       var thisInterval = window.setInterval(function () {
-        if (thisView.model.ytplayer) {
+        if (thisModel.ytplayer) {
           window.clearInterval(thisInterval);
           thisView.addVPlayerEvents();
           window.setTimeout(function () {
@@ -55,6 +56,16 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
           }, 2000);
         }
       }, 500);
+
+      // set the viewing time
+      thisView.setViewingTime();
+    },
+
+    setViewingTime: function () {
+      var thisView = this,
+          thisModel = thisView.model;
+      var $chaphead = thisView.$el.find("." + consts.chapHeaderClass).first();
+      $chaphead.attr("data-content", "(" + thisModel.getLengthString() + ")");
     },
 
     addVPlayerEvents: function () {
@@ -156,7 +167,12 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
         var time = thisModel.ytplayer && thisModel.ytplayer.getCurrentTime && thisModel.ytplayer.getCurrentTime();
         thisView.placeThumbnailInSec(secModel, time);
       });
-    },
+
+      thisView.listenTo(thisModel, "change:length", function () {
+        thisView.setViewingTime();
+      });
+
+    }, // end initialize
 
     sectionMouseOver: function (evt) {
       var thisView = this;

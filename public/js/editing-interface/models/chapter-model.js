@@ -8,7 +8,10 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
         sections: new SectionCollection(),
         startWord: null,
         title: "",
-        ytid: ""
+        ytid: "",
+        start: null,
+        end: null,
+        length: null
       };
     },
 
@@ -25,16 +28,52 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
         startWord.set("startSection", true, {silent: true});
         thisModel.get("sections").add(new SectionModel({startWord: startWord}));
       }
+
+      // TODO DRY
+      thisModel.on("change:start", function () {
+        thisModel.set("length", thisModel.get("end") - thisModel.get("start"));
+      });
+      thisModel.on("change:end", function () {
+       thisModel.set("length", thisModel.get("end") - thisModel.get("start"));
+      });
     },
 
     getStartTime: function () {
-      // TODO cache this and flag for update when start word is changed
-        return this.get("sections").models[0].getStartTime();
+      return this.get("start") || this.recomputeStartTime();
+    },
+
+    recomputeStartTime: function () {
+      this.set("start", this.get("sections").models[0].getStartTime());
+      return this.get("start");
     },
 
     getEndTime: function () {
+      return this.get("end") || this.recomputeEndTime();
+    },
+
+    recomputeEndTime: function () {
       var secs = this.get("sections");
-      return secs.models[secs.length - 1].getEndTime();
+      this.set("end", secs.models[secs.length - 1].getEndTime());
+      return this.get("end");
+    },
+
+    getLength: function () {
+      return this.get("length") || this.recomputeLength();
+    },
+
+    recomputeLength: function () {
+      var start = this.getStartTime(),
+          end = this.getEndTime(),
+          length = end - start;
+      this.set("length", length);
+      return length;
+    },
+
+    getLengthString: function () {
+      var clength = this.getLength(),
+          mins = Math.floor(clength/60),
+          secs = Math.floor(clength % 60);
+      return mins ? (secs ? (mins + " min " + secs + " sec") : (mins + " min")) : (secs + " sec");
     },
 
     switchStartWordListeners: function (oldWord, newWord) {
@@ -66,7 +105,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
       if (oldWord) {
         thisModel.stopListening(oldWord);
       }
+      thisModel.set("start", newWord.get("start"));
     }
-
   });
 });
