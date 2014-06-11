@@ -115,14 +115,14 @@ body {
 /********************/
 .digest-title-wrap {
     text-align: left;
-    /* font-size: 24px; */
     color: #645C6F;
     font-weight: normal;
     min-width: 200px;
     position: relative;
     padding: 0;
-    margin: 0;
+    margin: auto;
     margin-top: 22px;
+    /* display: inline-block; */
     margin-bottom: 40px;
 }
 .digest-title-wrap:focus {
@@ -131,33 +131,37 @@ body {
 .editor-wrap .digest-title-wrap h1{
     margin: 0;
     padding: 0;
-    /* font-size: 36px; */
-    /* display: inline-block; */
+    max-width: 1300px;
+    display: block;
+    margin: auto;
+    margin: 36px auto;
 }
 
 .digest-wrap {
     overflow-y: auto;
     overflow-x: hidden;
     float: left;
-    width: 60%;
+    width: 57%;
     min-width: 840px;
     height: inherit;
     padding-left: 10px;
     border-right: 1px solid #E0E0E0;
     background: white;
-    max-width: 1088px;
-    margin-left: 1%;
+    padding-left: 2%;
 }
 
 .viewing .digest-wrap {
-    width: 80%;
-    border: none;
+    width: 100%;
+    padding-left: 10%;
+    padding-right: 10%;
     margin: auto;
     float: none;
 }
 
 .digest-chapters-wrap {
     margin-top: 12px;
+    max-width: 1300px;
+    display: block;
 }
 
 
