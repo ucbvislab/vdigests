@@ -100,9 +100,6 @@ body {
 /********************/
 #editing-interface {
     height: inherit;
-    /* max-width: 1850px; */
-    /* width: 95%; */
-    /* margin: auto; */
 }
 
 .editor-wrap {
@@ -131,7 +128,6 @@ body {
 .editor-wrap .digest-title-wrap h1{
     margin: 0;
     padding: 0;
-    max-width: 1300px;
     display: block;
     margin: auto;
     margin: 36px auto;
@@ -140,9 +136,11 @@ body {
 .digest-wrap {
     overflow-y: auto;
     overflow-x: hidden;
-    float: left;
-    width: 57%;
-    min-width: 840px;
+    /* float: left; */
+    width: 60%;
+    position: absolute;
+    display:  inline-block;
+    min-width: 750px;
     height: inherit;
     padding-left: 10px;
     border-right: 1px solid #E0E0E0;
@@ -237,8 +235,8 @@ body {
     position: relative;
     display: inline-block;
     margin-left: 8px;
-    width: 48%;
-    min-width: 400px;
+    width: 50%;
+    /* min-width: 400px; */
 }
 
 .viewing .summary-column {
@@ -258,7 +256,7 @@ body {
 }
 
 .viewing .section-row:hover .keyframe-col:before {
-    content: "hello";
+    content: "";
     position: absolute;
     top: 0;
     background: rgba(1,1,1, 0.4);
@@ -285,13 +283,15 @@ body {
 }
 
 .keyframe-col {
-    display: inline-block;
-    border-radius: 3px;
-    position: relative;
-    border: none;
-    vertical-align: top;
+    /* display: inline-block; */
+    /* border-radius: 26px; */
+    /* position: absolute; */
+    /* border: none; */
+    /* vertical-align: top; */
     width: 20%;
-    min-width: 95px;
+    /* min-width: 95px; */
+    float: left;
+    position: relative;
 }
 
 .keyframe-col:empty {
@@ -309,16 +309,18 @@ body {
 .section-text-wrap {
     display: inline-block;
     vertical-align: text-bottom;
-    width: 75%;
+    width: 80%;
     height: inherit;
+    padding-left: 8px;
+    padding-right: 4px;
 }
 
 .section-text-wrap .abs-summary {
     border: none;
     font-size: 11px;
-    top: -1px;
+    /* top: -1px; */
     height: inherit;
-    position: relative;
+    /* position: absolute; */
     border-color:  rgba(163,161,161,0);
 }
 
@@ -330,6 +332,7 @@ body {
     position: relative;
     border: 1px solid #555555;
     width: 100%;
+    /* border-radius: 0px; */
 }
 
 .take-thumbnail-image {
@@ -389,6 +392,8 @@ body .viewing .section-row .remove-section {
     padding-top: 5px;
     line-height: 16px;
     height: inherit;
+    /* display: inline-block; */
+    margin-left: 60%;
     background-color: white;
     overflow: scroll;
 }

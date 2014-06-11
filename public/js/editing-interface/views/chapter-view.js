@@ -191,7 +191,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
           $aspectWrap = thisView.$aspectWrap || thisView.$el.find("." + consts.aspectWrapClass),
           aspectWidth =  $aspectWrap.outerWidth(),
           dispH = $aspectWrap.outerHeight(),
-          dispW = Math.min((dispH/$img.height() * $img.width() / aspectWidth) * 100, 100);
+          dispW = Math.min((dispH/$img.height() * $img.width() / aspectWidth) * 100, 100) - 2; // TODO FIXME (where is the +2 coming from???)
 
       // set the cover dimensions
       $curCover.html($imgClone);
