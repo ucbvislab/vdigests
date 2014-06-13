@@ -16,7 +16,6 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/chapt
           chaps = thisModel.get("chapters");
 
       // add remove and move events on chapters should recompute all start and stop times
-
       thisModel.listenTo(chaps, "add", function (chp) {
         // recompute the ends of all chapters
         thisModel.recomputeChapEnds();

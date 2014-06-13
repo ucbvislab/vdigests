@@ -31,7 +31,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
       routes: {
         "": "noParams",
         "edit/:params": "editRoute",
-        "view/:params": "viewRoute"
+        "preview/:params": "viewRoute"
       },
 
       noParams: function () {
@@ -57,8 +57,8 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
         window.editing = false;
 
         $("[data-ph]").attr("contenteditable", false);
-        thisRoute.editorView.$el.removeClass(consts.editingClass);
-        thisRoute.editorView.$el.addClass(consts.viewingClass);
+        thisRoute.editorView.$el.parent().removeClass(consts.editingClass);
+        thisRoute.editorView.$el.parent().addClass(consts.viewingClass);
       },
 
       /**
@@ -74,8 +74,8 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
 
         var showCallback = function () {
           thisRoute.$editingView = thisRoute.$editingView || $("#" + consts.editingId);
-          thisRoute.editorView.$el.removeClass(consts.viewingClass);
-          thisRoute.editorView.$el.addClass(consts.editingClass);
+          thisRoute.editorView.$el.parent().removeClass(consts.viewingClass);
+          thisRoute.editorView.$el.parent().addClass(consts.editingClass);
           window.viewing = false;
           window.editing = true;
           $("[data-ph]").attr("contenteditable", true);

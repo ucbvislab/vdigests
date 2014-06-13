@@ -12,9 +12,13 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
     template: _.template(tmpl),
 
     events: {
-      "blur .digest-title-wrap h1": function (evt) {
+      "blur #maintitle": function (evt) {
         var thisView = this;
         thisView.model.set("title", $(evt.currentTarget).text());
+      },
+      "blur #authortitle": function (evt) {
+        var thisView = this;
+        thisView.model.set("author", $(evt.currentTarget).text());
       }
     },
 

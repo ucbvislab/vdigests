@@ -97,6 +97,13 @@ body {
 /* editor-level css   */
 /********************/
 #editing-interface {
+    max-width: 1800px;
+    margin: auto;
+    min-width: 1200px;
+}
+
+#editing-interface.editing {
+    max-width: 3000px;
     height: inherit;
 }
 
@@ -108,18 +115,27 @@ body {
 /********************/
 /* digest-level css */
 /********************/
-.digest-title-wrap {
+#maintitle {
     text-align: left;
     color: #645C6F;
     font-weight: normal;
+    line-height: 45px;
     min-width: 200px;
     position: relative;
     padding: 0;
     margin: auto;
     margin-top: 22px;
-    /* display: inline-block; */
-    margin-bottom: 40px;
+    margin-bottom: 0;
 }
+
+#authortitle {
+    margin-top: 0;
+    margin-bottom: 35px;
+    font-size: 1.5em;
+    color: #999999;
+    font-style: italic;
+}
+
 .digest-title-wrap:focus {
     outline: 0;
 }
@@ -134,11 +150,11 @@ body {
 .digest-wrap {
     overflow-y: auto;
     overflow-x: hidden;
-    /* float: left; */
+    float: left;
     width: 60%;
-    position: absolute;
+    /* position: absolute; */
     display:  inline-block;
-    min-width: 750px;
+    /* min-width: 750px; */
     height: inherit;
     padding-left: 10px;
     border-right: 1px solid #E0E0E0;
@@ -147,11 +163,14 @@ body {
 }
 
 .viewing .digest-wrap {
-    width: 100%;
-    padding-left: 10%;
-    padding-right: 10%;
+    width: 80%;
+    max-width: 1600px;
+    /* width: 1500px; */
+    /* padding-right: 10%; */
     margin: auto;
     float: none;
+    display: block;
+    border: none;
 }
 
 .digest-chapters-wrap {
@@ -173,12 +192,13 @@ body {
 .chapter-header {
     width: 85%;
     font-size: 25px;
+    /* margin-right: 50px; */
 }
 
 .chapter-header:after {
     content: attr(data-content);
     font-size: 0.6em;
-    margin-left: 10px;
+    padding-left: 10px;
     color: #999999;
 }
 
@@ -392,10 +412,12 @@ body .viewing .section-row .remove-section {
 
 .transcript-wrap {
     padding-top: 5px;
+    width: 40%;
     line-height: 16px;
     height: inherit;
     /* display: inline-block; */
-    margin-left: 60%;
+    /* margin-left: 60%; */
+    float: left;
     background-color: white;
     overflow: scroll;
 }

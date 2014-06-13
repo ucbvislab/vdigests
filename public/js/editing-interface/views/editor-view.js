@@ -43,7 +43,7 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
                   });
                   if (!wasPlaying) {
                     if (window.prevPlayVid) {
-                      window.prevPlayVid.play();
+                        window.prevPlayVid.play();
                       evt.stopPropagation();
                     } else {
                       var thevid = $("video")[0];
@@ -123,7 +123,7 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
              */
             previewVDigest: function () {
               var locSplit = window.location.hash.split("/");
-              window.location.hash = "view/" + locSplit.slice(1).join("/");
+              window.location.hash = "preview/" + locSplit.slice(1).join("/");
             }
           });
         });
