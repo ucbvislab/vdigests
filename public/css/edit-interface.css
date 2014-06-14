@@ -70,6 +70,10 @@ body {
     display: none;
 }
 
+.editing #video-form, .viewing #video-form {
+    display: none;
+}
+
 .yt-header-thumb {
     width: 75px;
     display: inline;
