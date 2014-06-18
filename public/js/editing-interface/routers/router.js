@@ -79,7 +79,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
           window.viewing = false;
           window.editing = true;
           $("[data-ph]").attr("contenteditable", true);
-          // pvt.hideAllViews();
+          pvt.hideAllViews();
           thisRoute.$editingView.show();
         };
 

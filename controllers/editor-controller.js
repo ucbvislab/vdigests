@@ -1,4 +1,3 @@
-
 /**
  * GET /editing-interface
  * Video digest editing interface
@@ -12,6 +11,7 @@ var fs = require('fs'),
     url = require('url'),
     sys = require('sys'),
     exec = require('child_process').exec,
+    User = require('../models/User'),
     util = require('util'),
     querystring = require('querystring'),
     path = require('path'),
@@ -81,8 +81,15 @@ exports.getDigestData = function (req, res, next) {
   });
 };
 
+// multipart process for loading a new video
 exports.postNewVD = function(req, res, next) {
   req.assert('yturl', 'YouTube URL is not a valid URL').isURL();
+
+  // 5 minute timeout should allow most youtube videos to download
+  req.setTimeout(300);
+
+  debugger;
+
   var form = new multiparty.Form({
     maxFilesSize: settings.maxTransUploadSize,
     uploadDir: spaths.rawTrans
@@ -209,8 +216,8 @@ exports.postNewVD = function(req, res, next) {
               spkct += 1;
             }
             para = para.replace("\n", " ");
-            para = para.replace(/[^-\w,.?!\(\)' ]/g, "");
-            para = para.replace(/\s+[^\w]\s+/g, "");
+            para = para.replace(/[^-\w\d,.?!\(\)' ]/g, "");
+            para = para.replace(/\s+[^\w]+\s+/g, "");
             para = para.replace(/\s+/g, " ");
             if (para.replace(/\s+/g, "") !== "") {
               line = {
@@ -291,12 +298,24 @@ exports.postNewVD = function(req, res, next) {
                     + " > " + outAlignTrans + "-output";
               console.log("starting alignment command");
               console.log(alignCmd);
+
+              // get the user account
+              User.findById(req.user.id, function(err, user) {
+                if (err) return next(err);
+                if (!~user.vdigests.indexOf(vdigest._id)) {
+                  user.vdigests.push(vdigest._id);
+                  user.save();
+                }
+              });
+
+              // add this video digest to their account
               child = exec(alignCmd, {cwd: tmpAlignDir}, function (error, stdout, stderr) {
                 if (error !== null) {
                   console.log('exec error: ' + error);
                   returnError(res, "error creating the aligned transcript", next);
                   return;
                 }
+
                 console.log("finished processing vdigest");
                 fs.readFile(outAlignTrans, 'utf8', function (err2, data) {
                   console.log("done reading the aligned transcript");
@@ -306,14 +325,11 @@ exports.postNewVD = function(req, res, next) {
                   vdigest.alignTrans = alignTrans;
                   vdigest.state = 1;
                   vdigest.save(function (err) {
+                    console.log("unable to save the video digest");
                     if (err) {
                       console.log(err);
-                      returnError(res, "unable to open aligned transcript", next);
                       return;
                     }
-                    // res.writeHead(200, {'content-type': 'application/json'});
-                    // res.write('{"readyid":"' + vdigest._id +'"}');
-                    // res.end();
                   });
                 });
               });// end align command

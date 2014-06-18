@@ -121,10 +121,10 @@ app.use(function(err, req, res, next){
  * Application routes.
  */
 app.get('/', homeController.index);
-app.get('/editor', editorController.getEditor);
+app.get('/editor', passportConf.isAuthenticated, editorController.getEditor);
 app.get('/digestdata', editorController.getDigestData);
-app.get('/checkstatus', editorController.getStatus);
-app.get('/screenshot', screenShotController.getScreenShot);
+app.get('/checkstatus', passportConf.isAuthenticated, editorController.getStatus);
+app.get('/screenshot', passportConf.isAuthenticated, screenShotController.getScreenShot);
 app.post('/newvd', editorController.postNewVD);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);

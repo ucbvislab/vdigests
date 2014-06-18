@@ -1,5 +1,5 @@
 .navbar.navbar-default.navbar-fixed-top
-  .container
+  .topcontainer
     .navbar-header
       button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
         span.sr-only Toggle navigation
@@ -23,7 +23,7 @@
             a(href='/signup') Create Account
         else
           li.dropdown(class=title=='Account Management'?'active':undefined)
-            a.dropdown-toggle(href='#', data-toggle='dropdown')
+            a.dropdown-toggle(href='', data-toggle='dropdown')
               if user.profile.picture
                 img(src='#{user.profile.picture}')
               else
