@@ -77,8 +77,8 @@ app.use(connectAssets({
 }));
 app.use(compress());
 app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.json({limit: "50mb"}));
+app.use(bodyParser.urlencoded({limit: "50mb"}));
 app.use(expressValidator());
 app.use(methodOverride());
 app.use(cookieParser());
@@ -111,6 +111,8 @@ app.use(function(req, res, next) {
   next();
 });
 
+
+
 // TODO: make this more informative
 app.use(function(err, req, res, next){
   console.error(err.stack);
@@ -122,7 +124,10 @@ app.use(function(err, req, res, next){
  */
 app.get('/', homeController.index);
 app.get('/editor', passportConf.isAuthenticated, editorController.getEditor);
+// TODO make more restful
 app.get('/digestdata', editorController.getDigestData);
+// TODO add Authorization
+app.post('/digestdata/:vdid', passportConf.isAuthenticated, editorController.postDigestData);
 app.get('/checkstatus', passportConf.isAuthenticated, editorController.getStatus);
 app.get('/screenshot', passportConf.isAuthenticated, screenShotController.getScreenShot);
 app.post('/newvd', editorController.postNewVD);

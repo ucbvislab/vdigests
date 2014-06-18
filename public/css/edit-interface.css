@@ -374,7 +374,7 @@ body {
 }
 
 .take-thumbnail-image:hover {
-    color: navy;
+    color: indigo;
 }
 
 .take-thumbnail-image:hover, .section-row:hover .take-thumbnail-image {
@@ -557,7 +557,7 @@ body .viewing .section-row .remove-section {
     left: 0px;
     background: white;
     position: fixed;
-    z-index: 100;
+    z-index: 10000;
     font-size: 16px;
     border: 2px solid;
     border-width: 1px 1px 0 0;
@@ -571,6 +571,27 @@ body .viewing .section-row .remove-section {
 
 .toolbar .fa + .fa {
     margin-left: 10px;
+}
+
+.toolbar-icon {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+}
+
+.falabel {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 34px;
+    font-size: 9px;
+    margin-left: -17px;
+    cursor: pointer;
+}
+
+.toolbar-icon:hover * {
+    color: teal;
 }
 
 /** ASSORTED OTHER CSS */

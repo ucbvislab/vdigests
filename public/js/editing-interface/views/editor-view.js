@@ -1,7 +1,7 @@
 
 /*global define */
 define(["backbone", "underscore", "jquery", "text!templates/editing-template.html", "editing-interface/views/compound-view", "editing-interface/views/digest-view",
-        "editing-interface/views/transcript-view", "editing-interface/models/chapter-model", "editing-interface/models/section-model"], function (Backbone, _, $, tmpl, CompoundBackboneView, DigestView, TranscriptView, ChapterModel, SectionModel) {
+        "editing-interface/views/transcript-view", "editing-interface/models/chapter-model", "editing-interface/models/section-model", "editing-interface/utils/utils", "toastr"], function (Backbone, _, $, tmpl, CompoundBackboneView, DigestView, TranscriptView, ChapterModel, SectionModel, Utils, toastr) {
 
           var consts = {
             digestWrapClass: "digest-wrap",
@@ -26,7 +26,9 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
                   evt.preventDefault();
                 }
               },
-              "click #preview-vdigest": "previewVDigest"
+              "click #preview-vdigest": "previewVDigest",
+              "click #save-vdigest": "saveVDigest",
+              "click #publish-vdigest": "publishVDigest"
             },
 
             initialize: function () {
@@ -43,7 +45,7 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
                   });
                   if (!wasPlaying) {
                     if (window.prevPlayVid) {
-                        window.prevPlayVid.play();
+                      window.prevPlayVid.play();
                       evt.stopPropagation();
                     } else {
                       var thevid = $("video")[0];
@@ -124,6 +126,27 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
             previewVDigest: function () {
               var locSplit = window.location.hash.split("/");
               window.location.hash = "preview/" + locSplit.slice(1).join("/");
+            },
+            publishVDigest: function () {
+              // TODO give published url and change published status on the server
+            },
+            saveVDigest: function () {
+              var thisView = this,
+                  outpjson = {};
+              outpjson.object = thisView.model.getOutputJSON();
+              outpjson["_csrf"] = window._csrf;
+              $.ajax({
+                url: "/digestdata/" + window.dataname,
+                data: JSON.stringify(outpjson),
+                type: "post",
+                contentType: "application/json",
+                success: function () {
+                  toastr.success("save successful");
+                },
+                error: function () {
+                  toastr.error("unable to save -- please try again");
+                }
+              });
             }
           });
         });

@@ -20,4 +20,6 @@ html
 
     block js
       != js('application')
+      script
+        |window._csrf = "#{_csrf}";
       block morejs

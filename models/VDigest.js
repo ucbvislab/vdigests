@@ -25,7 +25,17 @@ var vdSchema = new mongoose.Schema({
   uploadDate: {type: Date, default: Date.now},
   uploadUser: {type: mongoose.Schema.ObjectId, ref: "User"},
   state: {type: Number, default: 0},
-  digest: Object
+  digest: {
+    author: String,
+    title: String,
+    chapters: [{
+      end_time: Number,
+      start_time: Number,
+      image_time: Number,
+      image_data: String,
+      text: [String]
+    }]
+  }
 });
 
 vdSchema.methods.isProcessing = function () {
