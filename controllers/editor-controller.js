@@ -21,6 +21,16 @@ var fs = require('fs'),
     pathUtils = require('../utils/fpaths'),
     returnError = require('../utils/errors').returnError;
 
+var nodemailer = require("nodemailer");
+var secrets = require('../config/secrets');
+var smtpTransport = nodemailer.createTransport('SMTP', {
+  service: 'Mailgun',
+  auth: {
+       user: secrets.mailgun.user,
+       pass: secrets.mailgun.password
+  }
+});
+
 /**
  * Returns the editor js template (TODO consider bootstraping data)
  */
@@ -86,7 +96,7 @@ exports.postNewVD = function(req, res, next) {
   req.assert('yturl', 'YouTube URL is not a valid URL').isURL();
 
   // 5 minute timeout should allow most youtube videos to download
-  req.setTimeout(300);
+  req.setTimeout(300000);
 
   debugger;
 
@@ -330,6 +340,29 @@ exports.postNewVD = function(req, res, next) {
                       console.log(err);
                       return;
                     }
+
+                    // send email to user
+                    var from = "admin@video-digest.com";
+                    var name = "video-digest admin";
+                    var body = "Hello " + req.user.profile.name +",\n\n"
+                      + "The transcript-video alignment is finished and you may now edit your video digest at: " + req.headers.host + "/editor#edit/" + vdigest._id + "\n\n"
+                      + "Best wishes,\n -Friendly Neighborhood Video Digest Bot";
+
+                    var to = req.user.email;
+                    var subject = 'Video Digests: Video-transcript alignment complete';
+
+                    var mailOptions = {
+                      to: to,
+                      from: from,
+                      subject: subject,
+                      text: body
+                    };
+
+                    smtpTransport.sendMail(mailOptions, function(err) {
+                      if (err) {
+                        console.log(err);
+                      }
+                    });
                   });
                 });
               });// end align command

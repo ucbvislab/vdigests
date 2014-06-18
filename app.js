@@ -164,6 +164,31 @@ app.get('/auth/twitter/callback', passport.authenticate('twitter', { failureRedi
   res.redirect(req.session.returnTo || '/');
 });
 
+  // TODO
+// process.on("uncaughtException", function(err) {
+//   if(process.env.NODE_ENV === "production")
+//   {
+//     var mailer = nodemailer.createTransport(config.mailMode, config.nodemailer);
+//     var message = {
+//       from: config.senderMail,
+//       to: config.problemMail,
+//       subject: "Error in service: " + config.serviceName,
+//       text: (new Date()).toUTCString() + "\n\n" +
+//         err.message + "\n\n" +
+//         err.stack
+//     };
+//     mailer.sendMail(message, function() {
+//       process.exit(1);
+//     });
+//   }
+//   else
+//   {
+//     console.error((new Date()).toUTCString() + " uncaughtException: " + err.message);
+//     console.error(err.stack);
+//     process.exit(1);
+//   }
+// });
+
 /**
  * 500 Error Handler.
  * As of Express 4.0 it must be placed at the end, after all routes.

@@ -15,7 +15,7 @@ var userSchema = new mongoose.Schema({
   tokens: Array,
 
   profile: {
-    name: { type: String, default: '' },
+    name: { type: String, default: 'VDigest User' },
     gender: { type: String, default: '' },
     location: { type: String, default: '' },
     website: { type: String, default: '' },
