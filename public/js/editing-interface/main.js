@@ -43,8 +43,8 @@ requirejs.config({
 });
 
 // launch the main application (start the router)
-requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router", "editing-interface/utils/utils", "jquerySmoothScroll", "jscrollpane", "jmousewheel", "filesaver", "jform"],
-          function ($, _, Backbone, AppRouter, Utils) {
+requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router", "editing-interface/utils/utils", "editing-interface/utils/player", "jquerySmoothScroll", "jscrollpane", "jmousewheel", "filesaver", "jform"],
+          function ($, _, Backbone, AppRouter, Utils, Player) {
             "use strict";
 
             // set jquery csrf token
@@ -60,6 +60,15 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
                 }
               }
             });
+
+            // setup YouTube object
+            window.toLoadPlayers = [];
+            $.getScript('//www.youtube.com/iframe_api');
+            window.onYouTubeIframeAPIReady = function() {
+              _.each(window.toLoadPlayers, function (pargs) {
+                Player.loadPlayer.apply(this, pargs);
+              });
+            };
 
             console.log("started main");
             var appRouter = new AppRouter();

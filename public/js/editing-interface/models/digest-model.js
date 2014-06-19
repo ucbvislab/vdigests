@@ -11,6 +11,13 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/chapt
       };
     },
 
+    parse: function (inp) {
+      var thisModel = this,
+          output = _.extend(thisModel.defaults(), thisModel.attributes);
+      output["chapters"].add(inp.chapters, {parse: true});
+      return output;
+    },
+
     initialize: function () {
       var thisModel = this,
           chaps = thisModel.get("chapters");

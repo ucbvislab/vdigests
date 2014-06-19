@@ -41,29 +41,6 @@ exports.getEditor = function(req, res) {
 };
 
 /**
- * Post to the digest data /digestdata/:vid
- */
-exports.postDigestData = function(req, res, next) {
-  var vdid = req.params.vdid;
-  VDigest.findById(vdid, function (err, vd) {
-    if (err || !vd) {
-      returnError(res, "unable to save the video digest data", next);
-      return;
-    }
-    vd.digest = req.body.object;
-    vd.save(function (err) {
-      // TODO check that the the user can save the data
-      if (err) {
-        returnError(res, "unable to save the video digest data", next);
-        return;
-      }
-      res.writeHead(200, {"content-type": "application/json"});
-      res.end(JSON.stringify({"status": "success", "message": "saved the video digest data"}));
-    });
-  });
-};
-
-/**
  * Returns the readyness/processing status of the video digest
  */
 exports.getStatus = function(req, res) {
@@ -90,14 +67,12 @@ exports.getStatus = function(req, res) {
   });
 };
 
-
 /**
- * Returns the digest data needed for the editor
+ * Returns the digest data needed for the editor /digestdata/:vid
  */
 exports.getDigestData = function (req, res, next) {
-  var uparsed = url.parse(req.url),
-      did = uparsed.query && querystring.parse(uparsed.query).id;
-  VDigest.findById(did, function (err, vd) {
+  var vdid = req.params.vdid;
+  VDigest.findById(vdid, function (err, vd) {
     if (err || !vd) {
       returnError(res, "unable to load the specified video digest data", next);
     }
@@ -107,11 +82,38 @@ exports.getDigestData = function (req, res, next) {
     else if (!vd.isReady()) {
       returnError(res, "the transcript did not upload correctly: please create the video digest from scratch", next);
     } else {
+      debugger;
       res.writeHead(200, {"content-type": "application/json"});
-      res.end(JSON.stringify({"transcript": vd.alignTrans, "ytid": vd.ytid}));
+      res.end(JSON.stringify({"digest": vd.digest, "transcript": vd.alignTrans, "ytid": vd.ytid}));
     }
   });
 };
+
+
+/**
+ * Post to the digest data /digestdata/:vid
+ */
+exports.postDigestData = function(req, res, next) {
+  var vdid = req.params.vdid;
+  VDigest.findById(vdid, function (err, vd) {
+    if (err || !vd) {
+      returnError(res, "unable to save the video digest data", next);
+      return;
+    }
+    vd.digest = req.body.object;
+    debugger;
+    vd.save(function (err) {
+      // TODO check that the the user can save the data
+      if (err) {
+        returnError(res, "unable to save the video digest data", next);
+        return;
+      }
+      res.writeHead(200, {"content-type": "application/json"});
+      res.end(JSON.stringify({"status": "success", "message": "saved the video digest data"}));
+    });
+  });
+};
+
 
 // multipart process for loading a new video
 exports.postNewVD = function(req, res, next) {

@@ -125,7 +125,7 @@ app.use(function(err, req, res, next){
 app.get('/', homeController.index);
 app.get('/editor', passportConf.isAuthenticated, editorController.getEditor);
 // TODO make more restful
-app.get('/digestdata', editorController.getDigestData);
+app.get('/digestdata/:vdid', editorController.getDigestData);
 // TODO add Authorization
 app.post('/digestdata/:vdid', passportConf.isAuthenticated, editorController.postDigestData);
 app.get('/checkstatus', passportConf.isAuthenticated, editorController.getStatus);

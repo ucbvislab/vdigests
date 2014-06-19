@@ -24,13 +24,11 @@ exports.getScreenShot = function (req, res, next) {
   } catch (e) {
     returnError(res, "time must be a nonegative number and indicate the the second value of the screenshot", next);
   }
-  debugger;
   VDigest.findById(vdid, function (err, vd) {
     if (err || !vd || !vd.videoName) {
       returnError(res, "cannot create a screenshot: unable to find the given video digest", next);
       return;
     }
-    debugger;
     usetime = Math.min(usetime, vd.videoLength - 0.3); // TODO fix the screenshot edge case
     var videoFile = vd.getVideoFile(),
         outssFile = pathUtils.getScreenShotFile(vd.videoName, usetime),

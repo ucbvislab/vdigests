@@ -12,14 +12,14 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
       _postAddThumb(addThumb.data, addThumb, toAddThumbs);
     } else {
       // capture the thumbnail
-      Utils.seekThenCaptureImgTime(addThumb.$vid, addThumb.time, function (data) {
+      Utils.getScreenShot(addThumb.ytid, addThumb.time, function (data) {
         _postAddThumb(data, addThumb, toAddThumbs);
       });
     }
   };
 
     var _postAddThumb = function (data, addThumb, toAddThumbs) {
-    addThumb.addSec.set("thumbnail", new ThumbnailModel({data: data, image_time: addThumb.time}));
+    addThumb.addSec.set("thumbnail", new ThumbnailModel({data: data, time: addThumb.time}));
     addThumbnails(toAddThumbs);
   };
 
@@ -33,7 +33,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
     },
 
     url: function () {
-      return "/digestdata?id=" + this.id;
+      return "/digestdata/" + this.id;
     },
 
     initialize: function () {
@@ -54,6 +54,12 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
                          "change:startSection", thisModel.handleSectionChange);
       thisModel.listenTo(thisModel.get("transcript").get("words"),
                          "change:startChapter", thisModel.handleChapterChange);
+
+      // add init data if it exists
+      if (thisModel.toAddDigest) {
+        thisModel.useJSONData(thisModel.toAddDigest);
+        thisModel.toAddDigest = null;
+      }
 
       // mark the first chapter if no chapters are present
       var chaps = thisModel.get("digest").get("chapters");
@@ -143,19 +149,18 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
     parse: function (inpData) {
       var thisModel = this,
           output = _.extend(thisModel.defaults(), thisModel.attributes);
+      // todo, change the existing transcipt...
       output["transcript"] = new TranscriptModel({words: inpData.transcript.words}, {parse: true});
       output["ytid"] = inpData.ytid;
+      thisModel.toAddDigest = inpData.digest;
       return output;
     },
 
+    // TODO this technique needs major refactoring
     useJSONData: function (inpData) {
       // parse the segment data
       var thisModel = this,
-          words = thisModel.get("transcript").get("words"),
-          chaps = {};
-
-      var vid = $("video").get(0),
-          $vid = $(vid);
+          words = thisModel.get("transcript").get("words");
 
       // reset the transcript
       thisModel.get("transcript").resetState();
@@ -163,14 +168,21 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
       if (inpData.title) {
         thisModel.get("digest").set("title", inpData.title);
       }
+      if (inpData.author) {
+        thisModel.get("digest").set("author", inpData.author);
+      }
 
-      _.each(inpData.chapters || inpData, function (inobj) {
-        var chasn = inobj.group,
-            sec = {summary: inobj.text[0], startWord: null, image_time: inobj.image_time, image_data: inobj.image_data};
+      // TODO write converter for previous schema
+      var parsechaps = [];
+      _.each(inpData.chapters || inpData, function (chobj) {
+        var outchap = {sections: [], startWord: null, title: chobj.title, ytid: chobj.ytid};
+        _.each(chobj.sections, function (sec) {
+            var outsec = {summary: sec.summary[0], startWord: null, image_time: sec.thumbnail.time, image_data: sec.thumbnail.data};
+
             // find the start word
             var closestWord = null,
                 closestDist = Infinity,
-                compTime = inobj.start_time;
+                compTime = sec.start_time;
             words.each(function (wrd) {
               var dist = Math.abs(wrd.get("start") - compTime);
               if (dist < closestDist) {
@@ -178,28 +190,29 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
                 closestWord = wrd;
               }
             });
-            sec.startWord = closestWord;
-
-        chaps[chasn] = chaps[chasn] || {"sections": [], startWord: null, title: inobj.group_title};
-        chaps[chasn].sections.push(sec);
+            outsec.startWord = closestWord;
+          outchap.sections.push(outsec);
+          });
+        parsechaps.push(outchap);
       });
 
-      _.each(chaps, function (chp) {
-        chp.sections = chp.sections.sort(function (s1, s2) {
-          return s1.startWord.get("start") - s2.startWord.get("start");
-        });
-        chp.startWord = chp.sections[0].startWord;
-      });
-      chaps = $.map(chaps, function (ch) {
-        return ch;
-      }).sort(function (c1, c2) {
-        return c1.startWord.get("start") - c2.startWord.get("start");
-      });
+      // _.each(chaps, function (chp) {
+      //   chp.sections = chp.sections.sort(function (s1, s2) {
+      //     return s1.startWord.get("start") - s2.startWord.get("start");
+      //   });
+      //   chp.startWord = chp.sections[0].startWord;
+      // }
+      //);
+      // chaps = $.map(chaps, function (ch) {
+      //   return ch;
+      // }).sort(function (c1, c2) {
+      //   return c1.startWord.get("start") - c2.startWord.get("start");
+      // });
 
       var modelChaps = thisModel.get("digest").get("chapters"),
           toAddThumbs = [];
       // set the start word of the chapter
-      _.each(chaps, function (chp) {
+      _.each(parsechaps, function (chp) {
         var mchp;
         _.each(chp.sections, function (sec, i) {
           var addSec = null;
@@ -209,6 +222,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
             // FIXME hack
             mchp.swapping = true;
             mchp.set("title", chp.title);
+            mchp.set("ytid", chp.ytid);
             // chapter has been created
           } else {
             sec.startWord.set("startSection", true);
@@ -219,46 +233,49 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
           } else {
             throw Error("unable to find section matching start word");
           }
-          toAddThumbs.push({$vid: $vid, time:  sec.image_time, addSec: addSec, data: sec.image_data});
+          toAddThumbs.push({ytid: chp.ytid, time:  sec.image_time, addSec: addSec, data: sec.image_data});
         });
         mchp.swapping = false;
       });
       addThumbnails(toAddThumbs);
-    },
-
-    getOutputJSON: function () {
-      var thisModel = this,
-          chapters = {},
-          ij = 0;
-      thisModel.get("digest").get("chapters").each(function (chap, i) {
-        chap.get("sections").each(function (sec, j) {
-          // TODO use actual image data once new MV* framework is inplace
-          var secjson = {
-            group: i,
-            group_title: chap.get("title"),
-            text: [sec.get("summary")],
-            start_time: sec.get("startWord").get("start"),
-            text_change: false,
-            image_change: false,
-            image_data: sec.get("thumbnail").get("data"),
-            image_id: sec.get("thumbnail").cid,
-            image_time: sec.get("thumbnail").get("image_time")
-          };
-
-          if (ij) {
-            chapters[ij-1].end_time = secjson.start_time;
-          }
-          chapters[ij++] = secjson;
-        });
-      });
-      var words = thisModel.get("transcript").get("words");
-      chapters[ij-1].end_time = words.at(words.length - 1).get("end");
-      var outjson = {
-        title: thisModel.get("digest").get("title"),
-        author: thisModel.get("digest").get("author"),
-        chapters: chapters
-      };
-      return outjson;
     }
+
+    // getOutputJSON: function () {
+    //   var thisModel = this,
+    //       chapters = {},
+    //       ij = 0;
+    //   var outp = thisModel.toJSON();
+    //   delete outp.transcript;
+    //   return outp;
+    //   // thisModel.get("digest").get("chapters").each(function (chap, i) {
+    //   //   chap.get("sections").each(function (sec, j) {
+    //   //     // TODO use actual image data once new MV* framework is inplace
+    //   //     var secjson = {
+    //   //       group: i,
+    //   //       group_title: chap.get("title"),
+    //   //       text: [sec.get("summary")],
+    //   //       start_time: sec.get("startWord").get("start"),
+    //   //       text_change: false,
+    //   //       image_change: false,
+    //   //       image_data: sec.get("thumbnail").get("data"),
+    //   //       image_id: sec.get("thumbnail").cid,
+    //   //       image_time: sec.get("thumbnail").get("image_time")
+    //   //     };
+
+    //   //     if (ij) {
+    //   //       chapters[ij-1].end_time = secjson.start_time;
+    //   //     }
+    //   //     chapters[ij++] = secjson;
+    //   //   });
+    //   // });
+    //   // var words = thisModel.get("transcript").get("words");
+    //   // chapters[ij-1].end_time = words.at(words.length - 1).get("end");
+    //   // var outjson = {
+    //   //   title: thisModel.get("digest").get("title"),
+    //   //   author: thisModel.get("digest").get("author"),
+    //   //   chapters: chapters
+    //   // };
+    //   // return outjson;
+    // }
   });
 });

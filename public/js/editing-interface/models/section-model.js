@@ -17,6 +17,16 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
       thisModel.switchStartWordListeners(null, startWord);
     },
 
+    toJSON: function () {
+      var thisModel = this,
+          outp = {};
+      outp.start_time = thisModel.getStartTime();
+      outp.end_time = thisModel.getEndTime();
+      outp.summary = thisModel.get("summary");
+      outp.thumbnail = thisModel.get("thumbnail").toJSON();
+      return outp;
+    },
+
     switchStartWordListeners: function (oldWord, newWord) {
       var thisModel = this;
 

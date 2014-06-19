@@ -55,7 +55,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
             thisView.showCover();
           }, 2000);
         }
-      }, 500);
+      }, 500*Math.random());
 
       // set the viewing time
       thisView.setViewingTime();
@@ -100,10 +100,12 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
         if (!sec.get("thumbnail")) {
           // TODO DRY
           window.setTimeout(function () {
-            thisView.$el.find("#" + sec.cid + " ." + consts.absSummaryClass).focus();
-            var $vid = thisView.$el.find("video");
-            thisView.placeThumbnailInSec(sec);
-          }, 200);
+            if (!sec.get("thumbnail")) {
+              thisView.$el.find("#" + sec.cid + " ." + consts.absSummaryClass).focus();
+              var $vid = thisView.$el.find("video");
+              thisView.placeThumbnailInSec(sec);
+            }
+          }, 1000);
         };
       });
 
@@ -231,7 +233,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       }, 200);
 
       Utils.getScreenShot(window.dataname, time, function (newImgData) {
-        sec.set("thumbnail", new ThumbnailModel({data: newImgData, image_time: time}));
+        sec.set("thumbnail", new ThumbnailModel({data: newImgData, time: time}));
       }, consts.imgWidth, consts.imgHeight);
     },
 

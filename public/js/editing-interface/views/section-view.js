@@ -69,7 +69,7 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
 
     render: function () {
       var thisView = this;
-      thisView.$el.html(thisView.template(thisView.model.toJSON()));
+      thisView.$el.html(thisView.template(thisView.model.attributes));
       // apply the dynamic classname
       thisView.$el.attr('class', _.result(this, 'className'));
       return thisView;

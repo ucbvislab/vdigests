@@ -5,7 +5,7 @@ define(["backbone", "underscore", "jquery"], function (Backbone, _, $) {
     defaults: function () {
       return {
         data: "",
-        image_time: -1
+        time: -1
       };
     }
   });

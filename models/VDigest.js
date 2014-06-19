@@ -25,16 +25,25 @@ var vdSchema = new mongoose.Schema({
   uploadDate: {type: Date, default: Date.now},
   uploadUser: {type: mongoose.Schema.ObjectId, ref: "User"},
   state: {type: Number, default: 0},
+  // TODO DB migration after migrating old data
   digest: {
     author: String,
     title: String,
     chapters: [{
-      end_time: Number,
-      start_time: Number,
-      image_time: Number,
-      image_data: String,
-      text: [String]
-    }]
+      title: String,
+      start: Number,
+      end: Number,
+      ytid: String,
+      vct: Number,
+      sections: [{
+        end_time: Number,
+        start_time: Number,
+        summary: [String],
+        thumbnail: {
+          time: Number,
+          data: String
+        }
+    }]}]
   }
 });
 

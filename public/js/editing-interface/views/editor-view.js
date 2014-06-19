@@ -133,7 +133,7 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
             saveVDigest: function () {
               var thisView = this,
                   outpjson = {};
-              outpjson.object = thisView.model.getOutputJSON();
+              outpjson.object = thisView.model.get("digest").toJSON();
               outpjson["_csrf"] = window._csrf;
               $.ajax({
                 url: "/digestdata/" + window.dataname,

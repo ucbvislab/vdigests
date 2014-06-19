@@ -565,10 +565,6 @@ body .viewing .section-row .remove-section {
     border-radius: 0 5px;
 }
 
-.toolbar .fa {
-    cursor: pointer;
-}
-
 .toolbar .fa + .fa {
     margin-left: 10px;
 }
@@ -578,6 +574,7 @@ body .viewing .section-row .remove-section {
     width: 30px;
     height: 30px;
     text-align: center;
+    cursor: pointer;
 }
 
 .falabel {

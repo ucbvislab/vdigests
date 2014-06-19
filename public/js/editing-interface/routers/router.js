@@ -86,7 +86,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
         if (!thisRoute.editorModel) {
           thisRoute.editorModel = new EditorModel({id: dataname});
           thisRoute.editorView =  new EditorView({model: thisRoute.editorModel});
-          thisRoute.editorModel.fetch({success: function () {
+          thisRoute.editorModel.fetch({success: function (mdl, inobj) {
             // create the editor view
             // now  show the editor view
             $("#" + consts.editingId).html(thisRoute.editorView.render().el);

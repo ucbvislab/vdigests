@@ -4,11 +4,7 @@ define(['jquery'], function($) {
   var player = {
     inputVideo: function(container, ytid, vplayerObj, startTime, exactStartTime, setAttr) {
       if (typeof(window.YT) == 'undefined' || typeof(window.YT.Player) == 'undefined') {
-        window.onYouTubeIframeAPIReady = function() {
-          player.loadPlayer(container, ytid, vplayerObj, startTime, exactStartTime, setAttr);
-        };
-
-        $.getScript('//www.youtube.com/iframe_api');
+        window.toLoadPlayers.push([container, ytid, vplayerObj, startTime, exactStartTime, setAttr]);
       } else {
           player.loadPlayer(container, ytid, vplayerObj, startTime, exactStartTime, setAttr);
       }

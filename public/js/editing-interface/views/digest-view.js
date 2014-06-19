@@ -5,7 +5,9 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
   var consts = {
     chapterWrapClass: "digest-chapters-wrap",
     chapterClass: "chapter",
-    digestWrapClass: "digest-wrap"
+    digestWrapClass: "digest-wrap",
+    mainTitleId: "maintitle",
+    authorTitleId: "authortitle"
   };
 
   return CompoundBackboneView.extend({
@@ -44,8 +46,14 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
         thisView.$el.find("#" + removedChap.cid).remove();
       });
 
-      thisView.listenTo(thisView.model, "change:title", function () {
-        thisView.$el.find(".digest-title-wrap h1").text(thisView.model.get("title"));
+      // title change
+      thisView.listenTo(thisView.model, "change:title", function (mdl, val) {
+        thisView.$el.find("#" + consts.mainTitleId).text(val);
+      });
+
+      // author change
+      thisView.listenTo(thisView.model, "change:author", function (mdl, val) {
+        thisView.$el.find("#" + consts.authorTitleId).text(val);
       });
 
       thisView.listenTo(chaps, "change:state", function (chp, val) {
