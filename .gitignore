@@ -2,7 +2,8 @@
 *.avi
 *.mp4
 *.wav
-config
+secrets.js
+settings.js
 public/content
 ffdata
 node_modules
