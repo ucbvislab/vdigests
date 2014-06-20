@@ -1,5 +1,5 @@
 {
-  "name": "video-digests",
+  "name": "vdigest",
   "version": "0.1.0",
   "repository": {
     "type": "git",
@@ -65,5 +65,18 @@
     "mocha": "^1.19.0",
     "multiline": "^0.3.4",
     "supertest": "^0.13.0"
-  }
+  },
+  "description": "placeholder",
+  "bugs": {
+    "url": "https://github.com/cjrd/vdigests/issues"
+  },
+  "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [
+    "video-digest"
+  ],
+  "author": "Colorado Reed",
+  "license": "GPLv3"
 }
