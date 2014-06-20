@@ -11,10 +11,15 @@ var mongoose = require('mongoose'),
 var vdSchema = new mongoose.Schema({
   _id: ShortId,
   ytid: String,
+  pubdisplay: {type: Boolean, default: false},
   rawTransName: String,
   preAlignTrans: [{speaker: String, line: String}],
   videoName: String,
   videoLength: Number,
+  puburl: {
+    type: String,
+    unique: true
+  },
   audioName: String,
   alignTrans:{words: [{"start": Number,
                        "speaker": Number,
@@ -28,7 +33,10 @@ var vdSchema = new mongoose.Schema({
   // TODO DB migration after migrating old data
   digest: {
     author: String,
-    title: String,
+    title: {
+      type: String,
+    default: "Video Digest"
+    },
     chapters: [{
       title: String,
       start: Number,

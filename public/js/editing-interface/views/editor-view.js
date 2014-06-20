@@ -128,13 +128,30 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
               var locSplit = window.location.hash.split("/");
               window.location.hash = "preview/" + locSplit.slice(1).join("/");
             },
+
             publishVDigest: function () {
-              // TODO give published url and change published status on the server
+              var thisView = this;
+              if (window.confirm("are you ready to publish this digest?")) {
+                $.ajax({
+                    url: "/digestpublish/" + window.dataname,
+                    data: JSON.stringify({"publish": true, _csrf: window._csrf}),
+                    type: "post",
+                    contentType: "application/json",
+                    success: function (resp) {
+                      toastr.success(resp.puburl);
+                    },
+                  error: function () {
+                    toastr.error("unable to publish -- please try again");
+                  }
+                });
+              }
             },
+
             toEditVDigest: function () {
               var locSplit = window.location.hash.split("/");
               window.location.hash = "edit/" + locSplit.slice(1).join("/");
             },
+
             saveVDigest: function () {
               var thisView = this,
                   outpjson = {};

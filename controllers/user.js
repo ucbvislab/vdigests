@@ -121,9 +121,21 @@ exports.postSignup = function(req, res, next) {
  */
 
 exports.getAccount = function(req, res) {
-  res.render('account/profile', {
-    title: 'Account Management'
-  });
+  User.findById(req.user.id)
+      .populate("vdigests", "digest.title puburl id")
+      .exec(function (err, user) {
+        if (err) {
+          console.log(err); // TODO handle error
+          req.flash('error', { msg: 'There was a problem loading your profile.' });
+          res.redirect('/');
+        } else {
+          debugger;
+          res.render('account/profile', {
+            title: 'Account Management',
+            vds: user.vdigests
+          });
+        }
+      });
 };
 
 /**

@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  .page-header
+    h3 Video Digests
+  ul
+    - for vd in vds
+      - if (vd.pubdisplay)
+        li
+          a(href="/digest/#{vd.puburl}")= vd.digest.title

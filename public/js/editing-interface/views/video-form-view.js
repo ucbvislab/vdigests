@@ -10,7 +10,8 @@ define(["backbone", "underscore", "jquery", "toastr", "text!templates/ytinfo-tem
       tranUploadId: "tranupload",
       processingFormClass: "processing-form",
       finalUrlClass: "finalurl",
-      intrmId: "intrmid"
+      intrmId: "intrmid",
+      yttitleId: "yttitle"
     };
     return Backbone.View.extend({
       el: document.getElementById(consts.viewId),
@@ -43,6 +44,7 @@ define(["backbone", "underscore", "jquery", "toastr", "text!templates/ytinfo-tem
         if ($el.hasClass(consts.firstFormClass)) {
           var ytinfoHtml = _.template(ytinfoTemplate, resobj);
           thisView.$el.find("." + consts.pageHeaderClass).html(ytinfoHtml);
+          thisView.$el.find("#" + consts.yttitleId).val(resobj.title);
           thisView.$el.removeClass(consts.firstFormClass);
           thisView.$el.addClass(consts.secondFormClass);
         } else if ($el.hasClass(consts.secondFormClass)){

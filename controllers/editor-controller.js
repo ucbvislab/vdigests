@@ -13,6 +13,7 @@ var fs = require('fs'),
     exec = require('child_process').exec,
     User = require('../models/User'),
     util = require('util'),
+    slug = require('slug'),
     querystring = require('querystring'),
     path = require('path'),
     VDigest = require('../models/VDigest'),
@@ -26,8 +27,8 @@ var secrets = require('../config/secrets');
 var smtpTransport = nodemailer.createTransport('SMTP', {
   service: 'Mailgun',
   auth: {
-       user: secrets.mailgun.user,
-       pass: secrets.mailgun.password
+    user: secrets.mailgun.user,
+    pass: secrets.mailgun.password
   }
 });
 
@@ -93,8 +94,39 @@ exports.getDigestData = function (req, res, next) {
 /**
  * Post to the digest data /digestdata/:vid
  */
+exports.postPublishDigest = function(req, res, next) {
+  var vdid = req.params.vdid;
+  if (req.user.vdigests.indexOf(vdid) === -1) {
+    returnError(res, "you do not have the access to publish this digest", next);
+    return;
+  }
+
+  VDigest.findById(vdid, function (err, vd) {
+    if (err || !vd) {
+      returnError(res, "unable to save the video digest data", next);
+      return;
+    }
+    if (!vd.pubdisplay) {
+      vd.pubdisplay = true;
+      vd.puburl = slug(vd.digest.title + " " + Math.random().toString(36).substr(4,8));
+      vd.save();
+    }
+    return;
+  });
+};
+
+/**
+ * Post to the digest data /digestdata/:vid
+ */
 exports.postDigestData = function(req, res, next) {
   var vdid = req.params.vdid;
+
+
+  if (req.user.vdigests.indexOf(vdid) === -1) {
+    returnError(res, "you do not have the access to change this digest", next);
+    return;
+  }
+
   VDigest.findById(vdid, function (err, vd) {
     if (err || !vd) {
       returnError(res, "unable to save the video digest data", next);
@@ -134,7 +166,6 @@ exports.postNewVD = function(req, res, next) {
       returnError(res, err.message, next);
       return;
     }
-
     // TODO check yturl
     var ytparsed = url.parse(fields.yturl && fields.yturl[0]),
         ytid = ytparsed.query && querystring.parse(ytparsed.query).v;
@@ -149,7 +180,6 @@ exports.postNewVD = function(req, res, next) {
 
       var vidFile = pathUtils.getVideoFile(ytid);
       var sendGoodResponse = function () {
-        // TODO add user to the model
         // read the text so we can store it into
         var vlencmd = "ffprobe -loglevel error -show_streams " + vidFile + " | grep duration= | cut -f2 -d= | head -n 1";
         exec(vlencmd, function (err, vlen) {
@@ -158,10 +188,10 @@ exports.postNewVD = function(req, res, next) {
             returnError(res, "unable to determine video length", next);
             return;
           }
-
           var fp = files.tranupload[0].path.split(path.sep),
               tfname = fp[fp.length - 1];
-          var vd = new VDigest({ytid: ytid, rawTransName: tfname, videoName: ytid, videoLength: vlen});
+          debugger;
+          var vd = new VDigest({ytid: ytid, rawTransName: tfname, videoName: ytid, videoLength: vlen, digest: {title: fields.yttitle[0]}});
           vd.save(function (err) {
             if (err) {
               returnError(res, "problem saving video digest to the database -- please try again", next);
@@ -174,7 +204,7 @@ exports.postNewVD = function(req, res, next) {
             }
           });
         });
-      };
+      }; // end sendGoodResponse
 
       debugger;
       // download the yt video
@@ -336,8 +366,8 @@ exports.postNewVD = function(req, res, next) {
               // get the user account
               User.findById(req.user.id, function(err, user) {
                 if (err) return next(err);
-                if (!~user.vdigests.indexOf(vdigest._id)) {
-                  user.vdigests.push(vdigest._id);
+                if (!~user.vdigests.indexOf(vdigest.id)) {
+                  user.vdigests.push(vdigest.id);
                   user.save();
                 }
               });
@@ -369,8 +399,8 @@ exports.postNewVD = function(req, res, next) {
                     var from = "admin@video-digest.com";
                     var name = "video-digest admin";
                     var body = "Hello " + req.user.profile.name +",\n\n"
-                      + "The transcript-video alignment is finished and you may now edit your video digest at: " + req.headers.host + "/editor#edit/" + vdigest._id + "\n\n"
-                      + "Best wishes,\n -Friendly Neighborhood Video Digest Bot";
+                          + "The transcript-video alignment is finished and you may now edit your video digest at: " + req.headers.host + "/editor#edit/" + vdigest._id + "\n\n"
+                          + "Best wishes,\n -Friendly Neighborhood Video Digest Bot";
 
                     var to = req.user.email;
                     var subject = 'Video Digests: Video-transcript alignment complete';

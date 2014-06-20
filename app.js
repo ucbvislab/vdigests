@@ -30,6 +30,7 @@ var apiController = require('./controllers/api');
 var contactController = require('./controllers/contact');
 var editorController = require('./controllers/editor-controller');
 var screenShotController = require('./controllers/screenshot');
+var vdlistController = require('./controllers/vdlist');
 
 /**
  * API keys + Passport configuration.
@@ -126,12 +127,13 @@ app.get('/', homeController.index);
 app.get('/editor', passportConf.isAuthenticated, editorController.getEditor);
 // TODO make more restful
 app.get('/digestdata/:vdid', editorController.getDigestData);
+app.post('/digestpublish/:vdid', editorController.postPublishDigest);
 // TODO add Authorization
 app.post('/digestdata/:vdid', passportConf.isAuthenticated, editorController.postDigestData);
 app.get('/checkstatus', passportConf.isAuthenticated, editorController.getStatus);
 app.get('/screenshot', passportConf.isAuthenticated, screenShotController.getScreenShot);
 app.post('/newvd', editorController.postNewVD);
-app.get('/login', userController.getLogin);
+app.get('/vdigests', vdlistController.getVDList);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.logout);
 app.get('/forgot', userController.getForgot);

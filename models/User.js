@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt-nodejs');
 var crypto = require('crypto');
+var ShortId = require('mongoose-minid');
 
 var userSchema = new mongoose.Schema({
   email: { type: String, unique: true, lowercase: true },
@@ -22,7 +23,7 @@ var userSchema = new mongoose.Schema({
     picture: { type: String, default: '' }
   },
 
-  vdigests: [String],
+  vdigests: [{ type: ShortId, ref: 'VDigest' }],
 
   resetPasswordToken: String,
   resetPasswordExpires: Date
