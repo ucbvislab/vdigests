@@ -145,7 +145,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
           // we're out of sections: delete the chapter
           thisView.model.ytplayer
             && thisView.model.ytplayer.stopVideo
-            && thisView.ytplayer.stopVideo();
+            && thisView.model.ytplayer.stopVideo();
           // TODO move this
           thisModel.get("startWord").set("startChapter", false);
           thisView.remove();

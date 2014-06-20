@@ -91,16 +91,6 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
             // now  show the editor view
             $("#" + consts.editingId).html(thisRoute.editorView.render().el);
             thisRoute.editorModel.postInit();
-
-            if (toView) {
-              window.setTimeout(function () {
-                thisRoute.editorModel.get("digest").set("title", "The best stats you've ever seen - Hans Rosling");
-                thisRoute.editorModel.get("digest").get("chapters").models[0].set("title", "Chapter 1: Introduction");
-                thisRoute.editorModel.get("digest").get("chapters").models[0].get("sections").models[0].set("summary", "After 20 years studying hunger in Africa, I started teaching global development to undergraduate students.");
-                thisRoute.viewRoute(dataname);
-                return;
-              }, 500);
-            }
             showCallback();
           }, // end success
           error: function (data, resp) {

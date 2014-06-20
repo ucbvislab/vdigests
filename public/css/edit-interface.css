@@ -151,14 +151,12 @@ body {
     margin: 36px auto;
 }
 
-.digest-wrap {
+#digest-wrap {
     overflow-y: auto;
     overflow-x: hidden;
     float: left;
     width: 60%;
-    /* position: absolute; */
     display:  inline-block;
-    /* min-width: 750px; */
     height: inherit;
     padding-left: 10px;
     border-right: 1px solid #E0E0E0;
@@ -166,11 +164,9 @@ body {
     padding-left: 2%;
 }
 
-.viewing .digest-wrap {
+.viewing #digest-wrap {
     width: 80%;
     max-width: 1600px;
-    /* width: 1500px; */
-    /* padding-right: 10%; */
     margin: auto;
     float: none;
     display: block;
@@ -410,18 +406,16 @@ body .viewing .section-row .remove-section {
 /* transcript-level css */
 /************************/
 
-.viewing .transcript-wrap {
+.viewing #transcript-wrap {
     display: none;
 }
 
-.transcript-wrap {
+#transcript-wrap {
     padding-top: 5px;
     width: 40%;
     line-height: 16px;
     height: inherit;
-    /* display: inline-block; */
-    /* margin-left: 60%; */
-    float: left;
+     float: left;
     background-color: white;
     overflow: scroll;
 }
@@ -558,7 +552,7 @@ body .viewing .section-row .remove-section {
     background: white;
     position: fixed;
     z-index: 10000;
-    font-size: 16px;
+    font-size: 20px;
     border: 2px solid;
     border-width: 1px 1px 0 0;
     padding: 3px 6px;
@@ -571,8 +565,8 @@ body .viewing .section-row .remove-section {
 
 .toolbar-icon {
     position: relative;
-    width: 30px;
-    height: 30px;
+    width: 36px;
+    height: 36px;
     text-align: center;
     cursor: pointer;
 }
@@ -589,6 +583,28 @@ body .viewing .section-row .remove-section {
 
 .toolbar-icon:hover * {
     color: teal;
+}
+
+#to-edit-vdigest {
+    width: 65px;
+    height: 65px;
+}
+#to-edit-vdigest .falabel {
+    width: 75px;
+    font-size: 12px;
+    margin-left: -37.5px;
+}
+
+.viewing .toolbar-icon {
+    display: none;
+}
+
+.viewing #to-edit-vdigest {
+    display: block;
+}
+
+.editing #to-edit-vdigest {
+    display: none;
 }
 
 /** ASSORTED OTHER CSS */

@@ -5,7 +5,7 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
   var consts = {
     chapterWrapClass: "digest-chapters-wrap",
     chapterClass: "chapter",
-    digestWrapClass: "digest-wrap",
+    digestWrapId: "digest-wrap",
     mainTitleId: "maintitle",
     authorTitleId: "authortitle"
   };
@@ -117,7 +117,7 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
               curPlayingChap.ytplayer.seekTo && curPlayingChap.ytplayer.seekTo(curTime, true);
               // TODO scroll if we're in viewing mode
               $.smoothScroll({
-                scrollElement: $('.' + consts.digestWrapClass),
+                scrollElement: $('#' + consts.digestWrapId),
                 scrollTarget: $(curPlayingChap.ytplayer.a.parentElement.parentElement)
               });
               thisView.chapTrans = true;

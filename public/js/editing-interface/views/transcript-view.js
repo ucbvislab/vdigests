@@ -12,6 +12,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
     segStClass: "start-marker",
     dragChapClass: "drag-chapter-word",
     dragSecClass: "drag-section-word",
+    transWrapId: "transcript-wrap",
     jspTrackClass: "jspTrack",
     scrollMarkPrefix: "scrollmark-",
     activeClass: "active",
@@ -281,7 +282,9 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
         if (newVal) {
           // add marker to the scrollbar
           var  mpos = thisView.getScrollMarkPercent($secEl);
-          thisView.addScrollMarker(mpos, consts.startSecScrollClass, $secEl.attr("id"));
+          if (mpos > -1) {
+            thisView.addScrollMarker(mpos, consts.startSecScrollClass, $secEl.attr("id"));
+          }
         } else {
           // else remove the marker if one is present before the given word
           thisView.removeScrollMarker($secEl.attr("id"));
@@ -295,7 +298,9 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
       if (newVal) {
         // add marker to the scrollbar
         var mpos = thisView.getScrollMarkPercent($chapEl);
-        thisView.addScrollMarker(mpos, consts.startChapScrollClass, $chapEl.attr("id"));
+        if (mpos > -1) {
+          thisView.addScrollMarker(mpos, consts.startChapScrollClass, $chapEl.attr("id"));
+        }
       } else {
         // remove the marker from the scrollbar
         thisView.removeScrollMarker($chapEl.attr("id"));
@@ -333,11 +338,12 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
 
     addScrollMarker: function (pos, mclass, relid) {
       var thisView = this,
+          $transWrap = thisView.$transWrap || $("#" + consts.transWrapId),
           $smark = $("<div>");
       $smark.addClass(mclass);
-      $smark.css("top", pos);
+      $smark.css("top", pos + "%");
       $smark.attr("id", consts.scrollMarkPrefix + relid);
-      $(document.body).append($smark);
+      $transWrap.append($smark);
     },
 
     removeScrollMarker: function (relid) {
@@ -349,13 +355,22 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
       var thisView = this,
           pos = thisView.getScrollMarkPercent($corrEl),
           $scrollEl = $("#" + consts.scrollMarkPrefix + $corrEl.attr("id"));
-      $scrollEl.css("top", pos);
+      if (pos > -1) {
+        $scrollEl.css("top", pos + "%");
+      }
       return $scrollEl;
     },
 
+    // TODO normalize by the size of the el
     getScrollMarkPercent: function ($transEl) {
-      var thisView = this;
-      return $transEl.position().top/thisView.$el.find("." + consts.transWordsClass).height()*100 - 0.1 + "%";
+      var thisView = this,
+          per;
+      if (window.jsApi && window.jspApi.getIsScrollableH()) {
+        per = $transEl.position().top/thisView.$el.find("." + consts.transWordsClass).height()*100;
+      } else {
+        per = -1;
+      }
+      return per;
     },
 
     focusOnWord: function (fword) {

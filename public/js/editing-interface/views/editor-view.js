@@ -4,8 +4,8 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
         "editing-interface/views/transcript-view", "editing-interface/models/chapter-model", "editing-interface/models/section-model", "editing-interface/utils/utils", "toastr"], function (Backbone, _, $, tmpl, CompoundBackboneView, DigestView, TranscriptView, ChapterModel, SectionModel, Utils, toastr) {
 
           var consts = {
-            digestWrapClass: "digest-wrap",
-            transWrapClass: "transcript-wrap",
+            digestWrapId: "digest-wrap",
+            transWrapId: "transcript-wrap",
             viewClass: "editor-wrap",
             RETURN_KEY_CODE: 13,
             ESCAPE_KEYCODE: 27,
@@ -28,7 +28,8 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
               },
               "click #preview-vdigest": "previewVDigest",
               "click #save-vdigest": "saveVDigest",
-              "click #publish-vdigest": "publishVDigest"
+              "click #publish-vdigest": "publishVDigest",
+              "click #to-edit-vdigest": "toEditVDigest"
             },
 
             initialize: function () {
@@ -72,7 +73,7 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
               var thisView = this;
               // FIXME jScrollPane needs to be called after DOM insertion?
               window.setTimeout(function () {
-                var el = thisView.$el.find("." + consts.transWrapClass).jScrollPane({autoReinitialise: true, autoReinitialiseDelay: 2000});
+                var el = thisView.$el.find("#" + consts.transWrapId).jScrollPane({autoReinitialise: true, autoReinitialiseDelay: 2000});
                 // TODO bad globals
                 window.jspApi = el.data("jsp");
               }, 100);
@@ -90,8 +91,8 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
 
               // now add the digest and transcript view components to the editor template shell using the assign method
               var assignObj = {};
-              assignObj["." + consts.digestWrapClass] = thisView.digestView;
-              assignObj["." + consts.transWrapClass] = thisView.transView;
+              assignObj["#" + consts.digestWrapId] = thisView.digestView;
+              assignObj["#" + consts.transWrapId] = thisView.transView;
 
               return assignObj;
             },
@@ -111,7 +112,7 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
                   var jsonObj = JSON.parse(txtRes);
                   thisView.model.useJSONData(jsonObj);
                   window.setTimeout(function () {
-                    $("." + consts.digestWrapClass).scrollTop(0);
+                    $("#" + consts.digestWrapId).scrollTop(0);
                   }, 500);
                 };
                 filereader.readAsText(uploadFile);
@@ -129,6 +130,10 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
             },
             publishVDigest: function () {
               // TODO give published url and change published status on the server
+            },
+            toEditVDigest: function () {
+              var locSplit = window.location.hash.split("/");
+              window.location.hash = "edit/" + locSplit.slice(1).join("/");
             },
             saveVDigest: function () {
               var thisView = this,
