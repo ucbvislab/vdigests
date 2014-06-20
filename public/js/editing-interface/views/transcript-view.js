@@ -196,11 +196,14 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
             window.vdstats.nChap2Sec.push((new Date()).getTime());
             window.changingSecChap = true;
 
-            stWordModel.set("startChapter", false);
-            thisView.changeStartSection (stWordModel, true);
+            // make sure we're not changing the first chapter
+            if (stWordModel.getPrevSectionStart()) {
+              stWordModel.set("startChapter", false);
+              thisView.changeStartSection (stWordModel, true);
 
-            // USE STATS
-            window.changingSecChap = false;
+              // USE STATS
+              window.changingSecChap = false;
+            }
           }
           return;
         } else {
