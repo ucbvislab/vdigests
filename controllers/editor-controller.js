@@ -108,7 +108,7 @@ exports.postPublishDigest = function(req, res, next) {
     }
     if (!vd.pubdisplay) {
       vd.pubdisplay = true;
-      vd.puburl = slug(vd.digest.title + " " + Math.random().toString(36).substr(4,8));
+      vd.puburl = slug(vd.digest.title + " " + vd.id);
       vd.save();
     }
     return;

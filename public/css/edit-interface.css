@@ -31,6 +31,12 @@ body {
   font-size: 0.95em;
 }
 
+/********************/
+/* published css   */
+/********************/
+body.published .toolbar {
+    display: none;
+}
 
 /********************/
 /* video form css   */

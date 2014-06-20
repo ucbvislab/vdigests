@@ -11,7 +11,8 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
       editingId: "editing-interface",
       editingClass: "editing",
       viewingClass: "viewing",
-      videoFormId: "video-form"
+      videoFormId: "video-form",
+      pubClass: "published"
     };
 
     var pvt = {};
@@ -36,12 +37,29 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
 
       noParams: function () {
         var thisRoute = this;
+        // are we in the editing/creating interface or the viewing interface?
+
+        var pname = window.location.pathname.split("/").filter(function(str){return str.length;});
+
+        if (pname[0] === "editor") {
+
         if (!thisRoute.videoFormView) {
           thisRoute.videoFormView = new VideoFormView({model: new VideoFormModel(), router: thisRoute});
           thisRoute.videoFormView.render();
         }
         pvt.hideAllViews();
         thisRoute.videoFormView.$el.show();
+
+        } else if (pname.length === 2) {
+          var vtitle = pname[1];
+          // vd viewing interface TODO the transcript is not needed
+          console.log(vtitle);
+          var IDLEN = 7;
+          $(document.body).addClass(consts.pubClass);
+          thisRoute.viewRoute(vtitle.substr(vtitle.length - IDLEN));
+        } else {
+          toastr.error("incorrect URL format, should be /view/title or /editor#edit/id or /editor#preview/id");
+        }
       },
 
       /**
@@ -70,7 +88,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
             reloadTrans = true;
         // create the editor model which has the trans and digest views
 
-        window.dataname = dataname;
+        window.dataname = window.dataname || dataname;
 
         var showCallback = function () {
           thisRoute.$editingView = thisRoute.$editingView || $("#" + consts.editingId);
@@ -91,7 +109,11 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
             // now  show the editor view
             $("#" + consts.editingId).html(thisRoute.editorView.render().el);
             thisRoute.editorModel.postInit();
-            showCallback();
+            if (toView) {
+              thisRoute.viewRoute(dataname);
+            } else {
+              showCallback();
+            }
           }, // end success
           error: function (data, resp) {
             toastr.error((resp.responseJSON && resp.responseJSON.error) || "unable to load the video digest");

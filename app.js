@@ -124,6 +124,8 @@ app.use(function(err, req, res, next){
  * Application routes.
  */
 app.get('/', homeController.index);
+// TODO separate editor from the viewer
+app.get('/view/:ptitle', editorController.getEditor);
 app.get('/editor', passportConf.isAuthenticated, editorController.getEditor);
 // TODO make more restful
 app.get('/digestdata/:vdid', editorController.getDigestData);
@@ -134,6 +136,7 @@ app.get('/checkstatus', passportConf.isAuthenticated, editorController.getStatus
 app.get('/screenshot', passportConf.isAuthenticated, screenShotController.getScreenShot);
 app.post('/newvd', editorController.postNewVD);
 app.get('/vdigests', vdlistController.getVDList);
+app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.logout);
 app.get('/forgot', userController.getForgot);

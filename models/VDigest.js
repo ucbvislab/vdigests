@@ -9,7 +9,7 @@ var mongoose = require('mongoose'),
     pathUtils = require('../utils/fpaths');
 
 var vdSchema = new mongoose.Schema({
-  _id: ShortId,
+  _id: { type: ShortId, length: 7},
   ytid: String,
   pubdisplay: {type: Boolean, default: false},
   rawTransName: String,

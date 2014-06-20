@@ -140,8 +140,8 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
                     success: function (resp) {
                       toastr.success(resp.puburl);
                     },
-                  error: function () {
-                    toastr.error("unable to publish -- please try again");
+                  error: function (resp) {
+                    toastr.error((resp && resp.responseJSON && resp.responseJSON.error) || "unable to publish -- please try again");
                   }
                 });
               }
@@ -165,8 +165,8 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
                 success: function () {
                   toastr.success("save successful");
                 },
-                error: function () {
-                  toastr.error("unable to save -- please try again");
+                error: function (resp) {
+                  toastr.error((resp && resp.responseJSON && resp.responseJSON.error) || "unable to save -- please try again");
                 }
               });
             }
