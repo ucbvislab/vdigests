@@ -6,8 +6,8 @@ BASE_DIR := $(realpath $(MAKEFILE_DIR))
 
 # dirs and files ignored by gitignore
 configd := $(BASE_DIR)/config
-demo_secrets := $(configd)/demo_secrets.js
-demo_settings := $(configd)/demo_settings.js
+demo_secrets := $(configd)/demo-secrets.js
+demo_settings := $(configd)/demo-settings.js
 secrets := $(configd)/secrets.js
 settings := $(configd)/settings.js
 
