@@ -129,7 +129,6 @@ exports.getAccount = function(req, res) {
           req.flash('error', { msg: 'There was a problem loading your profile.' });
           res.redirect('/');
         } else {
-          debugger;
           res.render('account/profile', {
             title: 'Account Management',
             vds: user.vdigests

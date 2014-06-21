@@ -83,7 +83,6 @@ exports.getDigestData = function (req, res, next) {
     else if (!vd.isReady()) {
       returnError(res, "the transcript did not upload correctly: please create the video digest from scratch", next);
     } else {
-      debugger;
       res.writeHead(200, {"content-type": "application/json"});
       res.end(JSON.stringify({"digest": vd.digest, "transcript": vd.alignTrans, "ytid": vd.ytid}));
     }
@@ -133,7 +132,6 @@ exports.postDigestData = function(req, res, next) {
       return;
     }
     vd.digest = req.body.object;
-    debugger;
     vd.save(function (err) {
       // TODO check that the the user can save the data
       if (err) {
@@ -153,8 +151,6 @@ exports.postNewVD = function(req, res, next) {
 
   // 5 minute timeout should allow most youtube videos to download
   req.setTimeout(300000);
-
-  debugger;
 
   var form = new multiparty.Form({
     maxFilesSize: settings.maxTransUploadSize,
@@ -183,14 +179,12 @@ exports.postNewVD = function(req, res, next) {
         // read the text so we can store it into
         var vlencmd = "ffprobe -loglevel error -show_streams " + vidFile + " | grep duration= | cut -f2 -d= | head -n 1";
         exec(vlencmd, function (err, vlen) {
-          debugger;
           if (err) {
             returnError(res, "unable to determine video length", next);
             return;
           }
           var fp = files.tranupload[0].path.split(path.sep),
               tfname = fp[fp.length - 1];
-          debugger;
           var vd = new VDigest({ytid: ytid, rawTransName: tfname, videoName: ytid, videoLength: vlen, digest: {title: fields.yttitle[0]}});
           vd.save(function (err) {
             if (err) {
@@ -207,7 +201,6 @@ exports.postNewVD = function(req, res, next) {
         });
       }; // end sendGoodResponse
 
-      debugger;
       // download the yt video
       var downloading = false;
       fs.exists(vidFile, function (exists) {
@@ -292,7 +285,6 @@ exports.postNewVD = function(req, res, next) {
               out.push(line);
             }
           });
-          debugger;
           vdigest.preAlignTrans = out;
           vdigest.save(function (err) {
             if (err) {

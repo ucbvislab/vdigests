@@ -294,26 +294,20 @@ body.published .toolbar {
     background-position: 50%;
 }
 
-.section-row.empty, .section-row:hover {
+.editing .section-row.empty, .editing .section-row:hover {
     border: 1px dashed #DFDDDD;
     border-width: 1px;
     border-left: 0;
 }
 
-.section-row.active, .viewing .section-row:hover {
+div.section-row.active, .viewing .section-row:hover {
     border-top: solid 1px #ddd;
     border-bottom: solid 1px #ddd;
     background: rgba(237, 237, 237, 1);
 }
 
 .keyframe-col {
-    /* display: inline-block; */
-    /* border-radius: 26px; */
-    /* position: absolute; */
-    /* border: none; */
-    /* vertical-align: top; */
     width: 20%;
-    /* min-width: 95px; */
     float: left;
     position: relative;
 }

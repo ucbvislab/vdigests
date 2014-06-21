@@ -16,5 +16,5 @@ exports.getAudioFile = function (aid) {
 };
 
 exports.getScreenShotFile = function (base, time) {
-  return path.join(spaths.screenshots, base + "--" + time + ".png");
+  return path.join(spaths.screenshots, base + "--" + time + ".jpg");
 };

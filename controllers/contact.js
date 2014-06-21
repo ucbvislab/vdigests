@@ -53,7 +53,6 @@ exports.postContact = function(req, res) {
   };
 
   smtpTransport.sendMail(mailOptions, function(err) {
-    debugger;
     if (err) {
       req.flash('errors', { msg: err.message });
       return res.redirect('/contact');

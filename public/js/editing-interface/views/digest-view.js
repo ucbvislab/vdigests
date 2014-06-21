@@ -6,6 +6,7 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
     chapterWrapClass: "digest-chapters-wrap",
     chapterClass: "chapter",
     digestWrapId: "digest-wrap",
+    editorWrapClass: "editor-wrap",
     mainTitleId: "maintitle",
     authorTitleId: "authortitle"
   };
@@ -116,10 +117,7 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
               // TODO move to chapter view
               curPlayingChap.ytplayer.seekTo && curPlayingChap.ytplayer.seekTo(curTime, true);
               // TODO scroll if we're in viewing mode
-              $.smoothScroll({
-                scrollElement: $('#' + consts.digestWrapId),
-                scrollTarget: $(curPlayingChap.ytplayer.a.parentElement.parentElement)
-              });
+              $.smoothScroll($(curPlayingChap.ytplayer.a.parentElement.parentElement).position().top - 120);
               thisView.chapTrans = true;
               window.setTimeout(function () {
                 prevChapPlayer.pauseVideo();

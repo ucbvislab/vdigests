@@ -88,6 +88,7 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
         // USE STATS
         window.vdstats.nSummaryEdits.push((new Date()).getTime());
       }
+      this.$el.attr('class', _.result(this, 'className'));
     },
 
     removeSection: function (evt) {
