@@ -194,6 +194,7 @@ exports.postNewVD = function(req, res, next) {
           var vd = new VDigest({ytid: ytid, rawTransName: tfname, videoName: ytid, videoLength: vlen, digest: {title: fields.yttitle[0]}});
           vd.save(function (err) {
             if (err) {
+		console.log(err);
               returnError(res, "problem saving video digest to the database -- please try again", next);
               return;
             } else {

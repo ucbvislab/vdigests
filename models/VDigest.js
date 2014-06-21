@@ -18,7 +18,8 @@ var vdSchema = new mongoose.Schema({
   videoLength: Number,
   puburl: {
     type: String,
-    unique: true
+    unique: true,
+    sparse: true
   },
   audioName: String,
   alignTrans:{words: [{"start": Number,

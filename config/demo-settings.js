@@ -7,7 +7,7 @@ var mkdirp = require('mkdirp'),
     path = require('path'),
     ffdataPath = path.normalize(path.join(__dirname, "..", "ffdata")),
     paths = {
-      alignpy:  "~/Tools/p2fa-vislab/align.py",
+      alignpy:  path.join(ffdataPath, "../submods/p2fa-vislab/align.py"),
       ffdata: ffdataPath,
       videos: path.join(ffdataPath, "videos"),
       audio:  path.join(ffdataPath, "audio"),
