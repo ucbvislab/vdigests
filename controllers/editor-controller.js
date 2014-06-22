@@ -107,10 +107,11 @@ exports.postPublishDigest = function(req, res, next) {
     }
     if (!vd.pubdisplay) {
       vd.pubdisplay = true;
-      vd.puburl = slug(vd.digest.title + " " + vd.id);
+      vd.puburl = "/view/" + slug(vd.digest.title + " " + vd.id);
       vd.save();
     }
-    return;
+    res.writeHead(200, {"content-type": "application/json"});
+    res.end(JSON.stringify({"status": "success", "message": "published the video digest", puburl: vd.puburl}));
   });
 };
 
@@ -188,7 +189,7 @@ exports.postNewVD = function(req, res, next) {
           var vd = new VDigest({ytid: ytid, rawTransName: tfname, videoName: ytid, videoLength: vlen, digest: {title: fields.yttitle[0]}});
           vd.save(function (err) {
             if (err) {
-		console.log(err);
+		          console.log(err);
               returnError(res, "problem saving video digest to the database -- please try again", next);
               return;
             } else {

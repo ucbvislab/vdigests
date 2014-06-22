@@ -138,7 +138,10 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
                     type: "post",
                     contentType: "application/json",
                     success: function (resp) {
-                      toastr.success(resp.puburl);
+                      toastr.success("published!");
+                      if (resp && resp.puburl ) {
+                        window.open(resp.puburl, "_blank");
+                      }
                     },
                   error: function (resp) {
                     toastr.error((resp && resp.responseJSON && resp.responseJSON.error) || "unable to publish -- please try again");
