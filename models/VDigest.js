@@ -43,10 +43,9 @@ var vdSchema = new mongoose.Schema({
       start: Number,
       end: Number,
       ytid: String,
-      vct: Number,
       sections: [{
-        end_time: Number,
-        start_time: Number,
+        end: Number,
+        start: Number,
         summary: [String],
         thumbnail: {
           time: Number,

@@ -383,8 +383,8 @@ exports.postNewVD = function(req, res, next) {
                   vdigest.alignTrans = alignTrans;
                   vdigest.state = 1;
                   vdigest.save(function (err) {
-                    console.log("unable to save the video digest");
                     if (err) {
+                      console.log("unable to save the video digest");
                       console.log(err);
                       return;
                     }

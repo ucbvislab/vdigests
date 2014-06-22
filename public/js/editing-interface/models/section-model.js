@@ -20,8 +20,8 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
     toJSON: function () {
       var thisModel = this,
           outp = {};
-      outp.start_time = thisModel.getStartTime();
-      outp.end_time = thisModel.getEndTime();
+      outp.start = thisModel.getStartTime();
+      outp.end = thisModel.getEndTime();
       outp.summary = thisModel.get("summary");
       outp.thumbnail = thisModel.get("thumbnail").toJSON();
       return outp;

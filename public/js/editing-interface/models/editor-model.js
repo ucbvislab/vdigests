@@ -12,7 +12,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
       _postAddThumb(addThumb.data, addThumb, toAddThumbs);
     } else {
       // capture the thumbnail
-      Utils.getScreenShot(addThumb.ytid, addThumb.time, function (data) {
+      Utils.getScreenShot(addThumb.vdid, addThumb.time, function (data) {
         _postAddThumb(data, addThumb, toAddThumbs);
       });
     }
@@ -182,7 +182,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
             // find the start word
             var closestWord = null,
                 closestDist = Infinity,
-                compTime = sec.start_time;
+                compTime = sec.start;
             words.each(function (wrd) {
               var dist = Math.abs(wrd.get("start") - compTime);
               if (dist < closestDist) {
@@ -222,7 +222,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
             // FIXME hack
             mchp.swapping = true;
             mchp.set("title", chp.title);
-            mchp.set("ytid", chp.ytid);
+            mchp.set("ytid", chp.ytid || thisModel.get("ytid"));
             // chapter has been created
           } else {
             sec.startWord.set("startSection", true);
@@ -233,7 +233,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
           } else {
             throw Error("unable to find section matching start word");
           }
-          toAddThumbs.push({ytid: chp.ytid, time:  sec.image_time, addSec: addSec, data: sec.image_data});
+          toAddThumbs.push({vdid: window.dataname, time:  sec.image_time, addSec: addSec, data: sec.image_data});
         });
         mchp.swapping = false;
       });
