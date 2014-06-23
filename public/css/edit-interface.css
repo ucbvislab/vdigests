@@ -267,7 +267,7 @@ body.published .toolbar {
 }
 
 .viewing .summary-column {
-    margin-left: 20px;
+    margin-left: 22px;
 }
 
 .section-row {
@@ -276,6 +276,10 @@ body.published .toolbar {
     border: 1px dashed #FFFFFF;
     border-width: 1px;
     border-left: 0;
+}
+
+.section-row:last-child {
+    margin-bottom: 0;
 }
 
 .viewing .section-row {
@@ -310,7 +314,7 @@ div.section-row.active, .viewing .section-row:hover {
 }
 
 .keyframe-col {
-    width: 20%;
+    width: 18%;
     float: left;
     position: relative;
 }
