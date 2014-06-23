@@ -347,6 +347,10 @@ div.section-row.active, .viewing .section-row:hover {
     border-color:  rgba(163,161,161,0);
 }
 
+.editing .section-text-wrap .abs-summary {
+    font-size: 11px;
+}
+
 .section-text-wrap .abs-summary:empty {
     padding: 3px 4px;
 }
