@@ -150,6 +150,11 @@ exports.postDigestData = function(req, res, next) {
 exports.postNewVD = function(req, res, next) {
   req.assert('yturl', 'YouTube URL is not a valid URL').isURL();
 
+  if (!req.user) {
+    returnError(res, "You must be logged in to create a video digest", next);
+    return;
+  }
+
   // 5 minute timeout should allow most youtube videos to download
   req.setTimeout(300000);
 

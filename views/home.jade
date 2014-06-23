@@ -1,6 +1,63 @@
 extends layout
 
+block morecss
+  != css('home')
+
 block content
-  h1 Video Digests
-  p.lead
-    Testing Server framework
+  h3
+    | Preamble
+  #landing-description
+    p
+      | This is a temporary homepage for the Video Digest creation software developed by the
+      a(href="http://vis.berkeley.edu/")  Vis Lab
+      |  at U.C. Berkeley. Soon, this page will consist of a video digest that explains our project.
+    p
+      | For now, please use a
+      strong
+        |  webkit browser
+      |  (chrome, safari, or opera).
+  h3
+    | Demo Digests
+  #study-results
+    p
+      | Here are some video digests we created using both our automated pipeline and video-digest creation tool:
+    ul
+      li
+        | Hans Rosling: The Best Stats You've Ever Seen
+        ul
+          li
+            |expert:
+            a(href="/view/The-Best-Stats-Youve-Ever-Seen-expert-KaZP9x9")  view
+            |  |
+            a(href="/editor#edit/KaZP9x9")  edit
+          li
+            | crowdsourced:
+            a(href="/view/The-best-stats-youve-ever-seen-crowdsourced-xuTl2DM")  view
+            |  |
+            a(href="/editor#edit/xuTl2DM")  edit
+      li
+        | Scott Klemmer: The Power of Prototyping
+        ul
+          li
+            | expert:
+            a(href="/view/The-Power-of-Protyping-expert-Q_YIysi")  view
+            |  |
+            a(href="/editor#edit/Q_YIysi")  edit
+          li
+            | crowdsourced:
+            a(href="/view/The-Power-of-Protyping-crowdsourced-xBkN85s")  view
+            |  |
+            a(href="/editor#edit/xBkN85s")  edit
+      li
+        | Sal Khan: U.S. History Overview 1 - Jamestown to the Civil War
+        ul
+          li
+            | expert:
+            a(href="/view/US-History-Overview-1-Jamestown-to-the-Civil-War-expert-8c3ivNX")  view
+            |  |
+            a(href="/editor#edit/8c3ivNX")  edit
+          li
+            | crowdsourced:
+            a(href="/view/US-History-Overview-1-Jamestown-to-the-Civil-War-crowdsourced-6zUmluC")  view
+            |  |
+            a(href="/editor#edit/6zUmluC")  edit

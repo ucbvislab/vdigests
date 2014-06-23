@@ -16,6 +16,7 @@ Assuming you've installed the dependencies
 
 1. `git clone --depth 1 --recursive https://github.com/cjrd/vdigests.git`
 2. make
-3.
 
 ## Running the application
+1. `node app.js`
+2. navigate to [http://127.0.0.1:3000](http://127.0.0.1:3000)

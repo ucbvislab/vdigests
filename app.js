@@ -112,8 +112,6 @@ app.use(function(req, res, next) {
   next();
 });
 
-
-
 // TODO: make this more informative
 app.use(function(err, req, res, next){
   console.error(err.stack);
@@ -126,14 +124,14 @@ app.use(function(err, req, res, next){
 app.get('/', homeController.index);
 // TODO separate editor from the viewer
 app.get('/view/:ptitle', editorController.getEditor);
-app.get('/editor', passportConf.isAuthenticated, editorController.getEditor);
+app.get('/editor', editorController.getEditor);
 // TODO make more restful
 app.get('/digestdata/:vdid', editorController.getDigestData);
-app.post('/digestpublish/:vdid', editorController.postPublishDigest);
+app.post('/digestpublish/:vdid', passportConf.isAuthenticated, editorController.postPublishDigest);
 // TODO add Authorization
 app.post('/digestdata/:vdid', passportConf.isAuthenticated, editorController.postDigestData);
-app.get('/checkstatus', passportConf.isAuthenticated, editorController.getStatus);
-app.get('/screenshot', passportConf.isAuthenticated, screenShotController.getScreenShot);
+app.get('/checkstatus', editorController.getStatus);
+app.get('/screenshot', screenShotController.getScreenShot);
 app.post('/newvd', editorController.postNewVD);
 app.get('/vdigests', vdlistController.getVDList);
 app.get('/login', userController.getLogin);
@@ -173,36 +171,6 @@ app.get('/auth/twitter', passport.authenticate('twitter'));
 app.get('/auth/twitter/callback', passport.authenticate('twitter', { failureRedirect: '/login' }), function(req, res) {
   res.redirect(req.session.returnTo || '/');
 });
-
-  // TODO
-// process.on("uncaughtException", function(err) {
-//   if(process.env.NODE_ENV === "production")
-//   {
-//     var mailer = nodemailer.createTransport(config.mailMode, config.nodemailer);
-//     var message = {
-//       from: config.senderMail,
-//       to: config.problemMail,
-//       subject: "Error in service: " + config.serviceName,
-//       text: (new Date()).toUTCString() + "\n\n" +
-//         err.message + "\n\n" +
-//         err.stack
-//     };
-//     mailer.sendMail(message, function() {
-//       process.exit(1);
-//     });
-//   }
-//   else
-//   {
-//     console.error((new Date()).toUTCString() + " uncaughtException: " + err.message);
-//     console.error(err.stack);
-//     process.exit(1);
-//   }
-// });
-
-/**
- * 500 Error Handler.
- * As of Express 4.0 it must be placed at the end, after all routes.
- */
 
 app.use(errorHandler());
 
