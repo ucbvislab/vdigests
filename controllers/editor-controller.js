@@ -183,7 +183,7 @@ exports.postNewVD = function(req, res, next) {
       var vidFile = pathUtils.getVideoFile(ytid);
       var sendGoodResponse = function () {
         // read the text so we can store it into
-        var vlencmd = "ffprobe -loglevel error -show_streams " + vidFile + " | grep duration= | cut -f2 -d= | head -n 1";
+        var vlencmd = "nice -n 20 ffprobe -loglevel error -show_streams " + vidFile + " | grep duration= | cut -f2 -d= | head -n 1";
         exec(vlencmd, function (err, vlen) {
           if (err) {
             returnError(res, "unable to determine video length", next);
@@ -313,7 +313,7 @@ exports.postNewVD = function(req, res, next) {
         //
         var child,
             cmd;
-        cmd = "ffmpeg -i " + inVideoFile + " -acodec pcm_s16le -y " + outAudioFile;
+        cmd = "nice -n 20 ffmpeg -i " + inVideoFile + " -acodec pcm_s16le -y " + outAudioFile;
         console.log(cmd);
         // executes `pwd`
         child = exec(cmd, function (error, stdout, stderr) {
@@ -356,7 +356,7 @@ exports.postNewVD = function(req, res, next) {
               res.write('{"readyid":"' + vdigest._id +'"}');
               res.end();
 
-              var alignCmd = "python " + spaths.alignpy + " "
+              var alignCmd = "nice -n 20 python " + spaths.alignpy + " "
                     + outAudioFile + " " + outPreFile + " " + outAlignTrans
                     + " > " + outAlignTrans + "-output";
               console.log("starting alignment command");
