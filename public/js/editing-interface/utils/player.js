@@ -32,7 +32,9 @@ define(['jquery'], function($) {
               window.setTimeout(function () {
                 event.target.unMute();
                 event.target.pauseVideo();
+                event.target.pauseVideo();
                 event.target.seekTo(exactStartTime);
+                // event.target.setPlaybackQuality("small"); // TODO figure out how to reduce quality
                 window.preppingVideo = false;
               }, 500);
           }

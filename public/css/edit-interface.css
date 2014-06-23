@@ -338,7 +338,7 @@ div.section-row.active, .viewing .section-row:hover {
 
 .section-text-wrap .abs-summary {
     border: none;
-    font-size: 11px;
+    font-size: 13px;
     height: inherit;
     border-color:  rgba(163,161,161,0);
 }
