@@ -36,19 +36,19 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
       },
 
       noParams: function () {
-        var thisRoute = this;
-        // are we in the editing/creating interface or the viewing interface?
-
-        var pname = window.location.pathname.split("/").filter(function(str){return str.length;});
+        var thisRoute = this,
+            pname = window.location.pathname.split("/").filter(function(str){return str.length;}),
+            $body = thisRoute.$body || $(document.body);
+        thisRoute.$body = $body;
 
         if (pname[0] === "editor") {
 
-        if (!thisRoute.videoFormView) {
-          thisRoute.videoFormView = new VideoFormView({model: new VideoFormModel(), router: thisRoute});
-          thisRoute.videoFormView.render();
-        }
-        pvt.hideAllViews();
-        thisRoute.videoFormView.$el.show();
+          if (!thisRoute.videoFormView) {
+            thisRoute.videoFormView = new VideoFormView({model: new VideoFormModel(), router: thisRoute});
+            thisRoute.videoFormView.render();
+          }
+          pvt.hideAllViews();
+          thisRoute.videoFormView.$el.show();
 
         } else if (pname.length === 2) {
           var vtitle = pname[1];
@@ -65,7 +65,9 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
        * Main route for the viewing interface
        */
       viewRoute: function (dataname) {
-        var thisRoute = this;
+        var thisRoute = this,
+            $body = thisRoute.$body || $(document.body);
+        thisRoute.$body = $body;
         if (!thisRoute.editorModel) {
           thisRoute.editRoute(dataname, true);
           return;
@@ -74,8 +76,8 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
         window.editing = false;
 
         $("[data-ph]").attr("contenteditable", false);
-        thisRoute.editorView.$el.parent().removeClass(consts.editingClass);
-        thisRoute.editorView.$el.parent().addClass(consts.viewingClass);
+        $body.removeClass(consts.editingClass);
+        $body.addClass(consts.viewingClass);
       },
 
       /**
@@ -84,15 +86,17 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
        */
       editRoute: function (dataname, toView) {
         var thisRoute = this,
-            reloadTrans = true;
+            reloadTrans = true,
+            $body = thisRoute.$body || $(document.body);
+        thisRoute.$body = $body;
         // create the editor model which has the trans and digest views
 
         window.dataname = window.dataname || dataname;
 
         var showCallback = function () {
           thisRoute.$editingView = thisRoute.$editingView || $("#" + consts.editingId);
-          thisRoute.editorView.$el.parent().removeClass(consts.viewingClass);
-          thisRoute.editorView.$el.parent().addClass(consts.editingClass);
+          $body.removeClass(consts.viewingClass);
+          $body.addClass(consts.editingClass);
           window.viewing = false;
           window.editing = true;
           $("[data-ph]").attr("contenteditable", true);
@@ -114,10 +118,10 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
               showCallback();
             }
           }, // end success
-          error: function (data, resp) {
-            toastr.error((resp.responseJSON && resp.responseJSON.error) || "unable to load the video digest");
-          } // end error
-          });
+                                       error: function (data, resp) {
+                                         toastr.error((resp.responseJSON && resp.responseJSON.error) || "unable to load the video digest");
+                                       } // end error
+                                      });
         } else {
           showCallback();
         }

@@ -18,6 +18,7 @@ body {
     width: 100%;
     margin: 0;
     padding: 0;
+    position: relative;
 }
 
 [class*="iconicfill-"]:before {
@@ -112,7 +113,7 @@ body.published .toolbar {
     min-width: 1200px;
 }
 
-#editing-interface.editing {
+.editing #editing-interface {
     max-width: 3000px;
     height: inherit;
 }
@@ -376,7 +377,7 @@ div.section-row.active, .viewing .section-row:hover {
     display: block;
 }
 
-body .viewing .section-row .take-thumbnail-image {
+body.viewing .section-row .take-thumbnail-image {
     display: none;
 }
 
@@ -396,7 +397,7 @@ body .viewing .section-row .take-thumbnail-image {
     display: block;
 }
 
-body .viewing .section-row .remove-section {
+body.viewing .section-row .remove-section {
     display: none;
 }
 
@@ -414,7 +415,8 @@ body .viewing .section-row .remove-section {
     width: 40%;
     line-height: 16px;
     height: inherit;
-     float: left;
+    float: left;
+    position: relative;
     background-color: white;
     overflow: scroll;
 }
@@ -426,6 +428,10 @@ body .viewing .section-row .remove-section {
 
 .jspDrag {
     background-color: rgb(184, 189, 216);
+}
+
+.viewing .start-chapter-scroll-marker, .viewing .start-section-scroll-marker {
+    display: none;
 }
 
 .start-chapter-scroll-marker, .start-section-scroll-marker {

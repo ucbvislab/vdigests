@@ -9,6 +9,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
     startSectionClass: "start-section-marker",
     startChapScrollClass: "start-chapter-scroll-marker",
     startSecScrollClass: "start-section-scroll-marker",
+    mcId: "main-container",
     segStClass: "start-marker",
     dragChapClass: "drag-chapter-word",
     dragSecClass: "drag-section-word",
@@ -339,12 +340,13 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
 
     addScrollMarker: function (pos, mclass, relid) {
       var thisView = this,
-          $transWrap = thisView.$transWrap || $("#" + consts.transWrapId),
+          $mc = thisView.$mc || $("#" + consts.mcId),
           $smark = $("<div>");
       $smark.addClass(mclass);
       $smark.css("top", pos + "%");
       $smark.attr("id", consts.scrollMarkPrefix + relid);
-      $transWrap.append($smark);
+      $mc.append($smark);
+      thisView.$mc = $mc;
     },
 
     removeScrollMarker: function (relid) {
@@ -365,12 +367,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
     // TODO normalize by the size of the el
     getScrollMarkPercent: function ($transEl) {
       var thisView = this,
-          per;
-      if (window.jsApi && window.jspApi.getIsScrollableH()) {
-        per = $transEl.position().top/thisView.$el.find("." + consts.transWordsClass).height()*100;
-      } else {
-        per = -1;
-      }
+          per = $transEl.position().top/thisView.$el.find("." + consts.transWordsClass).height()*100;
       return per;
     },
 
