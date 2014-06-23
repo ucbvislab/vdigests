@@ -247,8 +247,6 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
               revIndex = $minWord.data("idx");
             }
           }
-          console.log("rev index " + revIndex);
-          console.log("fwd index " + fwdIndex);
           $mdel.revIndex = revIndex;
           $mdel.fwdIndex = fwdIndex;
         } else {

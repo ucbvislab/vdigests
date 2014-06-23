@@ -59,7 +59,6 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
                 } else if (evt.keyCode === consts.F2_KEY_CODE) {
                   $('input[type=file]').one("change", function() {
                     thisView.handleUpload(this);
-                    console.log("input file change");
                   });
                   $('input[type=file]').trigger('click');
                 }

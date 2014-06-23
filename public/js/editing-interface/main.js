@@ -70,7 +70,6 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
               });
             };
 
-            console.log("started main");
             var appRouter = new AppRouter();
             // FIXME HACK for video count
             window.vct = 0;
@@ -129,16 +128,5 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
                 window.saveAs(blob, "use-stats.json");
               }
             });
-
-            // var saveToLocalStorage = function () {
-            //   window.setTimeout(function () {
-            //     var jvd = window.JSON.stringify(window.vdstats),
-            //         jdm = window.JSON.stringify(window.editorModel.getOutputJSON());
-            //     window.localStorage["vdstats"] = jvd;
-            //     window.localStorage["editorData"] = jdm;
-            //     console.log("saved to local");
-            //   }, 30000);
-            // };
-            // saveToLocalStorage();
           }
          );

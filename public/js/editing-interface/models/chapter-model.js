@@ -79,8 +79,6 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
     switchStartWordListeners: function (oldWord, newWord) {
       var thisModel = this;
 
-      console.log( "switch start word listeners" );
-
       // USE STATS
       if (oldWord) {
         window.vdstats.nChapMoves.push((new Date()).getTime());

@@ -85,7 +85,6 @@ define(["backbone", "underscore", "jquery", "toastr", "text!templates/ytinfo-tem
           };
           checkStatus();
         }
-        console.log( "form success" );
       },
 
       handleFormError: function (errResp) {

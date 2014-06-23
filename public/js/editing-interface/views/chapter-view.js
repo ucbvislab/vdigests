@@ -131,7 +131,6 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       // 'add' section listener
       thisView.listenTo(secs, "add", function (newSec) {
         thisView.assign(thisView.getAssignedObject());
-        console.log("adding a section in the chapter view");
         if (!thisView.model.swapping) {
           thisView.placeThumbnailInSec(newSec);
         }

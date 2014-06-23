@@ -35,9 +35,6 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/chapt
 
       thisModel.listenTo(chaps, "remove", function (chp) {
 
-        // move section of the chapter to the preceding chapter if it exists
-        console.log("remove chapter from digest model");
-
         // make sure we have remaining sections
         if (chp.get("sections").length == 0) {
           return;

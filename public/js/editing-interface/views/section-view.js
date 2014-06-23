@@ -97,7 +97,6 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
       // TODO for now, make sure it's not the first section
       if (window.confirm("Are you sure you want to remove this section?")) {
         thisModel.get("startWord").set("startSection", false);
-        console.log("section deleted");
       }
     },
 

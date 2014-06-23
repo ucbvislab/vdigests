@@ -53,7 +53,6 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
         } else if (pname.length === 2) {
           var vtitle = pname[1];
           // vd viewing interface TODO the transcript is not needed
-          console.log(vtitle);
           var IDLEN = 7;
           $(document.body).addClass(consts.pubClass);
           thisRoute.viewRoute(vtitle.substr(vtitle.length - IDLEN));
@@ -117,8 +116,6 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
           }, // end success
           error: function (data, resp) {
             toastr.error((resp.responseJSON && resp.responseJSON.error) || "unable to load the video digest");
-            console.log( "error fetching data" );
-            console.log(resp);
           } // end error
           });
         } else {

@@ -64,7 +64,6 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
       // mark the first chapter if no chapters are present
       var chaps = thisModel.get("digest").get("chapters");
       if (!chaps.length) {
-        console.log("postinit");
         var fw = thisModel.get("transcript").get("words").first();
         fw.set("startChapter", true);
       }
@@ -86,7 +85,6 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
       }
 
       if (newVal) {
-        console.log( "new chapter in editor model" );
         var sec2Chap = chWord.get("startSection");
         // we're creating a new chapter
         var newChap = new ChapterModel({ytid: thisModel.get("ytid"), startWord: chWord, sec2Chap: sec2Chap}),
@@ -103,8 +101,6 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
         }
         chaps.add(newChap);
 
-      } else {
-        console.log("editor model false chapter");
       }
     },
 

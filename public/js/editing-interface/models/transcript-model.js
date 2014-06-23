@@ -64,8 +64,6 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/word-
       var thisModel = this,
           oldStartChap = oldStartModel.get("startChapter"),
           oldStartSec = oldStartModel.get("startSection");
-      console.log("changeBreakStart");
-      console.log("changing break start");
       oldStartModel.set("startChapter", false, {silent: true});
       oldStartModel.set("startSection", false, {silent: true});
 
