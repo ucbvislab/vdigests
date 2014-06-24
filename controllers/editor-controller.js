@@ -271,7 +271,7 @@ exports.postNewVD = function(req, res, next) {
             return;
           }
 
-          var paragraphs = data.split("\n"),
+          var paragraphs = data.split("."),
               out = [],
               line,
               spkct = 0;
