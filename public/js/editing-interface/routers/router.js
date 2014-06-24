@@ -56,6 +56,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
           var IDLEN = 7;
           $(document.body).addClass(consts.pubClass);
           thisRoute.viewRoute(vtitle.substr(vtitle.length - IDLEN));
+          window.onbeforeunload = null;
         } else {
           toastr.error("incorrect URL format, should be /view/title or /editor#edit/id or /editor#preview/id");
         }
