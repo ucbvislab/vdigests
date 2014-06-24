@@ -96,9 +96,11 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
             });
             setMCHeight($window.height() - navHeight);
             setBodyHeight($window.height());
-            window.onbeforeunload = function () {
-              return "are you finished creating a digest?";
-            };
+            if (window.onbeforeunload !== null) {
+              window.onbeforeunload = function () {
+                return "are you finished creating a digest?";
+              };
+            }
 
             // USE STATS collection for interface study
             window.vdstats = {
