@@ -84,7 +84,7 @@ exports.getDigestData = function (req, res, next) {
       returnError(res, "the transcript did not upload correctly: please create the video digest from scratch", next);
     } else {
       res.writeHead(200, {"content-type": "application/json"});
-      res.end(JSON.stringify({"digest": vd.digest, "transcript": vd.alignTrans, "ytid": vd.ytid}));
+      res.end(JSON.stringify({"digest": vd.digest, "transcript": vd.alignTrans, "ytid": vd.ytid, "videoLength": vd.videoLength}));
     }
   });
 };
@@ -168,7 +168,7 @@ exports.postNewVD = function(req, res, next) {
       returnError(res, err.message, next);
       return;
     }
-    // TODO check yturl
+
     var ytparsed = url.parse(fields.yturl && fields.yturl[0]),
         ytid = ytparsed.query && querystring.parse(ytparsed.query).v;
     if (!(ytparsed.hostname === "youtube.com" || ytparsed.hostname === "www.youtube.com") || !ytid) {

@@ -137,6 +137,15 @@ body.published .toolbar {
     margin: auto;
     margin-top: 22px;
     margin-bottom: 0;
+    display: inline-block;
+}
+
+#videolength {
+    display: inline-block;
+    font-size: 15px;
+    color: #BDBDBD;
+    margin: 0;
+    margin-left: 0.4em;
 }
 
 #authortitle {

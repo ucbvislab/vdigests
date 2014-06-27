@@ -8,7 +8,8 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
     digestWrapId: "digest-wrap",
     editorWrapClass: "editor-wrap",
     mainTitleId: "maintitle",
-    authorTitleId: "authortitle"
+    authorTitleId: "authortitle",
+    videoLengthId: "videolength"
   };
 
   return CompoundBackboneView.extend({
@@ -55,6 +56,11 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
       // author change
       thisView.listenTo(thisView.model, "change:author", function (mdl, val) {
         thisView.$el.find("#" + consts.authorTitleId).text(val);
+      });
+
+      // videoLength change
+        thisView.listenTo(thisView.model, "change:videoLength", function (mdl, val) {
+        thisView.$el.find("#" + consts.videoLengthId).text(thisView.getVideoLengthString());
       });
 
       thisView.listenTo(chaps, "change:state", function (chp, val) {
@@ -160,6 +166,11 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
           });
         }
       }, 30);
+    },
+
+    getVideoLengthString: function () {
+      var thisView = this;
+      return thisView.model ? "(" + Math.max(Math.round(thisView.model.get("videoLength")/60) , 1) + " min)" : "";
     },
 
     /**

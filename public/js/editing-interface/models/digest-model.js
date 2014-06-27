@@ -7,15 +7,9 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/chapt
       return {
         title: "",
         author: "",
-        chapters: new ChapterCollection()
+        chapters: new ChapterCollection(),
+        videoLength: -1
       };
-    },
-
-    parse: function (inp) {
-      var thisModel = this,
-          output = _.extend(thisModel.defaults(), thisModel.attributes);
-      output["chapters"].add(inp.chapters, {parse: true});
-      return output;
     },
 
     initialize: function () {

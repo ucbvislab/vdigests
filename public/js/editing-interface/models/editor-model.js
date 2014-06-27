@@ -148,15 +148,16 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
       // todo, change the existing transcipt...
       output["transcript"] = new TranscriptModel({words: inpData.transcript.words}, {parse: true});
       output["ytid"] = inpData.ytid;
-      thisModel.toAddDigest = inpData.digest;
+      thisModel.toAddDigest = inpData;
       return output;
     },
 
     // TODO this technique needs major refactoring
-    useJSONData: function (inpData) {
+    useJSONData: function (jsonData) {
       // parse the segment data
       var thisModel = this,
-          words = thisModel.get("transcript").get("words");
+          words = thisModel.get("transcript").get("words"),
+          inpData = jsonData.digest;
 
       // reset the transcript
       thisModel.get("transcript").resetState();
@@ -166,6 +167,9 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
       }
       if (inpData.author) {
         thisModel.get("digest").set("author", inpData.author);
+      }
+      if (jsonData.videoLength) {
+        thisModel.get("digest").set("videoLength", jsonData.videoLength);
       }
 
       // TODO write converter for previous schema
