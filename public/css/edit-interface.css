@@ -324,6 +324,7 @@ div.section-row.active, .viewing .section-row:hover {
 .keyframe-col {
     width: 18%;
     float: left;
+    height: inherit;
     position: relative;
 }
 
@@ -342,8 +343,9 @@ div.section-row.active, .viewing .section-row:hover {
 .section-text-wrap {
     display: inline-block;
     vertical-align: text-bottom;
-    width: 80%;
-    height: inherit;
+    width: 82%;
+    /* height: inherit; */
+    /* height: 40px; */
     padding-left: 8px;
     padding-right: 4px;
 }
@@ -351,7 +353,8 @@ div.section-row.active, .viewing .section-row:hover {
 .section-text-wrap .abs-summary {
     border: none;
     font-size: 13px;
-    height: inherit;
+    min-height: 35px;
+    height: 100%;
     border-color:  rgba(163,161,161,0);
 }
 
