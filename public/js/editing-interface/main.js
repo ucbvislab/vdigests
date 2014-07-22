@@ -19,9 +19,11 @@ requirejs.config({
     filesaver: "lib/FileSaver",
     jmousewheel: "lib/jquery.mousewheel",
     jform: "lib/jquery.form.min",
-    toastr: "lib/toastr"
+    toastr: "lib/toastr",
+    jmenu: "lib/jquery.contextmenu"
   },
   shim: {
+    jmenu: ["jquery"],
     jmousewheel: ["jquery"],
     jform: ["jquery"],
     filesaver: {
@@ -43,7 +45,7 @@ requirejs.config({
 });
 
 // launch the main application (start the router)
-requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router", "editing-interface/utils/utils", "editing-interface/utils/player", "jquerySmoothScroll", "jscrollpane", "jmousewheel", "filesaver", "jform"],
+requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router", "editing-interface/utils/utils", "editing-interface/utils/player", "jquerySmoothScroll", "jscrollpane", "jmousewheel", "filesaver", "jform", "jmenu"],
           function ($, _, Backbone, AppRouter, Utils, Player) {
             "use strict";
 

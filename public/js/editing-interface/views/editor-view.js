@@ -75,6 +75,13 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
                 var el = thisView.$el.find("#" + consts.transWrapId).jScrollPane({autoReinitialise: true, autoReinitialiseDelay: 2000});
                 // TODO bad globals
                 window.jspApi = el.data("jsp");
+
+                $('.editor-wrap').contextPopup({
+                  title: 'Editing Options',
+                  items: [
+                    {label:'Auto Segment',    action:function() {  } },
+                    {label:'Auto Summarize',    action:function() {  } }
+                  ]});
               }, 100);
             },
 

@@ -47,6 +47,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
     render: function () {
       var thisView = this;
       thisView.$el.html(thisView.template(thisView.model.toJSON()));
+
       return thisView;
     },
 
