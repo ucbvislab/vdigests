@@ -148,11 +148,13 @@ body.published .toolbar {
 }
 
 #authortitle {
-    margin-top: 0;
+    padding-top: 5px;
     margin-bottom: 35px;
     font-size: 1.5em;
     color: #999999;
     font-style: italic;
+    margin-top: -5px;
+    width: 96%;
 }
 
 .digest-title-wrap:focus {
@@ -208,6 +210,8 @@ body.published .toolbar {
     font-size: 25px;
     position: relative;
     padding-bottom: 0.7em;
+    padding-top: 5px;
+    width: 96%;
 }
 
 .chapter-header:after {
@@ -642,4 +646,15 @@ input[type=file] {
 
 .floatclear {
     clear: both;
+}
+
+.gutterLine {
+    display: none;
+}
+.contextMenuPlugin li + li {
+    border-top: 1px solid #cccccc;
+}
+
+.editing .contextMenuPlugin > li > span {
+    padding: 3px 2px;
 }

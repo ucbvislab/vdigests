@@ -77,10 +77,9 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
                 window.jspApi = el.data("jsp");
 
                 $('.editor-wrap').contextPopup({
-                  title: 'Editing Options',
                   items: [
-                    {label:'Auto Segment',    action:function() {  } },
-                    {label:'Auto Summarize',    action:function() {  } }
+                    {label:'auto-segment',    action:function() {  } },
+                    {label:'auto-summarize',    action:function() {  } }
                   ]});
               }, 100);
             },
