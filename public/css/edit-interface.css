@@ -490,11 +490,14 @@ body.viewing .section-row .remove-section {
     font-size: 10pt;
     margin-bottom: 0;
     padding: 0 10px;
+    cursor: default;
+}
+
+.bpdrag * {
     -webkit-user-select: none;  /* Chrome all / Safari all */
     -moz-user-select: none;     /* Firefox all */
     -ms-user-select: none;      /* IE 10+ */
     user-select: none;
-    cursor: default;
 }
 
 .transcript-words p + p {

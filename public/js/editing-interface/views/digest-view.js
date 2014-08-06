@@ -145,8 +145,8 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
             curPlayingChap.get("sections").each(function (sec) {
               var secStart = sec.getStartTime(),
                   secEnd = sec.getEndTime();
-              if ((isSecEarly && (curTime + 0.2) > secStart && secStart >= curNextSecStart)
-                  || (!isSecEarly && (curTime + 0.2) < secEnd && (secEnd <= curNextSecEnd))) {
+              if ((isSecEarly && (curTime + 1) > secStart && secStart >= curNextSecStart)
+                  || (!isSecEarly && (curTime + 1) < secEnd && (secEnd <= curNextSecEnd))) {
                 curPlayingSec = sec;
                 curNextSecEnd = sec.getEndTime();
                 curNextSecStart = sec.getStartTime();

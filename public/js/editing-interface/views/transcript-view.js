@@ -17,7 +17,8 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
     jspTrackClass: "jspTrack",
     scrollMarkPrefix: "scrollmark-",
     activeClass: "active",
-    secWordClass: "secword"
+    secWordClass: "secword",
+    bpDragClass: "bpdrag"
   };
 
   return Backbone.View.extend({
@@ -113,19 +114,42 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
      */
     transMouseUp: function (evt) {
       var thisView = this,
+          thisModel = thisView.model,
           $tar = $(evt.target);
+
+      // remove no-dragging class
+      $(document.body).removeClass(consts.bpDragClass);
+
+      // if we mousedowned on a word model
       if (thisView.$mdel) {
         $("." + thisView.$mdel.mouseOverClass).removeClass(thisView.$mdel.mouseOverClass);
         var $newWord = thisView.$mdel.$curWord,
             oldWord = thisView.$mdel.origWordModel,
             words = thisView.model.get("words");
-        if ($newWord){
+
+        if ($newWord) {
           var newId = $newWord.attr("id");
           if (newId !== oldWord.cid) {
-            var thisModel = thisView.model;
             thisModel.changeBreakStart(oldWord, words.get(newId));
           }
-        }
+        } else if (oldWord && ((oldWord.prev && oldWord.prev.cid) || oldWord.cid) == $tar.attr("id")) {
+            var chstWord = oldWord.getPrevChapterStart(true),
+                secWord = oldWord.getPrevSectionStart(true);
+
+            oldWord = oldWord.prev || oldWord;
+
+                // USE STATS
+            window.vdstats.nVideoStartsFromTrans.push((new Date()).getTime());
+            window.startFromTran = true;
+
+            chstWord.trigger("startVideo", oldWord.get("start"));
+            secWord.trigger("infocus");
+
+            // USE STATS
+            window.setTimeout(function () {
+              window.startFromTran = false;
+            }, 800);
+          }
         thisView.$mdel = null;
       }
     },
@@ -225,56 +249,40 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
 
         thisView.$mdel.mdStartPt = thisView.$mdel.hasClass(consts.segStClass);
         thisView.$mdel.isChap = thisView.$mdel.hasClass(consts.startChapterClass);
+
+        // we're clicking on a section/chapter breakpoint
+        var revIndex = -1,
+            fwdIndex = Infinity,
+            $mdel = thisView.$mdel;
+
+        // TODO some of this may be extra work
+        thisView.$mdel.mouseOverClass = $mdel.isChap ? consts.dragChapClass : consts.dragSecClass;
+        // get the forward section/chapter index
+        var fwordModel = words.get($fWord.attr("id"));
+        if ($fWord.hasClass(consts.wordClass)) {
+          thisView.$mdel.origWordModel = fwordModel;
+          var fstartModel = fwordModel.getNextSectionStart();
+          if (fstartModel) {
+            var $maxWord = $("#" + fstartModel.cid);
+            $mdel.$maxWord = $maxWord;
+            fwdIndex = $maxWord.data("idx");
+          }
+        }
+        // get the backward section/chapter index
+        if ($fWord.hasClass(consts.wordClass)) {
+          var bstartModel = fwordModel.getPrevSectionStart();
+          if (bstartModel) {
+            var $minWord = $("#" + bstartModel.cid);
+            $mdel.$minWord = $minWord;
+            revIndex = $minWord.data("idx");
+          }
+        }
+        $mdel.revIndex = revIndex;
+        $mdel.fwdIndex = fwdIndex;
+
         if (thisView.$mdel.mdStartPt) {
-          var revIndex = -1,
-              fwdIndex = Infinity,
-              $mdel = thisView.$mdel;
-          thisView.$mdel.mouseOverClass = $mdel.isChap ? consts.dragChapClass : consts.dragSecClass;
-
-          // get the forward section/chapter index
-          var fwordModel = words.get($fWord.attr("id"));
-          if ($fWord.hasClass(consts.wordClass)) {
-            thisView.$mdel.origWordModel = fwordModel;
-            var fstartModel = fwordModel.getNextSectionStart();
-            if (fstartModel) {
-              var $maxWord = $("#" + fstartModel.cid);
-              $mdel.$maxWord = $maxWord;
-              fwdIndex = $maxWord.data("idx");
-            }
-          }
-          // get the backward section/chapter index
-          if ($fWord.hasClass(consts.wordClass)) {
-            var bstartModel = fwordModel.getPrevSectionStart();
-            if (bstartModel) {
-              var $minWord = $("#" + bstartModel.cid);
-              $mdel.$minWord = $minWord;
-              revIndex = $minWord.data("idx");
-            }
-          }
-          $mdel.revIndex = revIndex;
-          $mdel.fwdIndex = fwdIndex;
-        } else {
-          // we're not clicking on a breakpoint
-          if ($tar.hasClass(consts.wordClass)) {
-            // we're mousedowning on a word
-            var upword = words.get($tar.attr("id")),
-                chstWord = upword.getPrevChapterStart(true),
-                secWord = upword.getPrevSectionStart(true);;
-            if (chstWord) {
-              // USE STATS
-              window.vdstats.nVideoStartsFromTrans.push((new Date()).getTime());
-              window.startFromTran = true;
-
-              chstWord.trigger("startVideo", upword.get("start"));
-              secWord.trigger("infocus");
-
-              // USE STATS
-              window.setTimeout(function () {
-                window.startFromTran = false;
-              }, 800);
-
-            }
-          }
+          // disable selection on the body when dragging a breakpoint
+          $(document.body).addClass(consts.bpDragClass);
         }
       }
     },
