@@ -59,8 +59,9 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
 
       thisView.listenTo(thisModel, "gainfocus", function (mdl, val) {
         window.setTimeout(function () {
-          thisView.$el.find("." + consts.summaryDivClass)[0].focus();
-        }, 200);
+          thisView.focusSummary();
+          thisView.$el.focus();
+        }, 600);
       });
 
       // remove the view if the underlying model is removed
