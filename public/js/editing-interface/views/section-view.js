@@ -7,7 +7,8 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
     thumbClass: "section-thumbnail",
     takeThumbClass: "take-thumbnail-image",
     summaryDivClass: "abs-summary",
-    activeClass: "active"
+    activeClass: "active",
+    secWordClass: "secword"
   };
 
   return Backbone.View.extend({
@@ -25,6 +26,7 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
       'keyup .abs-summary': "summaryKeyUp",
       "click .remove-section": "removeSection",
       "blur .abs-summary": "blurSummary",
+      "focus .abs-summary": "focusSummary",
       "click" : "clickSection"
     },
 
@@ -76,7 +78,19 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
     },
 
     blurSummary: function () {
-      this.$el.attr('class', _.result(this, 'className'));
+      var thisView = this,
+          startWord = thisView.model.get("startWord");
+      thisView.$el.removeClass("focused");
+      thisView.$el.attr('class', _.result(thisView, 'className'));
+      startWord.trigger("unhighlight-section", startWord);
+    },
+
+    focusSummary: function (evt) {
+      var thisView = this,
+          startWord = thisView.model.get("startWord");
+      thisView.$el.addClass("focused");
+      startWord.trigger("unhighlight-section", startWord);
+      startWord.trigger("highlight-section", startWord);
     },
 
     summaryKeyUp: function (evt) {

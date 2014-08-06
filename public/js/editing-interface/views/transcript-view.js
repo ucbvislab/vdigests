@@ -17,7 +17,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
     jspTrackClass: "jspTrack",
     scrollMarkPrefix: "scrollmark-",
     activeClass: "active",
-    blinkClass: "blink-me"
+    secWordClass: "secword"
   };
 
   return Backbone.View.extend({
@@ -39,6 +39,8 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
       thisView.listenTo(words, "sectionToChapter", thisView.sectionToChapter);
       thisView.listenTo(words, "change:active", thisView.changeHighlight);
       thisView.listenTo(words, "focus", thisView.focusOnWord);
+      thisView.listenTo(words, "highlight-section", thisView.highlightSection);
+      thisView.listenTo(words, "unhighlight-section", thisView.unHighlightSection);
     },
 
     /**
@@ -376,11 +378,25 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
       if (window.jspApi) {
         window.jspApi.scrollToElement("#" + fword.cid, true, true);
       }
-      var $segMark =  $('#' + fword.cid).prevAll("." + consts.segStClass + ":first");
-      $segMark.addClass(consts.blinkClass);
-      window.setTimeout(function () {
-        $segMark.removeClass(consts.blinkClass);
-      }, 3300);
+    },
+
+    highlightSection: function (fword) {
+      // get the idxs
+      var nextWord = fword.getNextSectionStart(),
+          nextIdx = nextWord ? $("#" + nextWord.cid).data("idx") : Infinity,
+          thisIdx = $("#" + fword.cid).data("idx");
+
+      // mark the appropriate words TODO need to unmark them
+      var $words = this.$words || $(".word");
+      var $useWords = $words.filter(function (i, wrd) {
+        var idx = wrd.getAttribute("data-idx");
+        return idx >= thisIdx && idx < nextIdx ;
+      });
+      $useWords.addClass(consts.secWordClass);
+    },
+
+    unHighlightSection: function (wrd) {
+      $("." + consts.secWordClass).removeClass(consts.secWordClass);
     }
   });
 });

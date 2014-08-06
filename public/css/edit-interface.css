@@ -290,6 +290,11 @@ body.published .toolbar {
     border-left: 0;
 }
 
+.section-row.focused {
+    border: 1px solid rgba(56, 169, 240, 0.75);
+    box-shadow: 0px 0px 10px rgba(56, 169, 240, 0.75) !important;
+}
+
 .section-row:last-child {
     margin-bottom: 0;
 }
@@ -356,6 +361,7 @@ div.section-row.active, .viewing .section-row:hover {
 
 .section-text-wrap .abs-summary {
     border: none;
+    outline: none;
     font-size: 13px;
     min-height: 35px;
     height: 100%;
@@ -497,7 +503,11 @@ body.viewing .section-row .remove-section {
 
 /* so clicking near the word activates the word */
 .word {
-    padding: 5px 0;
+    padding: 0 2px;
+    line-height: 1.2em;
+    margin: 0;
+    margin-left: -5px;
+    padding-left: 5px;
 }
 .word:hover {
     color: #BBBBBB;
@@ -507,11 +517,16 @@ body.viewing .section-row .remove-section {
     background: rgb(255, 255, 111);
 }
 
+.secword {
+    background-color: #eeeeee;
+}
+
 .start-section-marker {
     width: 10px;
     height: 10px;
     background-color: blue;
     display: inline-block;
+    margin: 0 5px
 }
 
 .start-chapter-marker {
@@ -519,7 +534,7 @@ body.viewing .section-row .remove-section {
     height: 14px;
     background-color: red;
     display: inline-block;
-    margin-right: 13px;
+    margin-right: 18px;
 }
 .start-chapter-marker:after {
     content: "";
