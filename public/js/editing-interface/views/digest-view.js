@@ -59,7 +59,7 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
       });
 
       // videoLength change
-        thisView.listenTo(thisView.model, "change:videoLength", function (mdl, val) {
+      thisView.listenTo(thisView.model, "change:videoLength", function (mdl, val) {
         thisView.$el.find("#" + consts.videoLengthId).text(thisView.getVideoLengthString());
       });
 
@@ -88,7 +88,7 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
           return;
         }
 
-        if (curPlayingChap && curPlayingChap.get("state") !== 1 && curPlayingChap.get("state") === 3) {
+        if (curPlayingChap && curPlayingChap.get("state") !== 1 && curPlayingChap.get("state") === 3 && !thisView.chapTrans) {
             curPlayingSec && curPlayingSec.set("active", false);
             curPlayingChap = null;
             curPlayingSec = null;
@@ -148,6 +148,8 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
               if ((isSecEarly && curTime > secStart && secStart >= curNextSecStart)
                   || (!isSecEarly && curTime < secEnd && (secEnd <= curNextSecEnd))) {
                 curPlayingSec = sec;
+                curNextSecEnd = sec.getEndTime();
+                curNextSecStart = sec.getStartTime();
               }
             });
             curPlayingSec && curPlayingSec.set("active", true);
@@ -165,7 +167,7 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
             };
           });
         }
-      }, 30);
+      }, 40);
     },
 
     getVideoLengthString: function () {
