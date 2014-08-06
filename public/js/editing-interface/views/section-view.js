@@ -59,7 +59,6 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
 
       thisView.listenTo(thisModel, "gainfocus", function (mdl, val) {
         window.setTimeout(function () {
-          thisView.focusSummary();
           thisView.$el.focus();
         }, 600);
       });
