@@ -8,7 +8,8 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
     takeThumbClass: "take-thumbnail-image",
     summaryDivClass: "abs-summary",
     activeClass: "active",
-    secWordClass: "secword"
+    secWordClass: "secword",
+    splitClass: "split-section"
   };
 
   return Backbone.View.extend({
@@ -74,6 +75,9 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
       thisView.$el.html(thisView.template(thisView.model.attributes));
       // apply the dynamic classname
       thisView.$el.attr('class', _.result(this, 'className'));
+      window.setTimeout(function () {
+        thisView.el.focus();
+      }, 500);
       return thisView;
     },
 
@@ -130,6 +134,10 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
       thisModel.trigger("startVideo", thisModel.get("startWord").get("start"));
     },
 
+    splitSection: function () {
+        alert("not yet implemented");
+    },
+
     clickSection: function (evt) {
       var thisView = this,
           startWord = thisView.model.get("startWord"),
@@ -139,6 +147,8 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
         thisView.takeThumbnailImage(evt);
       } else if ($tar.hasClass(consts.thumbClass) || window.viewing) {
         thisView.startVideo();
+      } else if ($tar.hasClass(consts.splitClass)) {
+        thisView.splitSection();
       } else {
         startWord.trigger("focus", startWord);
         thisView.$el.find("." + consts.summaryDivClass).focus();

@@ -299,6 +299,20 @@ body.published .toolbar {
     margin-bottom: 0;
 }
 
+.editing .section-row + .section-row:hover .split-section {
+    content: "";
+    background: url('/img/split-icon.png');
+    background-size: 12px;
+    background-position: 10px 0;
+    width: 40px;
+    height: 20px;
+    position: absolute;
+    background-repeat: no-repeat;
+    top: -10px;
+    left: 196px;
+    cursor: pointer;
+}
+
 .viewing .section-row {
     cursor: pointer;
 }

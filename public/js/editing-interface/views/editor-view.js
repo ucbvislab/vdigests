@@ -82,6 +82,8 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
                     {label:'auto-summarize',    action:function() {  } }
                   ]});
               }, 100);
+
+              // split section components
             },
 
             /**

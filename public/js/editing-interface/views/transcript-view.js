@@ -71,6 +71,8 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
      */
     wordMouseOver: function (evt) {
       var thisView = this;
+
+      // if we're draging a marker
       if (thisView.$mdel && thisView.$mdel.mdStartPt) {
         // slight pause for smoother dragging
         var $curTar = $(evt.currentTarget);
@@ -91,6 +93,12 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
           }
           $placeMdl.before($mdel);
           thisView.moveScrollMarker($mdel);
+
+          // highlight from the marker to the next marker
+          var $words = this.$words || $(".word");
+          $words.removeClass(consts.secWordClass);
+          thisView.highlightSection(null, $placeMdl.data("idx"), fwdIndex);
+
         }, 30);
       }
     },
@@ -169,7 +177,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
 
       thisView.$mdel = $tar;
 
-      // add a section break
+      // add a section/chapter break
       if (evt.metaKey) {
         var $wordEl = $tar,
             changeType = "startSection";
@@ -240,8 +248,10 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
         }
       } // end alt-key
       else {
+        // mouse down without modifier
         var $fWord = thisView.$mdel.next();
         thisView.$mdel.origIndex = $fWord.data("idx");
+
         // make sure we leave the original segment
         if (thisView.$mdel.origIndex === 0) {
           return;
@@ -250,12 +260,11 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
         thisView.$mdel.mdStartPt = thisView.$mdel.hasClass(consts.segStClass);
         thisView.$mdel.isChap = thisView.$mdel.hasClass(consts.startChapterClass);
 
-        // we're clicking on a section/chapter breakpoint
-        var revIndex = -1,
+        var revIndex = 1,
             fwdIndex = Infinity,
             $mdel = thisView.$mdel;
 
-        // TODO some of this may be extra work
+        // TODO some of this may be extra work for certain cases
         thisView.$mdel.mouseOverClass = $mdel.isChap ? consts.dragChapClass : consts.dragSecClass;
         // get the forward section/chapter index
         var fwordModel = words.get($fWord.attr("id"));
@@ -263,6 +272,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
           thisView.$mdel.origWordModel = fwordModel;
           var fstartModel = fwordModel.getNextSectionStart();
           if (fstartModel) {
+            //fstartModel = fstartModel.prev;
             var $maxWord = $("#" + fstartModel.cid);
             $mdel.$maxWord = $maxWord;
             fwdIndex = $maxWord.data("idx");
@@ -272,6 +282,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
         if ($fWord.hasClass(consts.wordClass)) {
           var bstartModel = fwordModel.getPrevSectionStart();
           if (bstartModel) {
+            //maneebstartModel = bstartModel.next;
             var $minWord = $("#" + bstartModel.cid);
             $mdel.$minWord = $minWord;
             revIndex = $minWord.data("idx");
@@ -388,11 +399,11 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
       }
     },
 
-    highlightSection: function (fword) {
+    highlightSection: function (fword, thisIdx, nextIdx) {
       // get the idxs
-      var nextWord = fword.getNextSectionStart(),
-          nextIdx = nextWord ? $("#" + nextWord.cid).data("idx") : Infinity,
-          thisIdx = $("#" + fword.cid).data("idx");
+      var nextWord = nextIdx ? null : fword.getNextSectionStart();
+          nextIdx = typeof(nextIdx) === "undefined" ?  (nextWord ? $("#" + nextWord.cid).data("idx") : Infinity) : nextIdx,
+            thisIdx = typeof(thisIdx) === "undefined" ? $("#" + fword.cid).data("idx") : thisIdx;
 
       // mark the appropriate words TODO need to unmark them
       var $words = this.$words || $(".word");
@@ -401,6 +412,7 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
         return idx >= thisIdx && idx < nextIdx ;
       });
       $useWords.addClass(consts.secWordClass);
+      this.$words = $words;
     },
 
     unHighlightSection: function (wrd) {
