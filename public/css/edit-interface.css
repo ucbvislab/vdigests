@@ -309,7 +309,8 @@ body.published .toolbar {
     position: absolute;
     background-repeat: no-repeat;
     top: -10px;
-    left: 196px;
+    left: 50%;
+    margin-left: -20px;
     cursor: pointer;
 }
 

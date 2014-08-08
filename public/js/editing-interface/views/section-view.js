@@ -138,8 +138,13 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
         if (window.transView) {
           var thisView = this,
               stWordModel = thisView.model.get("startWord");
-          stWordModel.set("startChapter", true);
+
+          // USE STATS
+          window.vdstats.nSec2Chap.push((new Date()).getTime());
+          window.changingSecChap = true;
+
           window.transView.changeStartSection(stWordModel, false);
+          stWordModel.set("startChapter", true);
         } else {
           alert("unable to split chapter -- transcript object did not load correctly. Try saving then reloading.");
         }
