@@ -106,7 +106,7 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
         // USE STATS
         window.vdstats.nSummaryEdits.push((new Date()).getTime());
       }
-      this.$el.attr('class', _.result(this, 'className'));
+      //this.$el.attr('class', _.result(this, 'className'));
     },
 
     removeSection: function (evt) {
@@ -135,7 +135,14 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
     },
 
     splitSection: function () {
-        alert("not yet implemented");
+        if (window.transView) {
+          var thisView = this,
+              stWordModel = thisView.model.get("startWord");
+          stWordModel.set("startChapter", true);
+          window.transView.changeStartSection(stWordModel, false);
+        } else {
+          alert("unable to split chapter -- transcript object did not load correctly. Try saving then reloading.");
+        }
     },
 
     clickSection: function (evt) {

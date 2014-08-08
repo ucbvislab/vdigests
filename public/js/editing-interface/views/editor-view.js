@@ -95,6 +95,7 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
               // prep the subviews
               thisView.digestView = thisView.digestView || new DigestView({model: thisView.model.get("digest")});
               thisView.transView = thisView.transView || new TranscriptView({model: thisView.model.get("transcript")});
+              window.transView = thisView.transView;
 
               // now add the digest and transcript view components to the editor template shell using the assign method
               var assignObj = {};

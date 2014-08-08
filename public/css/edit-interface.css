@@ -302,8 +302,8 @@ body.published .toolbar {
 .editing .section-row + .section-row:hover .split-section {
     content: "";
     background: url('/img/split-icon.png');
-    background-size: 12px;
-    background-position: 10px 0;
+    background-size: 15px;
+    background-position: 0px 5px;
     width: 40px;
     height: 20px;
     position: absolute;
