@@ -9,7 +9,9 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
     summaryDivClass: "abs-summary",
     activeClass: "active",
     secWordClass: "secword",
-    splitClass: "split-section"
+    splitDownClass: "split-down",
+    mergeUpClass: "merge-up"
+
   };
 
   return Backbone.View.extend({
@@ -134,7 +136,39 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
       thisModel.trigger("startVideo", thisModel.get("startWord").get("start"));
     },
 
-    splitSection: function () {
+    mergeSectionUp: function() {
+      if (window.transView) {
+        var thisView = this,
+            stWord = thisView.model.get("startWord"),
+            pchapModel = stWord.getPrevChapterStart(true);
+
+
+        // TODO have to get chapter start, change it
+        window.vdstats.nChap2Sec.push((new Date()).getTime());
+        window.changingSecChap = true;
+
+        // make sure we're not changing the first chapter
+        if (pchapModel.getPrevSectionStart()) {
+          pchapModel.set("startChapter", false);
+          window.transView.changeStartSection(pchapModel, true);
+          // USE STATS
+          window.changingSecChap = false;
+        }
+
+        // get the next section (if it exists and change to a chapter)
+        var nxtSecWord = stWord.getNextSectionStart();
+        if (nxtSecWord) {
+          window.transView.changeStartSection(nxtSecWord, false);
+          nxtSecWord.set("startChapter", true);
+        }
+
+      } else {
+        alert("unable to split chapter -- transcript object did not load correctly. Try saving then reloading.");
+      }
+
+    },
+
+    splitSectionDown: function () {
         if (window.transView) {
           var thisView = this,
               stWordModel = thisView.model.get("startWord");
@@ -159,8 +193,10 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
         thisView.takeThumbnailImage(evt);
       } else if ($tar.hasClass(consts.thumbClass) || window.viewing) {
         thisView.startVideo();
-      } else if ($tar.hasClass(consts.splitClass)) {
-        thisView.splitSection();
+      } else if ($tar.hasClass(consts.splitDownClass)) {
+        thisView.splitSectionDown();
+      } else if ($tar.hasClass(consts.mergeUpClass)) {
+        thisView.mergeSectionUp();
       } else {
         startWord.trigger("focus", startWord);
         thisView.$el.find("." + consts.summaryDivClass).focus();
