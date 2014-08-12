@@ -168,20 +168,29 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
 
     },
 
-    splitSectionDown: function () {
-        if (window.transView) {
-          var thisView = this,
-              stWordModel = thisView.model.get("startWord");
+    mergeSectionDown: function () {
+      if (window.transView) {
+        var thisView = this,
+            stWord = thisView.model.get("startWord"),
+            nchapModel = stWord.getNextChapterStart(true);
 
-          // USE STATS
-          window.vdstats.nSec2Chap.push((new Date()).getTime());
-          window.changingSecChap = true;
 
-          window.transView.changeStartSection(stWordModel, false);
-          stWordModel.set("startChapter", true);
-        } else {
-          alert("unable to split chapter -- transcript object did not load correctly. Try saving then reloading.");
+        // check that we have a next chapter
+        if (nchapModel) {
+          nchapModel.set("startChapter", false);
+          window.transView.changeStartSection(nchapModel, true);
         }
+
+        // get the prev section (if it exists and change to a chapter)
+        var prevSecWord = stWord.getPrevSectionStart(true);
+        if (prevSecWord) {
+          window.transView.changeStartSection(prevSecWord, false);
+          prevSecWord.set("startChapter", true);
+        }
+
+      } else {
+        alert("unable to split chapter -- transcript object did not load correctly. Try saving then reloading.");
+      }
     },
 
     clickSection: function (evt) {
@@ -194,7 +203,7 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
       } else if ($tar.hasClass(consts.thumbClass) || window.viewing) {
         thisView.startVideo();
       } else if ($tar.hasClass(consts.splitDownClass)) {
-        thisView.splitSectionDown();
+        thisView.mergeSectionDown();
       } else if ($tar.hasClass(consts.mergeUpClass)) {
         thisView.mergeSectionUp();
       } else {
