@@ -299,7 +299,7 @@ body.published .toolbar {
     margin-bottom: 0;
 }
 
-.editing .section-row + .section-row:hover .split-down {
+.editing .section-row:hover .split-down {
     content: "";
     background: url('/img/split-icon.png');
     background-size: 15px;
@@ -329,6 +329,13 @@ body.published .toolbar {
     cursor: pointer;
 }
 
+.editing .chapter:first-child .section-row:first-child:hover .merge-up, .editing .chapter:first-child .section-row:first-child:hover .split-down {
+    background: none;
+}
+
+.editing .section-row:hover .merge-up {
+    margin: 0;
+}
 
 .viewing .section-row {
     cursor: pointer;
@@ -472,7 +479,7 @@ body.viewing .section-row .remove-section {
 
 #transcript-wrap {
     padding-top: 5px;
-    width: 40%;
+    width: 39.96%;
     line-height: 16px;
     height: inherit;
     float: left;
