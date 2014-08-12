@@ -299,42 +299,31 @@ body.published .toolbar {
     margin-bottom: 0;
 }
 
-.editing .section-row:hover .split-down {
+.editing .section-row:hover .split-down, .editing .section-row:hover .merge-up {
     content: "";
-    background: url('/img/split-icon.png');
-    background-size: 15px;
+    background-size: 12px;
     background-position: 0px 5px;
     width: 40px;
     height: 25px;
     position: absolute;
     background-repeat: no-repeat;
-    top: -18px;
     left: 50%;
     margin-left: -5px;
     cursor: pointer;
 }
 
+.editing .section-row:hover .split-down {
+    background-image: url('/img/split-icon.png');
+    top: -12px;
+}
+
 .editing .section-row:hover .merge-up {
-    content: "";
-    background: url('/img/split-icon-up.png');
-    background-size: 15px;
-    background-position: 0px 5px;
-    width: 40px;
-    height: 20px;
-    position: absolute;
-    background-repeat: no-repeat;
-    bottom: -12px;
-    left: 50%;
-    margin-left: -5px;
-    cursor: pointer;
+    background-image: url('/img/split-icon-up.png');
+    bottom: -19px;
 }
 
 .editing .chapter:first-child .section-row:first-child:hover .merge-up, .editing .chapter:first-child .section-row:first-child:hover .split-down {
     background: none;
-}
-
-.editing .section-row:hover .merge-up {
-    margin: 0;
 }
 
 .viewing .section-row {
