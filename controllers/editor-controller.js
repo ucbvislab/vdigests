@@ -413,27 +413,31 @@ exports.postNewVD = function(req, res, next) {
                       return;
                     }
 
-                    // send email to user
-                    var from = "admin@video-digest.com";
-                    var name = "video-digest admin";
-                    var body = "Hello " + req.user.profile.name +",\n\n"
-                          + "The transcript-video alignment is finished and you may now edit your video digest at: " + req.headers.host + "/editor#edit/" + vdigest._id + "\n\n"
-                          + "Best wishes,\n -Friendly Neighborhood Video Digest Bot";
+                    // now generate the sentences
+                    var sentCall = "python add_sentences " + vdigest.id;
+                    exec(sentCall, {cwd: spaths.analysis}, function () {
+                      // send email to user
+                      var from = "admin@video-digest.com";
+                      var name = "video-digest admin";
+                      var body = "Hello " + req.user.profile.name +",\n\n"
+                            + "The transcript-video alignment is finished and you may now edit your video digest at: " + req.headers.host + "/editor#edit/" + vdigest._id + "\n\n"
+                            + "Best wishes,\n -Friendly Neighborhood Video Digest Bot";
 
-                    var to = req.user.email;
-                    var subject = 'Video Digests: Video-transcript alignment complete';
+                      var to = req.user.email;
+                      var subject = 'Video Digests: Video-transcript alignment complete';
 
-                    var mailOptions = {
-                      to: to,
-                      from: from,
-                      subject: subject,
-                      text: body
-                    };
+                      var mailOptions = {
+                        to: to,
+                        from: from,
+                        subject: subject,
+                        text: body
+                      };
 
-                    smtpTransport.sendMail(mailOptions, function(err) {
-                      if (err) {
-                        console.log(err);
-                      }
+                      smtpTransport.sendMail(mailOptions, function(err) {
+                        if (err) {
+                          console.log(err);
+                        }
+                      });
                     });
                   });
                 });
@@ -486,12 +490,30 @@ exports.getAutoSeg = function (req, res, next) {
     }
 
     function doSysCall() {
-      debugger;
       var rtxtfile = vdigest.getSSFile();
       var segSysCall = "python adv_seg.py eval " + spaths.segConfigFile + " " + rtxtfile;
       // execute system call
+      if (!vdigest.sentSepTransName) {
+        console.log("trying to generate separated transcript");
+        var scmd = "python add_sentences.py " + vdigest.id;
+        console.log( scmd );
+
+        exec(scmd, {cwd: spaths.utils}, function (err, stdout, stderr) {
+          if (err) {
+            console.log("error: " + err);
+            console.log("error: " + stderr);
+            return returnErrorJson(res, {msg: "error processing transcript - please try again later"}, 500);
+          } else {
+            doSysCall();
+          }
+        });
+      } else {
+        
       console.log(segSysCall);
-      var segProc = exec(segSysCall, {cwd: spaths.analysis}, function (error, stdout, stderr) {
+      var segProc = exec(segSysCall, {cwd: spaths.utils}, function (error, stdout, stderr) {
+        if (error) {
+          return returnJson(res, {"msg": "Unable to segment the transcript"}, 500);
+        }
         console.log("finished segmentation");
         // get sentence breaks from stdout
         try{
@@ -504,6 +526,7 @@ exports.getAutoSeg = function (req, res, next) {
         // read results from system call or return error
         // return the word/sentence numbers
       });
+      }
     }
   });
 
