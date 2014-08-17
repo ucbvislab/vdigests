@@ -490,6 +490,7 @@ exports.getAutoSeg = function (req, res, next) {
     }
 
     function doSysCall() {
+      debugger;
       var rtxtfile = vdigest.getSSFile();
       var segSysCall = "python adv_seg.py eval " + spaths.segConfigFile + " " + rtxtfile;
       // execute system call
@@ -508,24 +509,21 @@ exports.getAutoSeg = function (req, res, next) {
           }
         });
       } else {
-        
-      console.log(segSysCall);
-      var segProc = exec(segSysCall, {cwd: spaths.utils}, function (error, stdout, stderr) {
-        if (error) {
-          return returnJson(res, {"msg": "Unable to segment the transcript"}, 500);
-        }
-        console.log("finished segmentation");
-        // get sentence breaks from stdout
-        try{
-          var sps = stdout.split("\n");
-          var sentBreaks = sps[sps.length-4];
-          return returnJson(res, {breaks: sentBreaks});
-        } catch (e) {
-          return returnErrorJson(res, {"msg": "Segmentation error -- please try again"});
-        }
-        // read results from system call or return error
-        // return the word/sentence numbers
-      });
+        debugger;
+        console.log(segSysCall);
+        var segProc = exec(segSysCall, {cwd: spaths.analysis}, function (error, stdout, stderr) {
+          console.log("finished segmentation");
+          // get sentence breaks from stdout
+          try{
+            var sps = stdout.split("\n");
+            var sentBreaks = sps[sps.length-4];
+            return returnJson(res, {breaks: sentBreaks});
+          } catch (e) {
+            return returnErrorJson(res, {"msg": "Segmentation error -- please try again"});
+          }
+          // read results from system call or return error
+          // return the word/sentence numbers
+        });
       }
     }
   });
