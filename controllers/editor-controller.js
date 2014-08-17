@@ -32,6 +32,25 @@ var smtpTransport = nodemailer.createTransport('SMTP', {
   }
 });
 
+
+// Helper functions
+var returnJson = function (res, data, code) {
+  code = code || 200;
+  res.writeHead(code, {'content-type': 'application/json'});
+  res.write(JSON.stringify(data));
+  res.end();
+};
+
+// Helper functions
+var returnErrorJson = function (res, data, code) {
+  code = code || 400;
+  res.writeHead(code, {'content-type': 'application/json'});
+  res.write(JSON.stringify(data));
+  res.end();
+};
+
+
+
 /**
  * Returns the editor js template (TODO consider bootstraping data)
  */
@@ -440,4 +459,53 @@ exports.postNewVD = function(req, res, next) {
     }
   });
   return;
+};
+
+
+exports.getAutoSeg = function (req, res, next) {
+  // get the transcript
+  VDigest.findById(req.params.vdid, function (err, vdigest) {
+    if (err || !vdigest) {
+      return returnErrorJson(res, err);
+    }
+
+    if (!vdigest.rawTransName) {
+      var transText = vdigest.alignTrans.words.map(function (wrd) {
+        return wrd.word;
+      }).join(" ").replace(" {p}", "");
+      vdigest.rawTransName = Math.random().toString(36).substr(6) + ".txt";
+      var outfile = path.join(spaths.rawTrans, vdigest.rawTransName);
+      fs.writeFile(outfile, transText, function (err) {
+        if (err) {
+          return returnErrorJson(res, err, 500);
+        }
+        doSysCall();
+      });
+    } else {
+      doSysCall();
+    }
+
+    function doSysCall() {
+      debugger;
+      var rtxtfile = vdigest.getSSFile();
+      var segSysCall = "python adv_seg.py eval " + spaths.segConfigFile + " " + rtxtfile;
+      // execute system call
+      console.log(segSysCall);
+      var segProc = exec(segSysCall, {cwd: spaths.analysis}, function (error, stdout, stderr) {
+        console.log("finished segmentation");
+        // get sentence breaks from stdout
+        try{
+          var sps = stdout.split("\n");
+          var sentBreaks = sps[sps.length-4];
+          return returnJson(res, {breaks: sentBreaks});
+        } catch (e) {
+          return returnErrorJson(res, {"msg": "Segmentation error -- please try again"});
+        }
+        // read results from system call or return error
+        // return the word/sentence numbers
+      });
+    }
+  });
+
+
 };

@@ -125,9 +125,12 @@ app.get('/', homeController.index);
 // TODO separate editor from the viewer
 app.get('/view/:ptitle', editorController.getEditor);
 app.get('/editor', editorController.getEditor);
+
 // TODO make more restful
 app.get('/digestdata/:vdid', editorController.getDigestData);
 app.post('/digestpublish/:vdid', passportConf.isAuthenticated, editorController.postPublishDigest);
+app.get('/autoseg/:vdid', editorController.getAutoSeg);
+
 // TODO add Authorization
 app.post('/digestdata/:vdid', passportConf.isAuthenticated, editorController.postDigestData);
 app.get('/checkstatus', editorController.getStatus);

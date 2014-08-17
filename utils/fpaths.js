@@ -18,3 +18,7 @@ exports.getAudioFile = function (aid) {
 exports.getScreenShotFile = function (base, time) {
   return path.join(spaths.screenshots, base + "--" + time + ".jpg");
 };
+
+exports.getSSTransFile = function (vid) {
+    return path.join(spaths.ssTrans, "ss-" + vid);
+};

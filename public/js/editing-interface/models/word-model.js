@@ -12,7 +12,8 @@ define(["backbone", "underscore", "jquery"], function (Backbone, _, $) {
         speaker: -1,
         startSection: false,
         startChapter: false,
-        active: false
+        active: false,
+        sentenceNumber: -1
       };
     },
 

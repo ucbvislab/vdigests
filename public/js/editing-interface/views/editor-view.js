@@ -73,12 +73,50 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
               // FIXME jScrollPane needs to be called after DOM insertion?
               window.setTimeout(function () {
                 var el = thisView.$el.find("#" + consts.transWrapId).jScrollPane({autoReinitialise: true, autoReinitialiseDelay: 2000});
+
                 // TODO bad globals
                 window.jspApi = el.data("jsp");
 
                 $('.editor-wrap').contextPopup({
                   items: [
-                    {label:'auto-segment',    action:function() {  } },
+                    {label:'auto-segment',
+                     action: function() {
+                      if (confirm("Are you sure you want to auto-segment this video digest? This will erase all of your current edits.")) {
+                        // show loading screen
+                        var loadDiv = document.createElement("div");
+                        loadDiv.className = "full-cover-loading";
+                        loadDiv.innerHTML = "Segmenting...";
+                        window.document.body.appendChild(loadDiv);
+                        $.get("/autoseg/" + window.dataname)
+                        .success(function (resp) {
+                          if (resp.breaks) {
+                            var sbreaks = eval(resp.breaks);
+                            // remove all current sections
+                            // iterate over the transcript and place breaks when appropriate
+                            var sentCount = 1,
+                                nextWordIsSec = false,
+                                curSent = 0;
+                            thisView.model.get("transcript").get("words").each(function (wrd, i) {
+                              if (i > 0) {
+                                wrd.set("startChapter", false);
+                                if (wrd.prev.get("sentenceNumber") !== wrd.get("sentenceNumber") && sbreaks.indexOf(wrd.get("sentenceNumber")) > -1) {
+                                  wrd.set("startSection", true);
+                                } else {
+                                  wrd.set("startSection", false);
+                                }
+                              }
+                            });
+
+                          }
+                          console.log(resp);
+                        })
+                        .error(function () {
+                        })
+                        .complete(function () {
+                          loadDiv.parentElement.removeChild(loadDiv);
+                        });
+                      }
+                    } },
                     {label:'auto-summarize',    action:function() {  } }
                   ]});
               }, 100);

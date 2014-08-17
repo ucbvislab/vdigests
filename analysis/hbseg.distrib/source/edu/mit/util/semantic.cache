@@ -1,0 +1,15 @@
+;; Object util/
+;; SEMANTICDB Tags save file
+(semanticdb-project-database-file "util/"
+  :tables (list 
+   (semanticdb-table "JacobUtil.java"
+    :major-mode 'jde-mode
+    :tags '(("edu.mit.util" package nil nil [1 22]) ("java.util.ArrayList" include nil nil [24 51]) ("JacobUtil" type (:typemodifiers ("public") :members (("getIntArray" function (:typemodifiers ("public" "static") :arguments (("array_string" variable (:type "String") (reparse-symbol formal_parameters) [1040 1059])) :type "ArrayList") (reparse-symbol class_member_declaration) [1004 1309]) ("formatArray" function (:typemodifiers ("public" "static") :arguments (("fmtstring" variable (:type "String") (reparse-symbol formal_parameters) [1348 1364]) ("delimiter" variable (:type "String") (reparse-symbol formal_parameters) [1366 1382]) ("array" variable (:type "double[]") (reparse-symbol formal_parameters) [1384 1398])) :type "String") (reparse-symbol class_member_declaration) [1315 1760]) ("formatArray" function (:typemodifiers ("public" "static") :arguments (("fmtstring" variable (:type "String") (reparse-symbol formal_parameters) [1798 1814]) ("delimiter" variable (:type "String") (reparse-symbol formal_parameters) [1816 1832]) ("array" variable (:type "int[]") (reparse-symbol formal_parameters) [1834 1845])) :type "String") (reparse-symbol class_member_declaration) [1765 2199]) ("formatArray" function (:typemodifiers ("public" "static") :arguments (("delimiter" variable (:type "String") (reparse-symbol formal_parameters) [2237 2253]) ("array" variable (:type "String[]") (reparse-symbol formal_parameters) [2255 2269])) :type "String") (reparse-symbol class_member_declaration) [2204 2573]) ("getNumArray" function (:throws ("Exception") :typemodifiers ("public" "static") :arguments (("spec" variable (:type "String") (reparse-symbol formal_parameters) [2618 2629])) :type "double[]") (reparse-symbol class_member_declaration) [2583 4018]) ("main" function (:typemodifiers ("public" "static") :arguments (("argv[]" variable (:type "String") (reparse-symbol formal_parameters) [4047 4060])) :type "void") (reparse-symbol class_member_declaration) [4023 4403])) :type "class") nil [53 4405]))
+    :file "JacobUtil.java"
+    :pointmax 4406
+    )
+   )
+  :file "semantic.cache"
+  :semantic-tag-version "2.0pre3"
+  :semanticdb-version "2.0pre3"
+  )

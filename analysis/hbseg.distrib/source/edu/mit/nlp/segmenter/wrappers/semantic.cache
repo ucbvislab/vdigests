@@ -1,0 +1,15 @@
+;; Object wrappers/
+;; SEMANTICDB Tags save file
+(semanticdb-project-database-file "wrappers/"
+  :tables (list 
+   (semanticdb-table "HBayesWrapper.java"
+    :major-mode 'jde-mode
+    :tags '(("edu.mit.nlp.segmenter.wrappers" package nil nil [1 40]) ("edu.mit.nlp.segmenter.hierarchical.*" include nil nil [42 86]) ("edu.mit.nlp.MyTextWrapper" include nil nil [87 120]) ("edu.mit.nlp.segmenter.*" include nil nil [121 152]) ("java.util.List" include nil nil [153 175]) ("java.util.ArrayList" include nil nil [176 203]) ("java.io.PrintStream" include nil nil [204 231]) ("HBayesWrapper" type (:typemodifiers ("public") :superclasses "SegDurParametrizable" :members (("HBayesWrapper" function (:constructor-flag t :typemodifiers ("public")) (reparse-symbol class_member_declaration) [578 648]) ("setPrintStream" function (:typemodifiers ("public") :arguments (("out" variable (:type "PrintStream") (reparse-symbol formal_parameters) [680 695])) :type "void") (reparse-symbol class_member_declaration) [653 777]) ("initialize" function (:typemodifiers ("public") :arguments (("config_filename" variable (:type "String") (reparse-symbol formal_parameters) [805 827])) :type "void") (reparse-symbol class_member_declaration) [782 1049]) ("segmentTexts" function (:typemodifiers ("public") :arguments (("texts" variable (:type "MyTextWrapper[]") (reparse-symbol formal_parameters) [1329 1350]) ("num_segs" variable (:type "int[]") (reparse-symbol formal_parameters) [1352 1366])) :type "List[]") (reparse-symbol class_member_declaration) [1302 2256]) ("setDebug" function (:typemodifiers ("public") :arguments (("debug" variable (:type "boolean") (reparse-symbol formal_parameters) [2282 2295])) :type "void") (reparse-symbol class_member_declaration) [2261 2366]) ("setEDurs" function (:typemodifiers ("public") :arguments (("edurs" variable (:type "double[]") (reparse-symbol formal_parameters) [2527 2541])) :type "void") (reparse-symbol class_member_declaration) [2506 2772]) ("r" variable (:type "double[][]") (reparse-symbol class_member_declaration) [2777 2790]) ("segmenter" variable (:type "HBayesSegEM") (reparse-symbol class_member_declaration) [2795 2817]) ("m_params" variable (:type "SegTesterParams") (reparse-symbol class_member_declaration) [2822 2847])) :type "class") nil [516 2854]))
+    :file "HBayesWrapper.java"
+    :pointmax 2855
+    )
+   )
+  :file "semantic.cache"
+  :semantic-tag-version "2.0pre3"
+  :semanticdb-version "2.0pre3"
+  )

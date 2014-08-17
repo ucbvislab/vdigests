@@ -1,0 +1,132 @@
+<project name="bayesseg" default="build">
+  <description>Build the source for the Bayesian discourse segmentation described in:
+    "Bayesian Unsupervised Topic Segmentation" (Eisenstein and Barzilay, EMNLP 2008)
+    "Unsupervised Hierarchical Segmentation from Multi-Scale Lexical Cohesion", (Eisenstein, submitted to NAACL 2009)</description>
+  <property name="src" location="source"/>
+  <property name="build" location="classes"/>
+  <property name="docs" location="doc"/>
+  <path id="class.path">
+    <fileset dir="lib">
+      <include name="*.jar"/>
+    </fileset>
+    <pathelement path="${build}"/>
+  </path>
+  <target name="build"> 
+    <!-- Compile the java code -->
+    <javac srcdir="${src}" 
+	   destdir="${build}"
+	   classpathref="class.path"
+           excludes="**/old/*,**/hidden/*"
+           verbose="false"
+           Debug = "on"
+           debuglevel="lines,vars,source"
+	   includejavaruntime="false"
+	   includeantruntime="false"
+	   />      
+  </target>
+  <target name="clean">
+    <delete dir="${build}"/>
+    <mkdir dir="${build}"/>
+  </target>
+  <target name="rebuild" depends="clean,build"/>
+  <target name="hsave">
+  <tar destfile="../bayesseg.tar.gz" compression="gzip">
+  <tarfileset dir="." prefix="bayesseg">
+  <include name="build.xml"/>
+  <include name="config/**"/>
+  <include name="classes"/>
+  <include name="data/**"/>
+        <!-- these files are excluded for licensing reasons -->
+        <exclude name="data/icsi/transcripts"/>
+        <exclude name="data/icsi/transcripts/**/*"/>
+        <exclude name="data/icsi/para_experiment"/>
+        <exclude name="data/icsi/para_experiment/**/*"/>
+        <exclude name="data/icsi/choi_segment"/>
+        <exclude name="data/icsi/choi_segment/**/*"/>
+        <include name="eval_hier"/>
+        <include name="eval_icsi"/>
+        <include name="hconfig/**"/>
+        <include name="hresults-naacl/*"/>
+        <include name="hsegment"/>
+        <include name="hbayesseg.cmd"/>
+        <include name="lib/*.jar"/>
+        <exclude name="**/.svn/**"/>
+        <exclude name="**/hidden/**"/>
+        <include name="log.config"/>
+        <include name="README"/>
+        <include name="segment"/>
+        <include name="source/**"/>
+  </tarfileset>
+  </tar>
+  </target>      
+  <target name="save">
+    <tar destfile="../bayesseg.tar.gz"
+         compression="gzip">
+      <tarfileset dir = "." prefix="bayesseg">
+        <!-- these files are excluded for licensing reasons -->
+        <exclude name="data/icsi/transcripts"/>
+        <exclude name="data/icsi/transcripts/**/*"/>
+        <exclude name="data/icsi/para_experiment"/>
+        <exclude name="data/icsi/para_experiment/**/*"/>
+        <exclude name="data/icsi/choi_segment"/>
+        <exclude name="data/icsi/choi_segment/**/*"/>
+        <exclude name="ruby"/>
+        <exclude name="hidden"/>
+        <exclude name="mincutsource"/>
+        <exclude name="scripts"/>
+        <exclude name="baselines/**"/>
+        <exclude name="classes/**"/>
+        <exclude name="mincutsource/**"/>
+        <exclude name="**/.svn/**"/>
+        <exclude name="**/hidden/**"/>
+<!--         <exclude name="baselines/lcseg"/> -->
+<!--         <exclude name="baselines/lcseg/**/*"/> -->
+      </tarfileset>
+      </tar>
+  </target>
+  <target name="docs" depends="build">
+    <delete dir="${docs}/api" quiet="true"/>
+    <mkdir dir="${docs}/api" />
+    <javadoc
+       packagenames="edu.mit.*"
+       sourcepath="${src}"
+       additionalparam="-breakiterator"
+       destdir="${docs}/api"
+       classpathref="class.path"
+       version="true"
+       author="true"
+       use="true"
+       source="1.5"
+       maxmemory="512M"
+       overview="${docs}/overview.html"
+       windowtitle="Bayesian Discourse Segmentation Specification">
+      <link href="http://java.sun.com/j2se/1.5/docs/api"/>
+      <link href="http://acs.lbl.gov/~hoschek/colt/api"/>
+      <link href="http://people.csail.mit.edu/igorm/acl06/docs/api"/>
+        <!-- maybe put a link to Igor's javadoc??-->
+      <bottom><![CDATA[<i>Copyright &#169; 2008 MIT. All Rights Reserved.</i>]]></bottom>
+      <doctitle>"Bayesian Discourse Segmentation Specification"</doctitle>
+    </javadoc>
+  </target>
+<!--   <taskdef name="lint4j" classname="com.jutils.lint4j.ant.Lint4jAntTask"> -->
+<!--     <classpath><pathelement location="/home/jacobe/installs/lint4j-0.9.1/jars/lint4j.jar"/></classpath> -->
+<!--   </taskdef> -->
+  <target name="lint" description="run lint4j on the source">
+    <lint4j packages="edu.mit.segmenter.nlp.*">
+      <sourcepath>
+	<pathelement path="source/edu/mit/nlp/segmenter/*.java"/>
+	<pathelement path="source/edu/mit/nlp/segmenter/hierarchical/HBayesSegN.java"/>
+        <pathelement path="source/edu/mit/nlp/segmenter/dp/*.java"/>
+      </sourcepath>
+      <classpath>
+        <fileset dir="lib">
+          <include name="*.jar"/>
+        </fileset>
+        <pathelement path="${build}"/>
+      </classpath>
+      <formatters>
+        <formatter type="text" />
+      </formatters>
+    </lint4j>
+  </target>
+</project>

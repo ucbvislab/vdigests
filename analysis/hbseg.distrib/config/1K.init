@@ -1,0 +1,94 @@
+{update-params-period=10, use-duration=false, dirichlet-prior-range=.0001,.1,20,M, remove-stop-words=true, chi-squared-analysis=false, update-lm-period=100, max-burnin-temp=1, careful-debug=false, lambda-b=1, em-param-search=false, segmenter=edu.mit.nlp.segmenter.mcmc.CuCoSeg, max-move=50, output-period=100, window-size=10, num-mcmc-moves=1000, phi-b-0=.01, use-fixed-blocks=false, cooling-duration=.25, dirichlet-prior=.2, use-choi-style-boundaries=true, cuephrase-file=config/CUEPHRASES.hl, initializer-old=edu.mit.nlp.segmenter.RandomSegmenter, phi-o-0=.005, num-segs-known=true, window-size-range=10,25,16,A, use-word-stems=true, initializer=edu.mit.nlp.segmenter.dp.BayesWrapper, stop-words=config/STOPWORD.list, burnin-duration=.25, segmentation-dispersion=1, segmentation-dispersion-range=.1,100,20,M, use-extra-features=false, mcem-cuephrases=false, lambda-o=0}
+data/icsi/choi_segment/Bmr022.ref
+data/icsi/choi_segment/Bmr005.ref
+data/icsi/choi_segment/Bmr024.ref
+data/icsi/choi_segment/Bmr007.ref
+data/icsi/choi_segment/Bmr025.ref
+data/icsi/choi_segment/Bmr008.ref
+data/icsi/choi_segment/Bmr026.ref
+data/icsi/choi_segment/Bro015.ref
+data/icsi/choi_segment/Bmr009.ref
+data/icsi/choi_segment/Bmr027.ref
+data/icsi/choi_segment/Bmr029.ref
+data/icsi/choi_segment/Bed011.ref
+data/icsi/choi_segment/Bmr010.ref
+data/icsi/choi_segment/Bmr011.ref
+data/icsi/choi_segment/Bmr012.ref
+data/icsi/choi_segment/Bmr013.ref
+data/icsi/choi_segment/Bmr014.ref
+data/icsi/choi_segment/Bro004.ref
+data/icsi/choi_segment/Bmr018.ref
+data/icsi/choi_segment/Bro007.ref
+data/icsi/choi_segment/Bed003.ref
+data/icsi/choi_segment/Bed004.ref
+data/icsi/choi_segment/Bmr001.ref
+data/icsi/choi_segment/Bmr002.ref
+data/icsi/choi_segment/Bmr021.ref
+running initializerINITIAL SEGMENTATION: 
+data/icsi/choi_segment/Bmr022.ref: [636, 899, 1315, 1321]
+data/icsi/choi_segment/Bmr005.ref: [233, 234, 657, 935, 1049, 1372]
+data/icsi/choi_segment/Bmr024.ref: [690, 704, 705, 1393, 1866, 1867, 1868, 1869, 1870, 1964]
+data/icsi/choi_segment/Bmr007.ref: [472, 1016, 1216, 1528, 1863, 1864]
+data/icsi/choi_segment/Bmr025.ref: [4, 61, 310, 506, 582, 877]
+data/icsi/choi_segment/Bmr008.ref: [581, 1588, 2135]
+data/icsi/choi_segment/Bmr026.ref: [227, 228, 229, 611, 1027, 1028, 1031]
+data/icsi/choi_segment/Bro015.ref: [27, 94, 147, 184]
+data/icsi/choi_segment/Bmr009.ref: [948, 1211, 1966]
+data/icsi/choi_segment/Bmr027.ref: [751, 840, 1165]
+data/icsi/choi_segment/Bmr029.ref: [1048]
+data/icsi/choi_segment/Bed011.ref: [202, 563, 564, 866, 1093, 1135]
+data/icsi/choi_segment/Bmr010.ref: [1, 384, 385, 987, 988, 989, 1310]
+data/icsi/choi_segment/Bmr011.ref: [589, 590, 591, 1025, 1271, 1272, 1273, 1426]
+data/icsi/choi_segment/Bmr012.ref: [421, 619, 620, 871, 872, 970]
+data/icsi/choi_segment/Bmr013.ref: [246, 784, 1102, 1107, 1347, 1376]
+data/icsi/choi_segment/Bmr014.ref: [307, 507, 509, 510, 973, 974, 976]
+data/icsi/choi_segment/Bro004.ref: [632, 891, 1344, 1534]
+data/icsi/choi_segment/Bmr018.ref: [428, 429, 430, 975, 976, 977, 978, 1108, 1377]
+data/icsi/choi_segment/Bro007.ref: [431, 660, 745]
+data/icsi/choi_segment/Bed003.ref: [671, 920, 1322, 1558]
+data/icsi/choi_segment/Bed004.ref: [196, 197, 429, 431, 867, 873]
+data/icsi/choi_segment/Bmr001.ref: [4, 5, 6, 255, 430, 664, 666]
+data/icsi/choi_segment/Bmr002.ref: [346, 350, 1109, 1592]
+data/icsi/choi_segment/Bmr021.ref: [1, 197, 214, 351, 555, 795, 851]
+done
+[I@1756db3
+Initializing engine with: Tue Oct 21 22:10:36 EDT 2008
+-1 -554049.890 [0 0.00e+00 0.50] [2.0e-01 1.0e-02 1.0e+00] 0.2631 0.3180
+0 -554147.597 [1 4.00e-04 0.50] [2.1e-01 5.3e-05 1.0e+00] 0.2631 0.3180
+100 -552707.665 [106 4.24e-02 0.50] [2.1e-01 5.3e-05 1.0e+00] 0.2634 0.3181
+200 -552621.753 [76 3.04e-02 0.50] [2.1e-01 5.3e-05 1.0e+00] 0.2657 0.3197
+300 -552585.330 [60 2.40e-02 0.50] [2.1e-01 5.3e-05 1.0e+00] 0.2626 0.3166
+400 -552560.237 [67 2.68e-02 0.50] [2.1e-01 5.3e-05 1.0e+00] 0.2620 0.3160
+500 -552559.374 [68 2.72e-02 0.50] [2.1e-01 5.3e-05 1.0e+00] 0.2646 0.3189
+600 -552548.172 [48 1.92e-02 0.50] [2.1e-01 5.3e-05 1.0e+00] 0.2618 0.3158
+700 -552549.094 [44 1.76e-02 0.50] [2.1e-01 5.3e-05 1.0e+00] 0.2615 0.3158
+800 -552531.441 [63 2.52e-02 0.42] [2.1e-01 5.3e-05 1.0e+00] 0.2614 0.3157
+900 -552531.312 [37 1.48e-02 0.18] [2.1e-01 5.3e-05 1.0e+00] 0.2597 0.3141
+999999 -552512.490 [20 8.00e-03 0.00] [2.1e-01 5.3e-05 1.0e+00] 0.2609 0.3151
+0.0320 0.0320
+0.2343 0.3429
+0.3220 0.3793
+0.3454 0.3876
+0.1688 0.1732
+0.2155 0.2155
+0.2746 0.3454
+0.2628 0.2999
+0.5375 0.5375
+0.2480 0.2803
+0.0000 0.0000
+0.2227 0.3123
+0.4554 0.5270
+0.2936 0.4126
+0.2815 0.4140
+0.2278 0.3146
+0.1955 0.2930
+0.3903 0.3903
+0.2685 0.3481
+0.1817 0.1817
+0.3037 0.4044
+0.2571 0.2959
+0.2515 0.2680
+0.3303 0.4068
+0.2213 0.3152
+----------
+0.2609 0.3151

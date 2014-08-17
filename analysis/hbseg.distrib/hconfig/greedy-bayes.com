@@ -1,0 +1,13 @@
+base-segmenter=edu.mit.nlp.segmenter.wrappers.HBayesWrapper
+use-choi-style-boundaries=true
+stop-words=config/STOPWORD.list
+use-word-stems=true
+lcseg-path=baselines/lcseg/bin/segment
+segmenter=edu.mit.nlp.segmenter.hierarchical.GreedySegmenter
+remove-stop-words=true
+use-fixed-blocks=false
+window-size=25
+num-segs-known=false
+dirichlet-prior=.1
+max-segs=25
+em-params=false

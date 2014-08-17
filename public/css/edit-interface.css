@@ -703,3 +703,16 @@ input[type=file] {
 .editing .contextMenuPlugin > li > span {
     padding: 3px 2px;
 }
+
+.full-cover-loading {
+    position: absolute;
+    top: 25px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(102, 102, 102, 0.61);
+    color: white;
+    font-size: 30pt;
+    padding-top: 4rem;
+    text-align: center;
+}

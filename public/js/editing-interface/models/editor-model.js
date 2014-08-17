@@ -196,19 +196,6 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
         parsechaps.push(outchap);
       });
 
-      // _.each(chaps, function (chp) {
-      //   chp.sections = chp.sections.sort(function (s1, s2) {
-      //     return s1.startWord.get("start") - s2.startWord.get("start");
-      //   });
-      //   chp.startWord = chp.sections[0].startWord;
-      // }
-      //);
-      // chaps = $.map(chaps, function (ch) {
-      //   return ch;
-      // }).sort(function (c1, c2) {
-      //   return c1.startWord.get("start") - c2.startWord.get("start");
-      // });
-
       var modelChaps = thisModel.get("digest").get("chapters"),
           toAddThumbs = [];
       // set the start word of the chapter
@@ -239,43 +226,5 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
       });
       addThumbnails(toAddThumbs);
     }
-
-    // getOutputJSON: function () {
-    //   var thisModel = this,
-    //       chapters = {},
-    //       ij = 0;
-    //   var outp = thisModel.toJSON();
-    //   delete outp.transcript;
-    //   return outp;
-    //   // thisModel.get("digest").get("chapters").each(function (chap, i) {
-    //   //   chap.get("sections").each(function (sec, j) {
-    //   //     // TODO use actual image data once new MV* framework is inplace
-    //   //     var secjson = {
-    //   //       group: i,
-    //   //       group_title: chap.get("title"),
-    //   //       text: [sec.get("summary")],
-    //   //       start_time: sec.get("startWord").get("start"),
-    //   //       text_change: false,
-    //   //       image_change: false,
-    //   //       image_data: sec.get("thumbnail").get("data"),
-    //   //       image_id: sec.get("thumbnail").cid,
-    //   //       image_time: sec.get("thumbnail").get("image_time")
-    //   //     };
-
-    //   //     if (ij) {
-    //   //       chapters[ij-1].end_time = secjson.start_time;
-    //   //     }
-    //   //     chapters[ij++] = secjson;
-    //   //   });
-    //   // });
-    //   // var words = thisModel.get("transcript").get("words");
-    //   // chapters[ij-1].end_time = words.at(words.length - 1).get("end");
-    //   // var outjson = {
-    //   //   title: thisModel.get("digest").get("title"),
-    //   //   author: thisModel.get("digest").get("author"),
-    //   //   chapters: chapters
-    //   // };
-    //   // return outjson;
-    // }
   });
 });

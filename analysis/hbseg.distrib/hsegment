@@ -1,0 +1,4 @@
+# usage: cat data/test/file | hsegment hconfig/greedy-ui.config
+CLASSPATH="classes:lib/jdom.jar:lib/colt.jar:lib/lingpipe-3.4.0.jar:lib/MinCutSeg.jar:lib/mtj.jar:lib/options.jar:lib/log4j-1.2.14.jar"
+#java -enableassertions -cp ${CLASSPATH} edu.mit.nlp.segmenter.hierarchical.HSegTester -config $1 -depth 3 -expected-durs "$2 $3 $4" 
+java -cp ${CLASSPATH} edu.mit.nlp.segmenter.hierarchical.HSegTester -config $1 -depth 2 -expected-durs "5 10" -debug

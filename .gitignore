@@ -8,7 +8,7 @@ public/content
 ffdata
 node_modules
 builtAssets
-
+vsbenv
 
 *~
 .tern-port

@@ -13,6 +13,8 @@ var vdSchema = new mongoose.Schema({
   ytid: String,
   pubdisplay: {type: Boolean, default: false},
   rawTransName: String,
+  sentSepTransName: String,
+  nSentences: Number,
   preAlignTrans: [{speaker: String, line: String}],
   videoName: String,
   videoLength: Number,
@@ -26,6 +28,7 @@ var vdSchema = new mongoose.Schema({
                        "speaker": Number,
                        "end": Number,
                        "word": String,
+                       "sentenceNumber": Number,
                        "alignedWord": String}]
              },
   uploadDate: {type: Date, default: Date.now},
@@ -71,4 +74,9 @@ vdSchema.methods.getAudioFile = function () {
   return pathUtils.getVideoFile(this.audioName);
 };
 
+vdSchema.methods.getSSFile = function () {
+  return pathUtils.getSSTransFile(this._id);
+};
+
+  
 module.exports = mongoose.model('VDigest', vdSchema);
