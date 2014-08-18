@@ -32,6 +32,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       },
       'mouseover .section-row': "sectionMouseOver",
       'mouseout .section-row': "sectionMouseOut",
+      "click .wysiwyg-add-chapter": "wysiwygAddChapter",
       "click .cover": function () {
         var thisView = this;
         thisView.model.ytplayer && thisView.model.ytplayer.playVideo();
@@ -258,6 +259,17 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       var thisView = this;
       thisView.model.ytplayer.seekTo(stTime, true);
       thisView.model.ytplayer.playVideo();
+    },
+
+    wysiwygAddChapter: function (evt) {
+      // create a new chapter before the last word of this chapter
+      var thisView = this,
+          csecs = thisView.model.get("sections"),
+          lsec = csecs.models[csecs.models.length - 1],
+          newChapWord = lsec.get("startWord").next;
+      
+      
+      newChapWord.set("startChapter", true);
     }
   });
 });

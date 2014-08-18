@@ -165,7 +165,6 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
       } else {
         alert("unable to split chapter -- transcript object did not load correctly. Try saving then reloading.");
       }
-
     },
 
     mergeSectionDown: function () {

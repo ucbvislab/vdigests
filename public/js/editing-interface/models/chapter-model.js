@@ -51,6 +51,11 @@ define(["backbone", "underscore", "jquery", "editing-interface/collections/secti
       return this.get("end") || this.recomputeEndTime();
     },
 
+    getEndWord: function () {
+      var secs = this.get("sections").models;
+      return secs[secs.length - 1].getEndWord();
+    },
+
     recomputeEndTime: function () {
       var secs = this.get("sections");
       this.set("end", secs.models[secs.length - 1].getEndTime());

@@ -500,7 +500,7 @@ exports.getAutoSeg = function (req, res, next) {
         console.log( scmd );
 
         exec(scmd, {cwd: spaths.utils}, function (err, stdout, stderr) {
-          if (err) {
+          if (err || !vdigest.sentSepTransName) {
             console.log("error: " + err);
             console.log("error: " + stderr);
             return returnErrorJson(res, {msg: "error processing transcript - please try again later"}, 500);

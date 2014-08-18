@@ -282,6 +282,20 @@ body.published .toolbar {
     margin-left: 22px;
 }
 
+.wysiwyg-add-chapter {
+    position: absolute;
+    left: 3px;
+    bottom: -20px;
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.wysiwyg-add-chapter:hover {
+    opacity: 1;
+}
+
+// SECTION
+
 .section-row {
     margin-bottom: 8px;
     position: relative;
@@ -716,3 +730,4 @@ input[type=file] {
     padding-top: 4rem;
     text-align: center;
 }
+
