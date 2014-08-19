@@ -295,8 +295,8 @@ body.published .toolbar {
 }
 
 // SECTION
-
 .section-row {
+    position: relative;
     margin-bottom: 8px;
     position: relative;
     border: 1px dashed #FFFFFF;
