@@ -359,12 +359,12 @@ body.published .toolbar {
     background-position: 50%;
 }
 
-/* .editing .section-row.empty, .editing .section-row:hover { */
-/*     border: 1px dashed #DFDDDD; */
-/*     border-width: 1px; */
-/*     border-left: 0; */
-/*     position: relative;  */
-/* } */
+.editing .section-row.empty, .editing .section-row:hover {
+    border: 1px dashed #DFDDDD;
+    border-width: 1px;
+    border-left: 0;
+    position: relative;
+}
 div.section-row.active, .viewing .section-row {
     border-top: solid 1px transparent;
     border-bottom: solid 1px transparent;
