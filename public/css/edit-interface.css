@@ -282,6 +282,10 @@ body.published .toolbar {
     margin-left: 22px;
 }
 
+.viewing .wysiwyg-add-chapter {
+    display: none;
+}
+
 .wysiwyg-add-chapter {
     position: absolute;
     left: 3px;
