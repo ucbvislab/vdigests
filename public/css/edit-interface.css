@@ -363,6 +363,7 @@ body.published .toolbar {
     border: 1px dashed #DFDDDD;
     border-width: 1px;
     border-left: 0;
+    position: relative;
 }
 
 div.section-row.active, .viewing .section-row:hover {
