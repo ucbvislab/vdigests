@@ -49,7 +49,19 @@ var returnErrorJson = function (res, data, code) {
   res.end();
 };
 
+var srtToText = function (srtText) {
+  var srtData = srtText.split(/\n\n/g),
+      writeData = "";
+  srtData.forEach(function (srCluster) {
+    if (srCluster) {
+      writeData += srCluster.split("\n").slice(2).join(". ");
+      writeData += "\n";
+    }
+  });
+  return writeData;
+};
 
+  
 
 /**
  * Returns the editor js template (TODO consider bootstraping data)
@@ -197,7 +209,7 @@ exports.postNewVD = function(req, res, next) {
     }
     var ytaddr = "http://www.youtube.com/watch?v=" + ytid;
 
-    if (files.tranupload) {
+    if (files.tranupload || (fields.usegtrans && fields.usegtrans[0])) {
 
       var vidFile = pathUtils.getVideoFile(ytid);
       var sendGoodResponse = function () {
@@ -208,51 +220,81 @@ exports.postNewVD = function(req, res, next) {
             returnError(res, "unable to determine video length", next);
             return;
           }
-          var fp = files.tranupload[0].path.split(path.sep),
-              tfname = fp[fp.length - 1];
-          var vd = new VDigest({ytid: ytid, rawTransName: tfname, videoName: ytid, videoLength: vlen, digest: {title: fields.yttitle[0]}});
-          vd.save(function (err) {
-            if (err) {
-		          console.log(err);
-              returnError(res, "problem saving video digest to the database -- please try again", next);
-              return;
-            } else {
-              res.writeHead(200, {'content-type': 'application/json'});
-              res.write('{"intrmid":"' + vd._id +'"}');
-              res.end();
-              return;
-            }
-          });
+          var tfname,
+              rawTransFile;
+          if (fields.usegtrans) {
+            tfname = ytid + ".srt";
+            // TODO convert SRT to text and move to appropo location
+            fs.readFile(path.join(spaths.videos, ytid + ".en.srt"), "utf8", function (err, data) {
+              if (err) {
+                return returnError(res, "unable to get YouTube transcript");
+              }
+              var writeData = srtToText(data);
+              tfname = ytid + ".txt";
+              rawTransFile = path.join(spaths.rawTrans, ytid + ".txt");
+              fs.writeFile(rawTransFile, writeData, function (err) {
+                if (err) {
+                  return returnError(res, "unable to get YouTube transcript");
+                }
+                saveVD();
+                // now call the ready function
+              });
+            });
+          } else {
+            var fp = files.tranupload[0].path.split(path.sep);
+            tfname = fp[fp.length - 1];
+            saveVD();
+          }
+
+          function saveVD () {
+            var vd = new VDigest({ytid: ytid, rawTransName: tfname, videoName: ytid, videoLength: vlen, digest: {title: fields.yttitle[0]}});
+            vd.save(function (err) {
+              if (err) {
+		            console.log(err);
+                returnError(res, "problem saving video digest to the database -- please try again", next);
+                return;
+              } else {
+                res.writeHead(200, {'content-type': 'application/json'});
+                res.write('{"intrmid":"' + vd._id +'"}');
+                res.end();
+                return;
+              }
+            });            
+          };
         });
       }; // end sendGoodResponse
 
       // download the yt video
       var downloading = false;
       fs.exists(vidFile, function (exists) {
+          debugger;
         if (downloading) {
           return;
         }
-        else if (exists) {
-          sendGoodResponse();
-        } else {
-          var vidWS = fs.createWriteStream(vidFile);
+        else {
+
+          // first download the video transcript if necessary
+          var ytdl_cmd = "youtube-dl -f mp4 --write-auto-sub -o '" + path.join(spaths.videos, ytid) + ".%(ext)s'" + " " + ytaddr;
+          
+          
+          //var vidWS = fs.createWriteStream(vidFile);
           ytdl.getInfo(ytaddr, function(err, info) {
             if (info.length_seconds > settings.max_yt_length || err) {
               returnError(res, (err && err.message) || ("Video length exceeds " + Math.floor(settings.max_yt_length/60) + " minutes"), next);
               return;
             }
 
-            var video = ytdl(ytaddr, {filter: function(format) { return format.container === 'mp4'; } });
-            vidWS.on("close", function () {
+            downloading = true;
+            console.log("cmd: " + ytdl_cmd);
+            exec(ytdl_cmd, function (error, stdout, stderr) {
               downloading = false;
+              if (error || stderr) {
+                console.log("error" + error);
+                console.log("stderror" + stderr);
+                return returnError(res, "unable to load YouTube video properly");
+              }
               sendGoodResponse();
             });
-            vidWS.on("error", function () {
-              downloading = false;
-              returnError(res, "unable to load the YouTube video properly", next);
-            });
-            downloading = true;
-            video.pipe(vidWS);
           });
         }
       });
@@ -262,6 +304,7 @@ exports.postNewVD = function(req, res, next) {
         returnError(res, "you must select 'yes' to continue", next);
         return;
       }
+
       var intrmid = fields.intrmid[0];
       // set the state to 2
       // first clean the text
@@ -288,6 +331,13 @@ exports.postNewVD = function(req, res, next) {
           if (err2) {
             returnError(res, "encountered a problem processing the transcript: is it a plain text file?", next);
             return;
+          }
+
+          // convert if it's an srt file
+          var newLineData = data.split("\n");
+          if (newLineData.length > 2 && newLineData[0] == "1" && /-->/.test(newLineData[1])) {
+            data = srtToText(data);
+            fs.writeFile(rtxtfile, data);
           }
 
           var paragraphs = data.split("."),
@@ -420,7 +470,7 @@ exports.postNewVD = function(req, res, next) {
                       var from = "admin@video-digest.com";
                       var name = "video-digest admin";
                       var body = "Hello " + req.user.profile.name +",\n\n"
-                            + "The transcript-video alignment is finished and you may now edit your video digest at: " + req.headers.host + "/editor#edit/" + vdigest._id + "\n\n"
+                            + "The transc\ript-video alignment is finished and you may now edit your video digest at: " + req.headers.host + "/editor#edit/" + vdigest._id + "\n\n"
                             + "Best wishes,\n -Friendly Neighborhood Video Digest Bot";
 
                       var to = req.user.email;

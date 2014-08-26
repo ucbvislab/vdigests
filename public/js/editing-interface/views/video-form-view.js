@@ -8,6 +8,7 @@ define(["backbone", "underscore", "jquery", "toastr", "text!templates/ytinfo-tem
       thirdFormClass: "third-form",
       loadingClass: "loading",
       tranUploadId: "tranupload",
+      gtransId: "usegtrans",
       processingFormClass: "processing-form",
       finalUrlClass: "finalurl",
       intrmId: "intrmid",
@@ -60,6 +61,8 @@ define(["backbone", "underscore", "jquery", "toastr", "text!templates/ytinfo-tem
                 el.href = finalHref;
             });
             $("#" + consts.tranUploadId).val("");
+            $("#" + consts.tranUploadId).val("");
+            $("#" + consts.gtransId).val("");
             $("#" + consts.intrmId).val(resobj.intrmid);
           } else {
             toastr.error("unable to process request correctly: try resubmitting");

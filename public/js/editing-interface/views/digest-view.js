@@ -125,10 +125,13 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
               // TODO scroll if we're in viewing mode
               $.smoothScroll($(curPlayingChap.ytplayer.a.parentElement.parentElement).position().top - 120);
               thisView.chapTrans = true;
-              window.setTimeout(function () {
+              var transTimer = window.setInterval(function () {
                 prevChapPlayer.pauseVideo();
-                curPlayingChap.ytplayer.playVideo();
-                thisView.chapTrans = false;
+                if (curPlayingChap.ytplayer.playVideo) {
+                  curPlayingChap.ytplayer.playVideo();
+                  thisView.chapTrans = false;
+                  window.clearInterval(transTimer);
+                }
               }, 30);
             }
           }
