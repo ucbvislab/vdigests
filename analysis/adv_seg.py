@@ -58,6 +58,7 @@ def eval_text(cfile, tfile):
     exp_cmd = "python ../add_initial_segments.py %(initsegsize)d %(tfile)s |java -cp %(cp)s edu.mit.nlp.segmenter.SegTester -config %(config)s"\
               % {"cp": CPATH, "config": cfile, "tfile": tfile, "initsegsize": 5}
     print 'starting', exp_cmd
+    ipdb.set_trace()
     resout = subprocess.check_output(exp_cmd, shell=True)
     resarr = resout.split("\n")
     hendings = sorted(list(set(ast.literal_eval(resarr[-2]))))

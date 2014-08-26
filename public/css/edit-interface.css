@@ -373,6 +373,8 @@ div.section-row:last-child {
 
 .editing .section-row {
     margin-bottom: 8px;
+    border: 1px solid transparent;
+    border-left: none;
 }
 
 .section-row.active, .viewing .section-row {
@@ -380,9 +382,11 @@ div.section-row:last-child {
     border-bottom: solid 1px transparent;
 }
 
-/* .section-row.active { */
-/*     background: rgba(237, 237, 237, 1); */
-/* } */
+ .section-row.active { 
+     background: rgba(237, 237, 237, 1); 
+    border-top: solid 1px #ddd;
+    border-bottom: solid 1px #ddd;
+ } 
 .viewing .section-row:hover {
     border-top: solid 1px #ddd;
     border-bottom: solid 1px #ddd;

@@ -490,7 +490,6 @@ exports.getAutoSeg = function (req, res, next) {
     }
 
     function doSysCall() {
-      debugger;
       var rtxtfile = vdigest.getSSFile();
       var segSysCall = "python adv_seg.py eval " + spaths.segConfigFile + " " + rtxtfile;
       // execute system call
@@ -500,20 +499,25 @@ exports.getAutoSeg = function (req, res, next) {
         console.log( scmd );
 
         exec(scmd, {cwd: spaths.utils}, function (err, stdout, stderr) {
+	   console.log("error: " + err);
+           console.log("error: " + stderr);
           if (err || !vdigest.sentSepTransName) {
-            console.log("error: " + err);
-            console.log("error: " + stderr);
-            return returnErrorJson(res, {msg: "error processing transcript - please try again later"}, 500);
+           return returnErrorJson(res, {msg: "error processing transcript - please try again later"}, 500);
           } else {
             doSysCall();
           }
         });
       } else {
-        debugger;
         console.log(segSysCall);
         var segProc = exec(segSysCall, {cwd: spaths.analysis}, function (error, stdout, stderr) {
           console.log("finished segmentation");
+	  console.log("error: " + error)
+	  console.log("stderror: " + stderr)
+	  console.log("stdout: " + stdout)
           // get sentence breaks from stdout
+	  if (error || stderr) {
+	      return returnErrorJson(res, {"msg": "Segmentation error -- please try again: " + stderr});
+          }
           try{
             var sps = stdout.split("\n");
             var sentBreaks = sps[sps.length-4];
