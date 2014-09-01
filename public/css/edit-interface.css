@@ -263,6 +263,9 @@ body.published .toolbar {
 }
 
 .aspect-wrap .video-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
 	width: 100%;
 	height: 100%;
 }
@@ -656,7 +659,7 @@ body.viewing .section-row .remove-section {
 /** Edit Toolbar **/
 .toolbar {
     bottom: 0;
-    left: 0px;
+    left: 0;
     background: white;
     position: fixed;
     z-index: 10000;
