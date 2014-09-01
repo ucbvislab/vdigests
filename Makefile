@@ -1,4 +1,4 @@
-.PHONY: update
+.PHONY: update build_production
 
 # obtain the absolute path to the makefile dir
 MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
@@ -23,3 +23,6 @@ $(settings):
 update:
 	git pull
 	cd submods/p2fa-vislab; git pull
+
+build_production:
+	cd public/js; r.js -o build.js

@@ -98,6 +98,7 @@ app.use(function(req, res, next) {
 });
 app.use(function(req, res, next) {
   res.locals.user = req.user;
+  res.locals.prod = app.get('env') == 'production';
   next();
 });
 app.use(flash());

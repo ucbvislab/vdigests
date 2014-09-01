@@ -24,31 +24,6 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
     return text;
   };
 
-  //   // thanks http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
-  //   var saveSelection = function () {
-  //       var sel = getSelectedText();
-  //         if (sel.getRangeAt && sel.rangeCount) {
-  //             var ranges = [];
-  //             for (var i = 0, len = sel.rangeCount; i < len; ++i) {
-  //                 ranges.push(sel.getRangeAt(i));
-  //             }
-  //             return ranges;
-  //         }
-  //     return null;
-  // };
-  //   // thanks http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
-  //   var restoreSelection = function (savedSel) {
-  //     if (savedSel) {
-  //             var sel = getSelectedText();
-  //             sel.removeAllRanges();
-  //             for (var i = 0, len = savedSel.length; i < len; ++i) {
-  //                 sel.addRange(savedSel[i]);
-  //             }
-  //         } else if (document.selection && savedSel.select) {
-  //             savedSel.select();
-  //         }
-  //     };
-
   function getLinksInSelection() {
     var selectedLinks = [];
     var range, containerEl, links, linkRange;

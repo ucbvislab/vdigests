@@ -8,5 +8,10 @@ block content
   #editing-interface
   #video-form.first-form
     include vd-form
+
 block morejs
-  != js("lib/require", {"data-main": "/js/editing-interface/main.js"})
+  if (prod)
+    != js("lib/require")
+    != js("main-built")
+  else
+    != js("lib/require", {"data-main": "/js/editing-interface/main.js"})
