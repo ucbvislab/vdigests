@@ -14,6 +14,102 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
 
   };
 
+  var getSelectedText = function () {
+    var text = "";
+    if (typeof window.getSelection != "undefined") {
+      text = window.getSelection().toString();
+    } else if (typeof document.selection != "undefined" && document.selection.type == "Text") {
+      text = document.selection.createRange().text;
+    }
+    return text;
+  };
+
+  //   // thanks http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
+  //   var saveSelection = function () {
+  //       var sel = getSelectedText();
+  //         if (sel.getRangeAt && sel.rangeCount) {
+  //             var ranges = [];
+  //             for (var i = 0, len = sel.rangeCount; i < len; ++i) {
+  //                 ranges.push(sel.getRangeAt(i));
+  //             }
+  //             return ranges;
+  //         }
+  //     return null;
+  // };
+  //   // thanks http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
+  //   var restoreSelection = function (savedSel) {
+  //     if (savedSel) {
+  //             var sel = getSelectedText();
+  //             sel.removeAllRanges();
+  //             for (var i = 0, len = savedSel.length; i < len; ++i) {
+  //                 sel.addRange(savedSel[i]);
+  //             }
+  //         } else if (document.selection && savedSel.select) {
+  //             savedSel.select();
+  //         }
+  //     };
+
+  function getLinksInSelection() {
+    var selectedLinks = [];
+    var range, containerEl, links, linkRange;
+    if (window.getSelection) {
+      var sel = window.getSelection();
+      if (sel.getRangeAt && sel.rangeCount) {
+        linkRange = document.createRange();
+        for (var r = 0; r < sel.rangeCount; ++r) {
+          range = sel.getRangeAt(r);
+          containerEl = range.commonAncestorContainer;
+          if (containerEl.nodeType != 1) {
+            containerEl = containerEl.parentNode;
+          }
+          if (containerEl.nodeName.toLowerCase() == "a") {
+            selectedLinks.push(containerEl);
+          } else {
+            links = containerEl.getElementsByTagName("a");
+            for (var i = 0; i < links.length; ++i) {
+              linkRange.selectNodeContents(links[i]);
+              if (linkRange.compareBoundaryPoints(range.END_TO_START, range) < 1 && linkRange.compareBoundaryPoints(range.START_TO_END, range) > -1) {
+                selectedLinks.push(links[i]);
+              }
+            }
+          }
+        }
+        linkRange.detach();
+      }
+    } else if (document.selection && document.selection.type != "Control") {
+      range = document.selection.createRange();
+      containerEl = range.parentElement();
+      if (containerEl.nodeName.toLowerCase() == "a") {
+        selectedLinks.push(containerEl);
+      } else {
+        links = containerEl.getElementsByTagName("a");
+        linkRange = document.body.createTextRange();
+        for (var j = 0; j < links.length; ++j) {
+          linkRange.moveToElementText(links[j]);
+          if (linkRange.compareEndPoints("StartToEnd", range) > -1 && linkRange.compareEndPoints("EndToStart", range) < 1) {
+            selectedLinks.push(links[j]);
+          } 
+        }
+      }
+    }
+    return selectedLinks;
+  }
+
+  var addTextLink = function () {
+    var selectedText = getSelectedText();
+    if (selectedText) {
+      var selLinks = getLinksInSelection();
+      if (selLinks.length > 0) {
+        document.execCommand("unlink", false, false);
+      } else {
+        var linkUrl = prompt("To what URL should this link go? ");
+        if (linkUrl) {
+          document.execCommand("insertHTML", false, "<a target='_blank' href='" + linkUrl + "'>" + selectedText + "</a>");
+        }
+      }
+    }
+  };
+
   return Backbone.View.extend({
     template: _.template(tmpl),
     id: function () {
@@ -27,6 +123,7 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
 
     events: {
       'keyup .abs-summary': "summaryKeyUp",
+      'keydown .abs-summary': "summaryKeyDown",
       "click .remove-section": "removeSection",
       "blur .abs-summary": "blurSummary",
       "focus .abs-summary": "focusSummary",
@@ -55,9 +152,10 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
         }
       });
 
-
       thisView.listenTo(thisModel, "change:summary", function (mdl, val) {
-        thisView.$el.find("." + consts.summaryDivClass).html(val);
+        if (!this.typing) {
+          thisView.$el.find("." + consts.summaryDivClass).html(val);
+        }
       });
 
       thisView.listenTo(thisModel, "gainfocus", function (mdl, val) {
@@ -99,12 +197,24 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
       startWord.trigger("highlight-section", startWord);
     },
 
+    summaryKeyDown: function (evt) {
+      // handle links/unlinks
+      if (evt.ctrlKey) {
+        if (evt.keyCode == 76) {
+          // 76 is L (link) -- toggle link
+          addTextLink();
+        } 
+      }
+    },
+
     summaryKeyUp: function (evt) {
       var thisView = this,
-      $curTar = $(evt.currentTarget),
-      text = $curTar.text();
+          curTar = evt.currentTarget,
+          text = curTar.innerHTML;
       if (text !== thisView.model.get("summary")) {
+        thisView.typing = true;
         thisView.model.set("summary", text);
+        thisView.typing = false;
         // USE STATS
         window.vdstats.nSummaryEdits.push((new Date()).getTime());
       }
@@ -141,7 +251,6 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
         var thisView = this,
             stWord = thisView.model.get("startWord"),
             pchapModel = stWord.getPrevChapterStart(true);
-
 
         // TODO have to get chapter start, change it
         window.vdstats.nChap2Sec.push((new Date()).getTime());

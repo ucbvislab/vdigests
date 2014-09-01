@@ -21,10 +21,9 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
 
     events: {
       'keyup .chapter-header': function (evt) {
-        var thisView = this,
-            $curTar = $(evt.currentTarget);
+        var thisView = this;
         thisView.typing = true;
-        thisView.model.set("title", $curTar.text());
+        thisView.model.set("title", evt.currentTarget.innerHTML);
 
         // USE STATS
         window.vdstats.nSubtitleEdits.push((new Date()).getTime());
@@ -92,7 +91,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
 
       thisView.listenTo(thisModel, "change:title", function (mdl, val) {
         if (!thisView.typing) {
-          thisView.$el.find("." + consts.chapHeaderClass).text(val);
+          thisView.$el.find("." + consts.chapHeaderClass).html(val);
         }
       });
 

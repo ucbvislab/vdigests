@@ -316,32 +316,32 @@ div.section-row:last-child {
     margin-bottom: 0;
 }
 
-.editing .section-row:hover .split-down, .editing .section-row:hover .merge-up {
-    content: "";
-    background-size: 12px;
-    background-position: 0px 5px;
-    width: 40px;
-    height: 25px;
-    position: absolute;
-    background-repeat: no-repeat;
-    left: 50%;
-    margin-left: -5px;
-    cursor: pointer;
-}
+/* .editing .section-row:hover .split-down, .editing .section-row:hover .merge-up { */
+/*     content: ""; */
+/*     background-size: 12px; */
+/*     background-position: 0px 5px; */
+/*     width: 40px; */
+/*     height: 25px; */
+/*     position: absolute; */
+/*     background-repeat: no-repeat; */
+/*     left: 50%; */
+/*     margin-left: -5px; */
+/*     cursor: pointer; */
+/* } */
 
 .editing .section-row:hover .split-down {
     background-image: url('/img/split-icon.png');
     top: -12px;
 }
 
-.editing .section-row:hover .merge-up {
-    background-image: url('/img/split-icon-up.png');
-    bottom: -19px;
-}
+/* .editing .section-row:hover .merge-up { */
+/*     background-image: url('/img/split-icon-up.png'); */
+/*     bottom: -19px; */
+/* } */
 
-.editing .chapter:first-child .section-row:first-child:hover .merge-up, .editing .chapter:first-child .section-row:first-child:hover .split-down {
-    background: none;
-}
+/* .editing .chapter:first-child .section-row:first-child:hover .merge-up, .editing .chapter:first-child .section-row:first-child:hover .split-down { */
+/*     background: none; */
+/* } */
 
 .viewing .section-row {
     cursor: pointer;

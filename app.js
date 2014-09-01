@@ -125,6 +125,7 @@ app.get('/', homeController.index);
 // TODO separate editor from the viewer
 app.get('/view/:ptitle', editorController.getEditor);
 app.get('/editor', editorController.getEditor);
+app.get('/ieditor', editorController.getEditor);
 
 // TODO make more restful
 app.get('/digestdata/:vdid', editorController.getDigestData);
@@ -136,6 +137,7 @@ app.post('/digestdata/:vdid', passportConf.isAuthenticated, editorController.pos
 app.get('/checkstatus', editorController.getStatus);
 app.get('/screenshot', screenShotController.getScreenShot);
 app.post('/newvd', editorController.postNewVD);
+app.get('/vdigests', vdlistController.getVDList);
 app.get('/vdigests', vdlistController.getVDList);
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
