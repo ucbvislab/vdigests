@@ -4,58 +4,95 @@ block morecss
   != css('home')
 
 block content
-  #landing-description
-    p
-      | This is a temporary homepage for the Video Digest creation software developed by the  
-      a(href="http://vis.berkeley.edu/") Vis Lab
-      |  at U.C. Berkeley. Soon, this page will consist of a video digest that explains our project.
-    p
-      | For now, please use a
-      strong
-        |  webkit browser
-      |  (chrome, safari, or opera).
-  h3
-    | Demo Digests
+  
+  h1#main-title Video Digests: A Browsable, Skimmable Format for Informational Lecture Videos
+  #what-description Inspired by Bret Victor's presentation  
+    a(href="http://worrydream.com/MediaForThinkingTheUnthinkable/") Media for Thinking the Unthinkable
+    |, members of the  
+    a(href="") VisLab
+    |  at U.C. Berkeley created a set of video digest authoring tools.
+
+  #main-video-wrapper
+    iframe(width="640", height="360", src="//www.youtube.com/embed/fTlPJ7f9VsU9", frameborder="0", allowfullscreen)
+
+  #read-the-paper
+    .paper-icon
+      a(href="http://vis.berkeley.edu/papers/videodigests/")
+        img(src="/img/paper.png")
+    .paper-details
+        h3
+          a(href="http://vis.berkeley.edu/papers/videodigests/") Video Digests: A Browsable, Skimmable Format for Informational Lecture Videos
+        p.authors Amy Pavel, Colorado Reed, Bjoern Hartmann, Maneesh Agrawala
+        p.conference UIST 2014, October 2014
+  
+  #landing-description 
   #study-results
-    p
-      | Here are some video digests we created using our automated pipeline (crowdsourced) and video-digest creation interface (expert):
-    ul.res-list
-      li.title
-        | Hans Rosling: The Best Stats You've Ever Seen
-        ul
+    .res-list-wrapper
+        h2#example-vd-title Example Video Digests
+        ul.res-list
           li
-            |expert:  
-            a(href="/view/The-Best-Stats-Youve-Ever-Seen-expert-KaZP9x9") view
-            |  |  
-            a(href="/editor#edit/KaZP9x9") edit
+            .res-thumb-wrap
+              img.thumb(src="/img/hans-thumb.jpeg")
+            .res-script-wrap
+                h3 The Best Stats You've Ever Seen
+                h3.vdauthor Hans Rosling
+                p.vresult
+                  | manually created video digest:  
+                  a(href="/view/The-Best-Stats-Youve-Ever-Seen-expert-KaZP9x9") view
+                  |  |  
+                  a(href="/editor#edit/KaZP9x9") edit
+                p.vresult
+                  |auto-generated video digest:  
+                  a(href="/view/The-best-stats-youve-ever-seen-crowdsourced-xuTl2DM") view
+                  |  |  
+                  a(href="/editor#edit/xuTl2DM") edit
+          .clearfix
           li
-            | crowdsourced:  
-            a(href="/view/The-best-stats-youve-ever-seen-crowdsourced-xuTl2DM") view
-            |  |  
-            a(href="/editor#edit/xuTl2DM") edit
-      li.title
-        | Scott Klemmer: The Power of Prototyping
-        ul
+            .res-thumb-wrap
+              img.thumb(src="/img/sk-thumb.jpeg")
+            .res-script-wrap
+                h3 The Power of Prototyping
+                h3.vdauthor Scott Klemmer
+                p.vresult
+                    | manually created video digest:  
+                    a(href="/view/The-Power-of-Protyping-expert-Q_YIysi") view
+                    |  |  
+                    a(href="/editor#edit/Q_YIysi") edit
+                p.vresult
+                    | auto-generated video digest:  
+                    a(href="/view/The-Power-of-Protyping-crowdsourced-xBkN85s") view
+                    |  |  
+                    a(href="/editor#edit/xBkN85s") edit
+          .clearfix 
           li
-            | expert:  
-            a(href="/view/The-Power-of-Protyping-expert-Q_YIysi") view
-            |  |  
-            a(href="/editor#edit/Q_YIysi") edit
+            .res-thumb-wrap
+              img.thumb(src="/img/khan-thumb.jpeg")
+            .res-script-wrap
+                h3 U.S. History Overview 1 - Jamestown to the Civil War
+                h3.vdauthor Sal Khan
+                p.vresult
+                    | manually created video digest:
+                    a(href="/view/US-History-Overview-1-Jamestown-to-the-Civil-War-expert-8c3ivNX")  view
+                    |  |  
+                    a(href="/editor#edit/8c3ivNX") edit
+                p.vresult
+                    | auto-generated video digest:
+                    a(href="/view/US-History-Overview-1-Jamestown-to-the-Civil-War-crowdsourced-6zUmluC")  view
+                    |  |  
+                    a(href="/editor#edit/6zUmluC") edit
+           .clearfix 
           li
-            | crowdsourced:  
-            a(href="/view/The-Power-of-Protyping-crowdsourced-xBkN85s") view
-            |  |  
-            a(href="/editor#edit/xBkN85s") edit
-      li.title
-        | Sal Khan: U.S. History Overview 1 - Jamestown to the Civil War
-        ul
-          li
-            | expert:
-            a(href="/view/US-History-Overview-1-Jamestown-to-the-Civil-War-expert-8c3ivNX")  view
-            |  |  
-            a(href="/editor#edit/8c3ivNX") edit
-          li
-            | crowdsourced:
-            a(href="/view/US-History-Overview-1-Jamestown-to-the-Civil-War-crowdsourced-6zUmluC")  view
-            |  |  
-            a(href="/editor#edit/6zUmluC") edit
+            .res-thumb-wrap
+              img.thumb(src="/img/tom-thumb.jpeg")
+            .res-script-wrap
+                h3 Five Principles for Choosing Research Problems in Computer Graphics
+                h3.vdauthor Thomas Funkhouser
+                p.vresult
+                    | manually created video digest:
+                    a(href="/view/US-History-Overview-1-Jamestown-to-the-Civil-War-expert-8c3ivNX")  view
+                    |  |  
+                    a(href="/editor#edit/8c3ivNX") edit
+                p.vresult
+           .clearfix 
+
+  #bg-color-change
