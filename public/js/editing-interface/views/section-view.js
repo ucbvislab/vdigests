@@ -283,7 +283,7 @@ define(["backbone", "underscore", "jquery", "text!templates/section-template.htm
 
       if ($tar.hasClass(consts.takeThumbClass)) {
         thisView.takeThumbnailImage(evt);
-      } else if ($tar.hasClass(consts.thumbClass) || window.viewing) {
+      } else if ($tar.hasClass(consts.thumbClass) || (window.viewing && !$tar.attr("href"))) {
         thisView.startVideo();
       } else if ($tar.hasClass(consts.splitDownClass)) {
         thisView.mergeSectionDown();

@@ -35,6 +35,12 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       "click .cover": function () {
         var thisView = this;
         thisView.model.ytplayer && thisView.model.ytplayer.playVideo();
+      },
+      'click a': function () {
+        var thisView = this;
+        thisView.model.ytplayer
+          && thisView.model.ytplayer.stopVideo
+          && thisView.model.ytplayer.stopVideo();
       }
     },
 
@@ -185,7 +191,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
 
     showCover: function ($img) {
       var thisView = this;
-          $img =  $img || thisView.$el.find("." + consts.sectionWrapClass).first().find("img").first();
+      $img =  $img || thisView.$el.find("." + consts.sectionWrapClass).first().find("img").first();
       var $curCover = thisView.$curCover || thisView.$el.find("." + consts.coverClass),
           $imgClone = $img.clone(),
           // extract the cover dimensions
