@@ -123,7 +123,11 @@ define(["backbone", "underscore", "jquery", "text!templates/digest-template.html
               // TODO move to chapter view
               curPlayingChap.ytplayer.seekTo && curPlayingChap.ytplayer.seekTo(curTime, true);
               // TODO scroll if we're in viewing mode
-              $.smoothScroll($(curPlayingChap.ytplayer.a.parentElement.parentElement).position().top - 120);
+              var ytel = curPlayingChap.ytplayer.a || curPlayingChap.ytplayer.d;
+              if (ytel) {
+                $.smoothScroll($(ytel.parentElement.parentElement).position().top - 120);
+              }
+
               thisView.chapTrans = true;
               var transTimer = window.setInterval(function () {
                 prevChapPlayer.pauseVideo();
