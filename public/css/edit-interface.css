@@ -245,7 +245,7 @@ body.published .toolbar {
     top: 0;
     background: rgba(1,1,1, 0.4);
     width: inherit;
-    background-image: url('../img/play-button.png');
+    background-image: url('/play-button.png');
     background-repeat: no-repeat;
     height: inherit;
     z-index: 100;
@@ -333,7 +333,7 @@ div.section-row:last-child {
 /* } */
 
 .editing .section-row:hover .split-down {
-    background-image: url('../img/split-icon.png');
+    background-image: url('http://192.241.199.43/img//split-icon.png');
     top: -12px;
 }
 
@@ -356,7 +356,7 @@ div.section-row:last-child {
     position: absolute;
     top: 0;
     background: rgba(1,1,1, 0.4);
-    background-image: url('../img/play-button.png');
+    background-image: url('/play-button.png');
     background-repeat: no-repeat;
     height: 100%;
     width: 100%;
@@ -404,7 +404,7 @@ div.section-row:last-child {
 
 .keyframe-col:empty {
     border: 1px dashed #A3A1A1;
-    background-image: url('../img/camera-icon-2.png');
+    background-image: url('/camera-icon-2.png');
     background-size: 59px 43px;
     background-repeat: no-repeat;
     background-position: 5px 3px;
