@@ -11,7 +11,7 @@ define(["underscore", "jquery", "canvas2Image"], function (_, $, Canvas2Image) {
     if (vidid === undefined || time === undefined){
       throw Error("must set vidid and time parameters");
     }
-    var url = "/screenshot?id=" + vidid + "&time=" + time;
+    var url = "/videodigests/screenshot?id=" + vidid + "&time=" + time;
     $.get(url, callback);
   };
 

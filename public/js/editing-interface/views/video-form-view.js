@@ -74,7 +74,7 @@ define(["backbone", "underscore", "jquery", "toastr", "text!templates/ytinfo-tem
           // final class -- check the status until it is finished
           var checkStatus = function () {
             window.setTimeout(function () {
-              $.get("/checkstatus?id=" + thisView.intrmid, function (resp) {
+              $.get("/videodigests/checkstatus?id=" + thisView.intrmid, function (resp) {
                 if (resp.status == 1) {
                   thisView.$el.removeClass(consts.processingFormClass);
                   thisView.$el.hide();

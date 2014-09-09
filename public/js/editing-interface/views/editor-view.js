@@ -87,7 +87,7 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
                         loadDiv.className = "full-cover-loading";
                         loadDiv.innerHTML = "Segmenting...";
                         window.document.body.appendChild(loadDiv);
-                        $.get("/autoseg/" + window.dataname)
+                        $.get("/videodigests/autoseg/" + window.dataname)
                         .success(function (resp) {
                           if (resp.breaks) {
                             var sbreaks = eval(resp.breaks);
@@ -179,7 +179,7 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
               var thisView = this;
               if (window.confirm("are you ready to publish this digest?")) {
                 $.ajax({
-                    url: "/digestpublish/" + window.dataname,
+                    url: "/videodigests/digestpublish/" + window.dataname,
                     data: JSON.stringify({"publish": true, _csrf: window._csrf}),
                     type: "post",
                     contentType: "application/json",
@@ -207,7 +207,7 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
               outpjson.object = thisView.model.get("digest").toJSON();
               outpjson["_csrf"] = window._csrf;
               $.ajax({
-                url: "/digestdata/" + window.dataname,
+                url: "/videodigests/digestdata/" + window.dataname,
                 data: JSON.stringify(outpjson),
                 type: "post",
                 contentType: "application/json",

@@ -7,7 +7,7 @@
 
 // configure require.js
 requirejs.config({
-  baseUrl: "/js",
+  baseUrl: "/videodigests/js",
   paths: {
     jquery:"lib/jquery-1.11.0.min",
     underscore: "lib/underscore-min",

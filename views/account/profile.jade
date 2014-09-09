@@ -16,7 +16,7 @@ block content
   .page-header
     h3 Profile Information
 
-  form.form-horizontal(action='/account/profile', method='POST')
+  form.form-horizontal(action='../account/profile', method='POST')
     input(type='hidden', name='_csrf', value=_csrf)
     .form-group
       label.col-sm-2.control-label(for='email') Email
@@ -30,7 +30,7 @@ block content
   .page-header
     h3 Change Password
 
-  form.form-horizontal(action='/account/password', method='POST')
+  form.form-horizontal(action='../account/password', method='POST')
     input(type='hidden', name='_csrf', value=_csrf)
     .form-group
       label.col-sm-3.control-label(for='password') New Password

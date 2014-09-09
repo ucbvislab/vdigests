@@ -138,7 +138,7 @@ exports.postPublishDigest = function(req, res, next) {
     }
     if (!vd.pubdisplay) {
       vd.pubdisplay = true;
-      vd.puburl = "/view/" + slug(vd.digest.title + " " + vd.id);
+      vd.puburl = "http://vis.berkeley.edu/videodigests/view/" + slug(vd.digest.title + " " + vd.id);
       vd.save();
     }
     res.writeHead(200, {"content-type": "application/json"});
@@ -470,7 +470,7 @@ exports.postNewVD = function(req, res, next) {
                       var from = "admin@video-digest.com";
                       var name = "video-digest admin";
                       var body = "Hello " + req.user.profile.name +",\n\n"
-                            + "The transc\ript-video alignment is finished and you may now edit your video digest at: " + req.headers.host + "/editor#edit/" + vdigest._id + "\n\n"
+                            + "The transc\ript-video alignment is finished and you may now edit your video digest at: http://vis.berkeley.edu/videodigests/editor#edit/" + vdigest._id + "\n\n"
                             + "Best wishes,\n -Friendly Neighborhood Video Digest Bot";
 
                       var to = req.user.email;

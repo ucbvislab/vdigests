@@ -102,7 +102,7 @@ app.use(function(req, res, next) {
   next();
 });
 app.use(flash());
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: week }));
+app.use('/:extra(videodigests)?', express.static(path.join(__dirname, 'public'), { maxAge: week }));
 app.use(function(req, res, next) {
   // Keep track of previous URL to redirect back to
   // original destination after a successful login.
@@ -122,61 +122,41 @@ app.use(function(err, req, res, next){
 /**
  * Application routes.
  */
-app.get('/', homeController.index);
+var extraPath = ":extra(videodigests/)?";
+app.get('/:extra(videodigests)?', homeController.index);
 // TODO separate editor from the viewer
-app.get('/view/:ptitle', editorController.getEditor);
-app.get('/editor', editorController.getEditor);
-app.get('/ieditor', editorController.getEditor);
+app.get('/' + extraPath + 'view/:ptitle', editorController.getEditor);
+app.get('/' + extraPath + 'editor', editorController.getEditor);
+app.get('/' + extraPath + 'editor', editorController.getEditor);
 
 // TODO make more restful
-app.get('/digestdata/:vdid', editorController.getDigestData);
-app.post('/digestpublish/:vdid', passportConf.isAuthenticated, editorController.postPublishDigest);
-app.get('/autoseg/:vdid', editorController.getAutoSeg);
+app.get('/' + extraPath + 'digestdata/:vdid', editorController.getDigestData);
+app.post('/' + extraPath + 'digestpublish/:vdid', passportConf.isAuthenticated, editorController.postPublishDigest);
+app.get('/' + extraPath + 'autoseg/:vdid', editorController.getAutoSeg);
 
 // TODO add Authorization
-app.post('/digestdata/:vdid', passportConf.isAuthenticated, editorController.postDigestData);
-app.get('/checkstatus', editorController.getStatus);
-app.get('/screenshot', screenShotController.getScreenShot);
-app.post('/newvd', editorController.postNewVD);
-app.get('/vdigests', vdlistController.getVDList);
-app.get('/vdigests', vdlistController.getVDList);
-app.get('/login', userController.getLogin);
-app.post('/login', userController.postLogin);
-app.get('/logout', userController.logout);
-app.get('/forgot', userController.getForgot);
-app.post('/forgot', userController.postForgot);
-app.get('/reset/:token', userController.getReset);
-app.post('/reset/:token', userController.postReset);
-app.get('/signup', userController.getSignup);
-app.post('/signup', userController.postSignup);
-app.get('/contact', contactController.getContact);
-app.post('/contact', contactController.postContact);
-app.get('/account', passportConf.isAuthenticated, userController.getAccount);
-app.post('/account/profile', passportConf.isAuthenticated, userController.postUpdateProfile);
-app.post('/account/password', passportConf.isAuthenticated, userController.postUpdatePassword);
-app.post('/account/delete', passportConf.isAuthenticated, userController.postDeleteAccount);
-app.get('/account/unlink/:provider', passportConf.isAuthenticated, userController.getOauthUnlink);
-
-/**
- * OAuth routes for sign-in.
- */
-
-app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email', 'user_location'] }));
-app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/login' }), function(req, res) {
-  res.redirect(req.session.returnTo || '/');
-});
-app.get('/auth/github', passport.authenticate('github'));
-app.get('/auth/github/callback', passport.authenticate('github', { failureRedirect: '/login' }), function(req, res) {
-  res.redirect(req.session.returnTo || '/');
-});
-app.get('/auth/google', passport.authenticate('google', { scope: 'profile email' }));
-app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), function(req, res) {
-  res.redirect(req.session.returnTo || '/');
-});
-app.get('/auth/twitter', passport.authenticate('twitter'));
-app.get('/auth/twitter/callback', passport.authenticate('twitter', { failureRedirect: '/login' }), function(req, res) {
-  res.redirect(req.session.returnTo || '/');
-});
+app.post('/' + extraPath + 'digestdata/:vdid', passportConf.isAuthenticated, editorController.postDigestData);
+app.get('/' + extraPath + 'checkstatus', editorController.getStatus);
+app.get('/' + extraPath + 'screenshot', screenShotController.getScreenShot);
+app.post('/' + extraPath + 'newvd', editorController.postNewVD);
+app.get('/' + extraPath + 'vdigests', vdlistController.getVDList);
+app.get('/' + extraPath + 'vdigests', vdlistController.getVDList);
+app.get('/' + extraPath + 'login', userController.getLogin);
+app.post('/' + extraPath + 'login', userController.postLogin);
+app.get('/' + extraPath + 'logout', userController.logout);
+app.get('/' + extraPath + 'forgot', userController.getForgot);
+app.post('/' + extraPath + 'forgot', userController.postForgot);
+app.get('/' + extraPath + 'reset/:token', userController.getReset);
+app.post('/' + extraPath + 'reset/:token', userController.postReset);
+app.get('/' + extraPath + 'signup', userController.getSignup);
+app.post('/' + extraPath + 'signup', userController.postSignup);
+app.get('/' + extraPath + 'contact', contactController.getContact);
+app.post('/' + extraPath + 'contact', contactController.postContact);
+app.get('/' + extraPath + 'account', passportConf.isAuthenticated, userController.getAccount);
+app.post('/' + extraPath + 'account/profile', passportConf.isAuthenticated, userController.postUpdateProfile);
+app.post('/' + extraPath + 'account/password', passportConf.isAuthenticated, userController.postUpdatePassword);
+app.post('/' + extraPath + 'account/delete', passportConf.isAuthenticated, userController.postDeleteAccount);
+app.get('/' + extraPath + 'account/unlink/:provider', passportConf.isAuthenticated, userController.getOauthUnlink);
 
 app.use(errorHandler());
 
