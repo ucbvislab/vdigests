@@ -122,11 +122,10 @@ app.use(function(err, req, res, next){
 /**
  * Application routes.
  */
-var extraPath = ":extra(videodigests/)?";
+var extraPath = ":extra?/?";
 app.get('/:extra(videodigests)?', homeController.index);
 // TODO separate editor from the viewer
 app.get('/' + extraPath + 'view/:ptitle', editorController.getEditor);
-app.get('/' + extraPath + 'editor', editorController.getEditor);
 app.get('/' + extraPath + 'editor', editorController.getEditor);
 
 // TODO make more restful
@@ -139,7 +138,6 @@ app.post('/' + extraPath + 'digestdata/:vdid', passportConf.isAuthenticated, edi
 app.get('/' + extraPath + 'checkstatus', editorController.getStatus);
 app.get('/' + extraPath + 'screenshot', screenShotController.getScreenShot);
 app.post('/' + extraPath + 'newvd', editorController.postNewVD);
-app.get('/' + extraPath + 'vdigests', vdlistController.getVDList);
 app.get('/' + extraPath + 'vdigests', vdlistController.getVDList);
 app.get('/' + extraPath + 'login', userController.getLogin);
 app.post('/' + extraPath + 'login', userController.postLogin);
