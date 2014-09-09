@@ -7,4 +7,4 @@ block content
     - for vd in vds
       - if (vd.pubdisplay)
         li
-          a(href="#{vd.puburl}")= vd.digest.title
+          a(href="/videodigests#{vd.puburl}")= vd.digest.title

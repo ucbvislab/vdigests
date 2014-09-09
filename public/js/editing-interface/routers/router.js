@@ -39,9 +39,11 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
         var thisRoute = this,
             pname = window.location.pathname.split("/").filter(function(str){return str.length;}),
             $body = thisRoute.$body || $(document.body);
+
+        var vtype = pname[pname.length - 2];
         thisRoute.$body = $body;
 
-        if (pname[0] === "editor") {
+        if (vtype === "editor") {
 
           if (!thisRoute.videoFormView) {
             thisRoute.videoFormView = new VideoFormView({model: new VideoFormModel(), router: thisRoute});
@@ -50,8 +52,8 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
           pvt.hideAllViews();
           thisRoute.videoFormView.$el.show();
 
-        } else if (pname.length === 2) {
-          var vtitle = pname[1];
+        } else if (vtype === "view") {
+          var vtitle = pname[pname.length-1];
           // vd viewing interface TODO the transcript is not needed
           var IDLEN = 7;
           $(document.body).addClass(consts.pubClass);
