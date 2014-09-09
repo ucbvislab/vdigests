@@ -74,7 +74,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(connectAssets({
   paths: ['public/css', 'public/js'],
-  helperContext: app.locals
+  helperContext: app.locals,
+  servePath: 'http://192.241.199.43/assets'
 }));
 app.use(compress());
 app.use(logger('dev'));
@@ -102,6 +103,7 @@ app.use(function(req, res, next) {
   next();
 });
 app.use(flash());
+
 app.use('/:extra(videodigests)?', express.static(path.join(__dirname, 'public'), { maxAge: week }));
 app.use(function(req, res, next) {
   // Keep track of previous URL to redirect back to
