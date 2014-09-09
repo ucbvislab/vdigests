@@ -75,7 +75,7 @@ app.set('view engine', 'jade');
 app.use(connectAssets({
   paths: ['public/css', 'public/js'],
   helperContext: app.locals,
-  servePath: 'http://192.241.199.43/assets'
+  servePath: 'vdstatic'
 }));
 app.use(compress());
 app.use(logger('dev'));
