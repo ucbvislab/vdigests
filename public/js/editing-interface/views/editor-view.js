@@ -77,7 +77,7 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
                 // TODO bad globals
                 window.jspApi = el.data("jsp");
 
-                $('.editor-wrap').contextPopup({
+                $('#transcript-wrap').contextPopup({
                   items: [
                     {label:'auto-segment',
                      action: function() {
