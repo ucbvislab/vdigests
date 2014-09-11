@@ -209,7 +209,7 @@ body.published .toolbar {
 .chapter-header {
     font-size: 25px;
     position: relative;
-    padding: 5px o;
+    padding: 5px 0;
     width: 96%;
 }
 
