@@ -209,16 +209,15 @@ body.published .toolbar {
 .chapter-header {
     font-size: 25px;
     position: relative;
-    padding-bottom: 0.7em;
     padding-top: 5px;
     width: 96%;
 }
 
 .chapter-header:after {
     content: attr(data-content);
-    position: absolute;
-    bottom: 0;
-    left: 0;
+    position: relative;
+    bottom: 3px;
+    left: 7px;
     white-space: pre;
     font-size: 0.6em;
     color: #BDBDBD;
