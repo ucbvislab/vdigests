@@ -65,7 +65,7 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
 
             // setup YouTube object
             window.toLoadPlayers = [];
-            $.getScript('//www.youtube.com/iframe_api');
+            $.getScript('https://www.youtube.com/iframe_api');
             window.onYouTubeIframeAPIReady = function() {
               _.each(window.toLoadPlayers, function (pargs) {
                 Player.loadPlayer.apply(this, pargs);

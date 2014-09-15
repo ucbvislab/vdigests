@@ -207,7 +207,7 @@ exports.postNewVD = function(req, res, next) {
       returnError(res, "you must proivde a YouTube url in the format: http://www.youtube.com/watch?v=someIdValue", next);
       return;
     }
-    var ytaddr = "http://www.youtube.com/watch?v=" + ytid;
+    var ytaddr = "https://www.youtube.com/watch?v=" + ytid;
 
     if (files.tranupload || (fields.usegtrans && fields.usegtrans[0])) {
 
