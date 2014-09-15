@@ -78,32 +78,6 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
 
             Backbone.history.start();
 
-            // pull in the youtube api
-
-            // keep body size to the size of the viewport
-            var $body = $(window.body),
-                $maincon= $("#main-container");
-            var setMCHeight = function (inHeight) {
-              $maincon.height(inHeight);
-            };
-            var setBodyHeight = function (inHeight) {
-              $body.height(inHeight);
-            };
-            var $window = $(window),
-                navHeight = $(".navbar").eq(0).height();
-
-            $window.resize(function () {
-              setMCHeight($window.height() - navHeight);
-              setBodyHeight($window.height());
-            });
-            setMCHeight($window.height() - navHeight);
-            setBodyHeight($window.height());
-            if (window.onbeforeunload !== null) {
-              window.onbeforeunload = function () {
-                return "are you finished creating a digest?";
-              };
-            }
-
             // USE STATS collection for interface study
             window.vdstats = {
               nChapCreation: [],

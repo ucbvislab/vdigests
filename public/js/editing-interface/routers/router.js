@@ -3,6 +3,33 @@
 define(["backbone", "underscore", "jquery", "editing-interface/models/editor-model", "editing-interface/views/editor-view", "editing-interface/views/output-digest-view", "editing-interface/views/video-form-view", "editing-interface/models/video-form-model", "toastr"], function (Backbone, _, $, EditorModel, EditorView, OutputView, VideoFormView, VideoFormModel, toastr) {
   "use strict";
 
+  var keepWindowSized = function() {
+    // keep body size to the size of the viewport
+    var $body = $(window.body),
+        $maincon= $("#main-container");
+    var setMCHeight = function (inHeight) {
+      $maincon.height(inHeight);
+    };
+    var setBodyHeight = function (inHeight) {
+      $body.height(inHeight);
+    };
+    var $window = $(window),
+        navHeight = $(".navbar").eq(0).height();
+
+    $window.resize(function () {
+      setMCHeight($window.height() - navHeight);
+      setBodyHeight($window.height());
+    });
+    setMCHeight($window.height() - navHeight);
+    setBodyHeight($window.height());
+    if (window.onbeforeunload !== null) {
+      window.onbeforeunload = function () {
+        return "are you finished creating a digest?";
+      };
+    }
+
+  }
+
   /**
    * Central router to control URL state
    */
@@ -46,6 +73,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
 
         if (vtype1 === "editor" || vtype2 === "editor") {
 
+          keepWindowSized();
           if (!thisRoute.videoFormView) {
             thisRoute.videoFormView = new VideoFormView({model: new VideoFormModel(), router: thisRoute});
             thisRoute.videoFormView.render();
@@ -94,6 +122,10 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
             $body = thisRoute.$body || $(document.body);
         thisRoute.$body = $body;
         // create the editor model which has the trans and digest views
+
+        if (!toView) {
+            keepWindowSized();
+        }
 
         window.dataname = window.dataname || dataname;
 
