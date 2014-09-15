@@ -88,6 +88,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
           $(document.body).addClass(consts.pubClass);
           thisRoute.viewRoute(vtitle.substr(vtitle.length - IDLEN));
           window.onbeforeunload = null;
+          window.setTimeout(function(){$("#about").show();}, 1500);
         } else {
           toastr.error("incorrect URL format, should be /view/title or /editor#edit/id or /editor#preview/id");
         }
