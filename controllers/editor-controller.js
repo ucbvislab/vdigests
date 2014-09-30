@@ -267,7 +267,6 @@ exports.postNewVD = function(req, res, next) {
       // download the yt video
       var downloading = false;
       fs.exists(vidFile, function (exists) {
-          debugger;
         if (downloading) {
           return;
         }
@@ -288,9 +287,9 @@ exports.postNewVD = function(req, res, next) {
             console.log("cmd: " + ytdl_cmd);
             exec(ytdl_cmd, function (error, stdout, stderr) {
               downloading = false;
-              if (error || stderr) {
-                console.log("error" + error);
-                console.log("stderror" + stderr);
+              if (error) {
+                console.log("error: " + error);
+                console.log("stderror: " + stderr);
                 return returnError(res, "unable to load YouTube video properly");
               }
               sendGoodResponse();

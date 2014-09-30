@@ -19,7 +19,7 @@ define(["backbone", "underscore", "jquery", "text!templates/editing-template.htm
             className: consts.viewClass,
             events: {
               "keydown": function (evt) {
-                if (evt.keyCode === consts.RETURN_KEY_CODE) {
+                if (evt.keyCode === consts.RETURN_KEY_CODE && !evt.shiftKey) {
                   // enter should always blur
                   evt.target.blur();
                   evt.stopPropagation();

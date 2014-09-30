@@ -13,6 +13,10 @@ body {
     color: rgb(100, 92, 111);
 }
 
+body.viewing {
+    padding-top: 40px;
+}
+
 #main-container.container {
     width: 100%;
     margin: 0;
@@ -129,26 +133,28 @@ body.published .toolbar {
     text-align: left;
     color: #645C6F;
     font-weight: normal;
-    line-height: 45px;
+    line-height: 1em;
     min-width: 200px;
     position: relative;
     padding: 0;
     margin: auto;
     margin-top: 22px;
     margin-bottom: 0;
-    display: inline-block;
+    display: inline;
 }
 
 #videolength {
-    display: inline-block;
+    display: inline;
     font-size: 15px;
+    position: relative;
+    bottom: 0.3em;
     color: #BDBDBD;
     margin: 0;
     margin-left: 0.4em;
 }
 
 #authortitle {
-    padding-top: 5px;
+    padding-top: 8px;
     margin-bottom: 35px;
     font-size: 1.5em;
     color: #999999;
@@ -182,7 +188,7 @@ body.published .toolbar {
 }
 
 .viewing #digest-wrap {
-    width: 80%;
+    width: 89%;
     max-width: 1600px;
     margin: auto;
     float: none;
@@ -209,7 +215,7 @@ body.published .toolbar {
 .chapter-header {
     font-size: 25px;
     position: relative;
-    padding: 5px 0;
+    padding: 0;
     width: 96%;
 }
 
@@ -421,6 +427,7 @@ div.section-row:last-child {
     /* height: 40px; */
     padding-left: 8px;
     padding-right: 4px;
+    line-height: 1.25em;
 }
 
 .section-text-wrap .abs-summary {

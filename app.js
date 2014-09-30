@@ -89,8 +89,8 @@ app.use(connectAssets({
 }));
 app.use(compress());
 app.use(logger('dev'));
-app.use(bodyParser.json({limit: "50mb"}));
-app.use(bodyParser.urlencoded({limit: "50mb"}));
+app.use(bodyParser.json({limit: "100mb"}));
+app.use(bodyParser.urlencoded({limit: "100mb"}));
 app.use(expressValidator());
 app.use(methodOverride());
 app.use(cookieParser());
