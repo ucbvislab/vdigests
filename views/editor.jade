@@ -9,6 +9,43 @@ block content
   #video-form.first-form
     include vd-form
 
+  .unminimize-instructions.instr-shown Editing Instructions
+  .instructions-text
+      .instructions-minimize –
+      ul
+          li
+            span.instr-task
+              | add new chapter:
+            i  control/command+alt+click
+            |  at desired transcript location
+          li
+            span.instr-task
+              | add new section:
+            i  control/command+click
+            |  at desired transcript location
+          li
+            span.instr-task
+              | move a chapter/section start point:
+            |  drag the chapter/section marker to a different location
+          li
+            span.instr-task
+              | change a section break to chapter break:
+            |  control/command+alt+click on section marker
+          li
+            span.instr-task
+              | change a chapter break to a section break:
+            |  control/command+click on chapter marker
+          li
+            span.instr-task
+              | delete a section:
+            |  click the red "x" when hovering over a section in
+            |  the WYSIWYG view
+          li
+            span.instr-task
+              | delete a chapter:
+            |  delete all sections within the chapter
+
+
 block morejs
   if (prod)
     != js("lib/require")

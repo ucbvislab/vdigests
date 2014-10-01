@@ -78,6 +78,23 @@ requirejs(["jquery", "underscore", "backbone", "editing-interface/routers/router
 
             Backbone.history.start();
 
+	        // Show/hide editing instructions
+	        var $instrMinimize = $(".instructions-minimize"),
+	            $showInstr = $(".unminimize-instructions"),
+	            instrShownClass = "instr-shown",
+	            hideEditInstrKey = "hide-editing-instructions";
+	        $instrMinimize.on("click", function (evt) {
+		        $showInstr.removeClass(instrShownClass);
+		        window.localStorage[hideEditInstrKey] = "yes";
+		    });
+	        $showInstr.on("click", function (evt) {
+		        $showInstr.addClass(instrShownClass);
+		        delete window.localStorage[hideEditInstrKey];
+		    });
+	        if (window.localStorage.hasOwnProperty(hideEditInstrKey)) {
+		        $showInstr.removeClass(instrShownClass);
+		    }
+
             // USE STATS collection for interface study
             window.vdstats = {
               nChapCreation: [],

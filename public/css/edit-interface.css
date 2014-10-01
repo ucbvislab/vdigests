@@ -125,7 +125,6 @@ body.published .toolbar {
     height: inherit;
 }
 
-
 /********************/
 /* digest-level css */
 /********************/
@@ -185,6 +184,10 @@ body.published .toolbar {
     border-right: 1px solid #E0E0E0;
     background: white;
     padding-left: 2%;
+}
+
+.editing #digest-wrap {
+    padding-top: 2em;
 }
 
 .viewing #digest-wrap {
@@ -626,41 +629,64 @@ body.viewing .section-row .remove-section {
     color: blue;
 }
 
-.blink-me {
-    -webkit-animation-name: blinker;
-    -webkit-animation-duration: 1s;
-    -webkit-animation-timing-function: linear;
-    -webkit-animation-iteration-count: 3;
+/** Instructions **/
 
-    -moz-animation-name: blinker;
-    -moz-animation-duration: 1s;
-    -moz-animation-timing-function: linear;
-    -moz-animation-iteration-count: 3;
-
-    animation-name: blinker;
-    animation-duration: 1s;
-    animation-timing-function: linear;
-    animation-iteration-count: 3;
+.instructions-text {
+    display: none;
+    font-size: 1.1em;
+    padding: 1em;
+    background: aliceblue;
+    border: 1px solid #dddddd;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    line-height: 1.1em;
 }
 
-@-moz-keyframes blinker {
-    0% { opacity: 1.0; }
-    50% { opacity: 0.0; }
-    100% { opacity: 1.0; }
+.editing .instr-shown + .instructions-text {
+    display: block;
 }
 
-@-webkit-keyframes blinker {
-    0% { opacity: 1.0; }
-    50% { opacity: 0.0; }
-    100% { opacity: 1.0; }
+.instructions-text ul {
+    list-style: none;
 }
 
-@keyframes blinker {
-    0% { opacity: 1.0; }
-    50% { opacity: 0.0; }
-    100% { opacity: 1.0; }
+.instructions-text li+li {
+    margin-top: 1em;
 }
 
+.instructions-minimize {
+    background-color: #D8D8D8;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 20pt;
+    cursor: pointer;
+}
+
+.unminimize-instructions {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    padding: 0.5em;
+    border: 1px #D8D8D8 solid;
+    background: aliceblue;
+    cursor: pointer;
+}
+
+.unminimize-instructions.instr-shown {
+    display: none;
+}
+
+.instr-task {
+    display: block;
+    font-weight: bold;
+    margin-left: -2em;
+}
 
 /** Edit Toolbar **/
 .toolbar {

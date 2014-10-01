@@ -178,11 +178,11 @@ define(["backbone", "underscore", "jquery", "text!templates/transcript-template.
       thisView.$mdel = $tar;
 
       // add a section/chapter break
-      if (evt.metaKey) {
+      if (evt.metaKey || evt.ctrlKey) {
         var $wordEl = $tar,
             changeType = "startSection";
 
-        if (evt.altKey || evt.ctrlKey) {
+        if (evt.altKey) {
           changeType = "startChapter";
         }
 
