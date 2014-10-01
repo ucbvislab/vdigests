@@ -34,7 +34,7 @@ var vdSchema = new mongoose.Schema({
   uploadDate: {type: Date, default: Date.now},
   uploadUser: {type: mongoose.Schema.ObjectId, ref: "User"},
   state: {type: Number, default: 0},
-  // TODO DB migration after migrating old data
+  anyedit: {type: Boolean, default: false},
   digest: {
     author: String,
     title: {
