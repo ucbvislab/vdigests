@@ -22,13 +22,12 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
     });
     setMCHeight($window.height() - navHeight);
     setBodyHeight($window.height());
-    if (window.onbeforeunload !== null) {
+    if (!window.onbeforeunload && window.onbeforeunload !== false) {
       window.onbeforeunload = function () {
-        return "are you finished creating a digest?";
+        return "Did you save your video digest?";
       };
     }
-
-  }
+  };
 
   /**
    * Central router to control URL state
@@ -87,8 +86,8 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
           var IDLEN = 7;
           $(document.body).addClass(consts.pubClass);
           thisRoute.viewRoute(vtitle.substr(vtitle.length - IDLEN));
-          window.onbeforeunload = null;
-          window.setTimeout(function(){$("#about").show();}, 1500);
+          window.onbeforeunload = false;
+          window.setTimeout(function(){$("#about").show();}, 2000);
         } else {
           toastr.error("incorrect URL format, should be /view/title or /editor#edit/id or /editor#preview/id");
         }

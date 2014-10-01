@@ -466,10 +466,10 @@ exports.postNewVD = function(req, res, next) {
                     var sentCall = "python add_sentences " + vdigest.id;
                     exec(sentCall, {cwd: spaths.analysis}, function () {
                       // send email to user
-                      var from = "admin@video-digest.com";
+                      var from = "video.digests@vis.berkeley.edu";
                       var name = "video-digest admin";
                       var body = "Hello " + req.user.profile.name +",\n\n"
-                            + "The transc\ript-video alignment is finished and you may now edit your video digest at: http://vis.berkeley.edu/videodigests/editor#edit/" + vdigest._id + "\n\n"
+                            + "The transcript-video alignment is finished and you may now edit your video digest at: http://vis.berkeley.edu/videodigests/editor#edit/" + vdigest._id + "\n\n"
                             + "Best wishes,\n -Friendly Neighborhood Video Digest Bot";
 
                       var to = req.user.email;
