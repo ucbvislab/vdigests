@@ -641,6 +641,7 @@ body.viewing .section-row .remove-section {
     bottom: 0;
     right: 0;
     line-height: 1.1em;
+    z-index: 1000;
 }
 
 .editing .instr-shown + .instructions-text {
@@ -666,9 +667,11 @@ body.viewing .section-row .remove-section {
     right: 25px;
     font-size: 20pt;
     cursor: pointer;
+    z-index: 2000;
 }
 
 .unminimize-instructions {
+    display: none;
     position: fixed;
     right: 0;
     bottom: 0;
@@ -676,9 +679,14 @@ body.viewing .section-row .remove-section {
     border: 1px #D8D8D8 solid;
     background: rgb(254, 255, 240);
     cursor: pointer;
+    z-index: 500;
 }
 
-.unminimize-instructions.instr-shown {
+.editing .unminimize-instructions {
+    display: block;
+}
+
+.editing .unminimize-instructions.instr-shown {
     display: none;
 }
 
