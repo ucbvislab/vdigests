@@ -146,7 +146,7 @@ app.post('/' + extraPath + 'digestpublish/:vdid', passportConf.isAuthenticated, 
 app.get('/' + extraPath + 'autoseg/:vdid', editorController.getAutoSeg);
 
 // TODO add Authorization
-app.post('/' + extraPath + 'digestdata/:vdid', passportConf.isAuthenticated, editorController.postDigestData);
+app.post('/' + extraPath + 'digestdata/:vdid', editorController.postDigestData);
 app.get('/' + extraPath + 'checkstatus', editorController.getStatus);
 app.get('/' + extraPath + 'screenshot', screenShotController.getScreenShot);
 app.post('/' + extraPath + 'newvd', editorController.postNewVD);

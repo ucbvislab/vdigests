@@ -153,16 +153,18 @@ exports.postDigestData = function(req, res, next) {
   var vdid = req.params.vdid;
 
 
-  if (req.user.vdigests.indexOf(vdid) === -1) {
-    returnError(res, "you do not have the access to change this digest", next);
-    return;
-  }
-
   VDigest.findById(vdid, function (err, vd) {
     if (err || !vd) {
       returnError(res, "unable to save the video digest data", next);
       return;
     }
+      
+      // TODO remove audioName check used for VD experiment
+      if ((!req.user || req.user.vdigests.indexOf(vdid) === -1) && vd.audioName != 'Fpz-stC1uh8') {
+	  returnError(res, "you do not have the access to change this digest", next);
+	  return;
+      }
+
     vd.digest = req.body.object;
     vd.save(function (err) {
       // TODO check that the the user can save the data

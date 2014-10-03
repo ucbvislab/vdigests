@@ -12,8 +12,9 @@ html
     block morecss
   body
     block bodycontent
-      if user
-        include partials/navigation
+      block navbar
+        if user
+          include partials/navigation
 
       #main-container.container
         include partials/flash

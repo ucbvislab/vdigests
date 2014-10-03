@@ -635,7 +635,7 @@ body.viewing .section-row .remove-section {
     display: none;
     font-size: 1.1em;
     padding: 1em;
-    background: aliceblue;
+    background: rgb(254, 255, 240);
     border: 1px solid #dddddd;
     position: fixed;
     bottom: 0;
@@ -674,7 +674,7 @@ body.viewing .section-row .remove-section {
     bottom: 0;
     padding: 0.5em;
     border: 1px #D8D8D8 solid;
-    background: aliceblue;
+    background: rgb(254, 255, 240);
     cursor: pointer;
 }
 
