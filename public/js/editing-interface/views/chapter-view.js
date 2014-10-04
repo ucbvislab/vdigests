@@ -263,10 +263,19 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
 
     startVideo: function (stTime) {
       var thisView = this;
-      thisView.model.ytplayer.seekTo(stTime, true);
-	  window.setTimeout(function () {
+	    // detect if video hasn't player
+	    // mute
+	    // play
+	    // pause
+	    // play
+	  if (!thisView.vplayed) {
 		  thisView.model.ytplayer.playVideo();
-	  }, 350);
+		  thisView.model.ytplayer.mute();
+	  }
+      thisView.model.ytplayer.seekTo(stTime, true);
+	  thisView.model.ytplayer.playVideo();
+	  thisView.model.ytplayer.unMute();
+	  thisView.vplayed = true;
     },
 
     wysiwygAddChapter: function (evt) {
