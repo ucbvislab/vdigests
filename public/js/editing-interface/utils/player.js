@@ -20,7 +20,6 @@ define(['jquery'], function($) {
           enablejsapi: 1,
           rel: 0,
           modestbranding: 1,
-          rel: 0,
           showInfo: 0,
           start: startTime
         },
