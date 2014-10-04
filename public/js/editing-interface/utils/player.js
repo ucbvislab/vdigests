@@ -25,18 +25,17 @@ define(['jquery'], function($) {
         },
         events: {
           'onReady': function (event) {
-	          event.target.seekTo(exactStartTime);
-              // window.preppingVideo = true;
-              // event.target.playVideo();
-              // event.target.mute();
-              // window.setTimeout(function () {
-              //   event.target.unMute();
-              //   event.target.pauseVideo();
-              //   event.target.pauseVideo();
-              //   event.target.seekTo(exactStartTime);
-              //   // event.target.setPlaybackQuality("small"); // TODO figure out how to reduce quality
-              //   window.preppingVideo = false;
-              // }, 500);
+              window.preppingVideo = true;
+              event.target.playVideo();
+              event.target.mute();
+              window.setTimeout(function () {
+                event.target.unMute();
+                event.target.pauseVideo();
+                event.target.pauseVideo();
+                event.target.seekTo(exactStartTime);
+                // event.target.setPlaybackQuality("small"); // TODO figure out how to reduce quality
+                window.preppingVideo = false;
+              }, 500);
           }
         }
       });
