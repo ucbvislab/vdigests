@@ -78,6 +78,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       var thisView = this;
       // listen for state changes & propagate to the model
       thisView.model.ytplayer.addEventListener("onStateChange", function (stobj) {
+	    console.log("chp state: " + stobj.data);
         thisView.model.set("state", stobj.data);
       });
     },
@@ -130,7 +131,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       });
 
       thisView.listenTo(thisModel, "showCover", function (mdl, val) {
-        thisModel.ytplayer && thisModel.ytplayer.seekTo(thisModel.getStartTime());
+        thisModel.ytplayer && thisModel.ytplayer.seekTo(thisModel.getStartTime(), true);
         thisView.showCover();
       });
 
@@ -263,7 +264,9 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
     startVideo: function (stTime) {
       var thisView = this;
       thisView.model.ytplayer.seekTo(stTime, true);
-      thisView.model.ytplayer.playVideo();
+	  window.setTimeout(function () {
+		  thisView.model.ytplayer.playVideo();
+	  }, 350);
     },
 
     wysiwygAddChapter: function (evt) {
