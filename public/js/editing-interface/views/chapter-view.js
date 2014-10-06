@@ -78,7 +78,6 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       var thisView = this;
       // listen for state changes & propagate to the model
       thisView.model.ytplayer.addEventListener("onStateChange", function (stobj) {
-	    console.log("chp state: " + stobj.data);
         thisView.model.set("state", stobj.data);
       });
     },
