@@ -203,6 +203,7 @@ define(["backbone", "underscore", "jquery", "text!templates/chapter-template.htm
       // set the cover dimensions
       $curCover.html($imgClone);
       $imgClone.width(dispW + "%");
+      $imgClone.height(dispH + "%");
       $curCover.show();
 
       // memoize the view els
