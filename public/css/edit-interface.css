@@ -794,3 +794,16 @@ input[type=file] {
     padding-top: 4rem;
     text-align: center;
 }
+
+
+/* LOADING IMG */
+#loading-image {
+    display: none;
+    position: absolute;
+    z-index: 10000;
+    left: 50%;
+    margin-left: -150px;
+    top: 80px;
+    font-size: 20pt;
+}
+

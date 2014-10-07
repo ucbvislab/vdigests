@@ -87,7 +87,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
           $(document.body).addClass(consts.pubClass);
           thisRoute.viewRoute(vtitle.substr(vtitle.length - IDLEN));
           window.onbeforeunload = false;
-          window.setTimeout(function(){$("#about").show();}, 2000);
+          $("#loading-image").show();
         } else {
           toastr.error("incorrect URL format, should be /view/title or /editor#edit/id or /editor#preview/id");
         }
@@ -148,18 +148,20 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
             // now  show the editor view
             $("#" + consts.editingId).html(thisRoute.editorView.render().el);
             thisRoute.editorModel.postInit();
+            $("#loading-image").hide();
+            $("#about").show();
+
             if (toView) {
-              thisRoute.viewRoute(dataname);
+                thisRoute.viewRoute(dataname);
             } else {
-              showCallback();
+                showCallback();
             }
-          }, // end success
-                                       error: function (data, resp) {
-                                         toastr.error((resp.responseJSON && resp.responseJSON.error) || "unable to load the video digest");
-                                       } // end error
+          }, error: function (data, resp) {
+              toastr.error((resp.responseJSON && resp.responseJSON.error) || "unable to load the video digest");
+          } // end error
                                       });
         } else {
-          showCallback();
+            showCallback();
         }
       }
     });

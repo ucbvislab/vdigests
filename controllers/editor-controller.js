@@ -20,7 +20,8 @@ var fs = require('fs'),
     settings = require('../config/settings'),
     spaths = settings.paths,
     pathUtils = require('../utils/fpaths'),
-    returnError = require('../utils/errors').returnError;
+    returnError = require('../utils/errors').returnError,
+    cache = require('memory-cache');
 
 var nodemailer = require("nodemailer");
 var secrets = require('../config/secrets');
@@ -104,6 +105,12 @@ exports.getStatus = function(req, res) {
  */
 exports.getDigestData = function (req, res, next) {
   var vdid = req.params.vdid;
+  if (cache.get(vdid)) {
+   console.log("using vdid cache for: " + vdid);
+      res.writeHead(200, {"content-type": "application/json"});
+      return res.end(cache.get(vdid));
+  }
+
   VDigest.findById(vdid, function (err, vd) {
     if (err || !vd) {
       returnError(res, "unable to load the specified video digest data", next);
@@ -115,7 +122,9 @@ exports.getDigestData = function (req, res, next) {
       returnError(res, "the transcript did not upload correctly: please create the video digest from scratch", next);
     } else {
       res.writeHead(200, {"content-type": "application/json"});
-      res.end(JSON.stringify({"digest": vd.digest, "transcript": vd.alignTrans, "ytid": vd.ytid, "videoLength": vd.videoLength}));
+      var jsonStrResp = JSON.stringify({"digest": vd.digest, "transcript": vd.alignTrans, "ytid": vd.ytid, "videoLength": vd.videoLength});
+      res.end(jsonStrResp);
+      cache.put(vdid, jsonStrResp, 10000000);
     }
   });
 };
