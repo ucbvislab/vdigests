@@ -284,6 +284,7 @@ body.published .toolbar {
 
 .summary-column {
     position: relative;
+    top: -1px;
     display: inline-block;
     margin-left: 8px;
     width: 50%;
@@ -356,7 +357,16 @@ div.section-row:last-child {
 
 .viewing .section-row {
     cursor: pointer;
-    margin-bottom: 4px;
+}
+
+.viewing .section-row:after {
+    cursor: pointer;
+    content: ' ';
+    display: block;
+    height: 3px;
+}
+.viewing .section-row:hover:after {
+    border-top: 1px solid #dddddd;
 }
 
 .viewing .section-row:hover .keyframe-col:before {
@@ -390,17 +400,14 @@ div.section-row:last-child {
 
 .section-row.active, .viewing .section-row {
     border-top: solid 1px transparent;
-    border-bottom: solid 1px transparent;
 }
 
  .section-row.active { 
      background: rgba(237, 237, 237, 1); 
     border-top: solid 1px #ddd;
-    border-bottom: solid 1px #ddd;
  } 
 .viewing .section-row:hover {
     border-top: solid 1px #ddd;
-    border-bottom: solid 1px #ddd;
 }
 
 .keyframe-col {

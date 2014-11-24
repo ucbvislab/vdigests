@@ -149,8 +149,10 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/editor-mod
             $("#" + consts.editingId).html(thisRoute.editorView.render().el);
             thisRoute.editorModel.postInit();
             $("#loading-image").hide();
-            $("#about").show();
-
+            if ($(document.body).hasClass(consts.pubClass)) {
+                $("#about").show();
+            }
+            
             if (toView) {
                 thisRoute.viewRoute(dataname);
             } else {
