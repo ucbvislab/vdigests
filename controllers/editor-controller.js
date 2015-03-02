@@ -170,8 +170,8 @@ exports.postDigestData = function(req, res, next) {
       
       // TODO remove audioName check used for VD experiment
       if ((!req.user || req.user.vdigests.indexOf(vdid) === -1) && vd.audioName != 'Fpz-stC1uh8') {
-	  returnError(res, "you do not have the access to change this digest", next);
-	  return;
+      returnError(res, "you do not have the access to change this digest", next);
+      return;
       }
 
     vd.digest = req.body.object;
@@ -261,7 +261,7 @@ exports.postNewVD = function(req, res, next) {
             var vd = new VDigest({ytid: ytid, rawTransName: tfname, videoName: ytid, videoLength: vlen, digest: {title: fields.yttitle[0]}});
             vd.save(function (err) {
               if (err) {
-		            console.log(err);
+                    console.log(err);
                 returnError(res, "problem saving video digest to the database -- please try again", next);
                 return;
               } else {
@@ -559,7 +559,7 @@ exports.getAutoSeg = function (req, res, next) {
         console.log( scmd );
 
         exec(scmd, {cwd: spaths.utils}, function (err, stdout, stderr) {
-	   console.log("error: " + err);
+       console.log("error: " + err);
            console.log("error: " + stderr);
           if (err || !vdigest.sentSepTransName) {
            return returnErrorJson(res, {msg: "error processing transcript - please try again later"}, 500);
@@ -571,12 +571,12 @@ exports.getAutoSeg = function (req, res, next) {
         console.log(segSysCall);
         var segProc = exec(segSysCall, {cwd: spaths.analysis}, function (error, stdout, stderr) {
           console.log("finished segmentation");
-	  console.log("error: " + error)
-	  console.log("stderror: " + stderr)
-	  console.log("stdout: " + stdout)
+      console.log("error: " + error)
+      console.log("stderror: " + stderr)
+      console.log("stdout: " + stdout)
           // get sentence breaks from stdout
-	  if (error || stderr) {
-	      return returnErrorJson(res, {"msg": "Segmentation error -- please try again: " + stderr});
+      if (error || stderr) {
+          return returnErrorJson(res, {"msg": "Segmentation error -- please try again: " + stderr});
           }
           try{
             var sps = stdout.split("\n");

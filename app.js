@@ -139,6 +139,7 @@ app.get('/:extra(videodigests)?', homeController.index);
 // TODO separate editor from the viewer
 app.get('/' + extraPath + 'view/:ptitle', editorController.getEditor);
 app.get('/' + extraPath + 'editor', editorController.getEditor);
+app.get('/' + extraPath + 'tutorial', editorController.getEditor);
 
 // TODO make more restful
 app.get('/' + extraPath + 'digestdata/:vdid', editorController.getDigestData);
@@ -175,7 +176,7 @@ app.use(errorHandler());
  */
 
 app.listen(app.get('port'), function() {
-  console.log("✔ Express server listening on port %d in %s mode", app.get('port'), app.get('env'));
+  console.log(" ✔ Express server listening on port %d in %s mode", app.get('port'), app.get('env'));
 });
 
 module.exports = app;
