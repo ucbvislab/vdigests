@@ -139,7 +139,7 @@ app.get('/:extra(videodigests)?', homeController.index);
 // TODO separate editor from the viewer
 app.get('/' + extraPath + 'view/:ptitle', editorController.getEditor);
 app.get('/' + extraPath + 'editor', editorController.getEditor);
-app.get('/' + extraPath + 'tutorial', editorController.getEditor);
+app.get('/' + extraPath + 'tutorial', homeController.tutorial);
 
 // TODO make more restful
 app.get('/' + extraPath + 'digestdata/:vdid', editorController.getDigestData);
