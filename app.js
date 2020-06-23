@@ -190,19 +190,9 @@ MongoClient.connect(secrets.db, function (err, db) {
 
   initServer();
 
-  // https.createServer({
-  //   key: fs.readFileSync('server.key'),
-  //   cert: fs.readFileSync('server.cert')
-  // }, app).listen(app.get('port'), function() {
-
   app.listen(app.get('port'), function() {
     console.log(" ✔ Express server listening on port %d in %s mode", app.get('port'), app.get('env'));
   });
 });
-
-
-// .listen(3001, function () {
-//   console.log('Example app listening on port 3000! Go to https://localhost:3001/')
-// })
 
 module.exports = app;

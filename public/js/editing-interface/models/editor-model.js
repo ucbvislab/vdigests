@@ -33,7 +33,7 @@ define(["backbone", "underscore", "jquery", "editing-interface/models/digest-mod
     },
 
     url: function () {
-      return "/videodigests/digestdata/" + this.id;
+      return "/digestdata/" + this.id;
     },
 
     initialize: function () {
