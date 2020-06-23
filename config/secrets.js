@@ -1,6 +1,6 @@
 module.exports = {
 
-  db: process.env.MONGODB|| 'mongodb://localhost:27017/vdigest',
+  db: process.env.MONGODB_URI || 'mongodb://localhost:27017/vdigest',
 
   betaPW: process.env.BETA_PASSWORD || "somepw",
 
