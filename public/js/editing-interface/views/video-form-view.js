@@ -42,6 +42,17 @@ define(["backbone", "underscore", "jquery", "toastr", "text!templates/ytinfo-tem
       handleFormSuccess: function (resobj) {
         var thisView = this,
             $el = thisView.$el;
+        
+        // TODO: check for if we couldn't get a transcript from youtube
+
+        if (resobj.intrmid) {
+          // redirect to the video digest editor
+          thisView.intrmid = resobj.intrmid;
+          var $finalUrls = thisView.$el.find("." + consts.finalUrlClass);
+          window.location = window.location.href + "#edit/" + resobj.intrmid;
+          return;
+        }
+
         if ($el.hasClass(consts.firstFormClass)) {
           var ytinfoHtml = _.template(ytinfoTemplate, resobj);
           thisView.$el.find("." + consts.pageHeaderClass).html(ytinfoHtml);
@@ -51,42 +62,13 @@ define(["backbone", "underscore", "jquery", "toastr", "text!templates/ytinfo-tem
         } else if ($el.hasClass(consts.secondFormClass)){
           if (resobj.intrmid) {
             thisView.intrmid = resobj.intrmid;
-            thisView.$el.removeClass(consts.secondFormClass);
-            thisView.$el.addClass(consts.thirdFormClass);
-            var $finalUrls = thisView.$el.find("." + consts.finalUrlClass),
-            finalHref = window.location.href + "#edit/" + resobj.intrmid;
-            thisView.finalHref = finalHref;
-            $finalUrls.each(function (i, el) {
-                el.innerHTML = finalHref;
-                el.href = finalHref;
-            });
-            $("#" + consts.tranUploadId).val("");
-            $("#" + consts.tranUploadId).val("");
-            $("#" + consts.gtransId).val("");
-            $("#" + consts.intrmId).val(resobj.intrmid);
+            var $finalUrls = thisView.$el.find("." + consts.finalUrlClass);
+            window.location = window.location.href + "#edit/" + resobj.intrmid;
           } else {
-            toastr.error("unable to process request correctly: try resubmitting");
+            toastr.error("Unable to process request correctly: try again");
           }
-          // thisView.router.navVideoId(resobj.contentid);
         } else {
-          thisView.$el.removeClass(consts.thirdFormClass);
-          thisView.$el.addClass(consts.processingFormClass);
-          // final class -- check the status until it is finished
-          var checkStatus = function () {
-            window.setTimeout(function () {
-              $.get("/videodigests/checkstatus?id=" + thisView.intrmid, function (resp) {
-                if (resp.status == 1) {
-                  thisView.$el.removeClass(consts.processingFormClass);
-                  thisView.$el.hide();
-                  window.location = thisView.finalHref;
-                } else {
-                  //still waiting
-                  checkStatus();
-                }
-              });
-            }, 10000);
-          };
-          checkStatus();
+          toastr.error("Unable to process request: try again");
         }
       },
 
