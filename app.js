@@ -100,7 +100,7 @@ function initServer() {
   });
   app.use(function(req, res, next) {
     res.locals.user = req.user;
-    res.locals.prod = app.get('env') == 'production';
+    res.locals.prod = process.env.NODE_ENV === 'production';
     next();
   });
   app.use(flash());
