@@ -448,9 +448,7 @@ exports.postDigestData = function (req, res, next) {
 
 // multipart process for loading a new video
 exports.postNewVD = function (req, res, next) {
-  console.log("Trying to print url");
-  console.log(req.yturl);
-
+  console.log(req);
   req.assert("yturl", "YouTube URL is not a valid URL").isURL();
 
   if (!req.user) {
