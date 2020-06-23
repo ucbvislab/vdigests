@@ -77,7 +77,7 @@ function initServer() {
   app.set('views', path.join(__dirname, 'views'));
   app.set('view engine', 'jade');
   app.use(connectAssets({
-    paths: ['public/css', 'public/js'],
+    paths: ['public/css', 'public/js', 'public/img'],
     helperContext: app.locals,
     servePath: 'vdstatic'
   }));

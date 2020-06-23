@@ -510,7 +510,7 @@ exports.postNewVD = function (req, res, next) {
       //  TODO return informative messages to the user (how to do this?)
       returnError(
         res,
-        "You must provide a YouTube url in the format: http://www.youtube.com/watch?v=someIdValue",
+        "You must provide a YouTube url in the format: https://www.youtube.com/watch?v=someIdValue",
         next
       );
       return;
