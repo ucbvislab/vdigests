@@ -373,7 +373,6 @@ exports.getDigestData = function (req, res, next) {
       );
     } else {
       res.writeHead(200, { "content-type": "application/json" });
-      console.log('Got digest: ', vd);
       var jsonStrResp = JSON.stringify({
         digest: vd.digest,
         transcript: vd.alignTrans,
@@ -404,7 +403,7 @@ exports.postPublishDigest = function (req, res, next) {
     if (!vd.pubdisplay) {
       vd.pubdisplay = true;
       vd.puburl =
-        "http://vis.berkeley.edu/videodigests/view/" +
+        "/view/" +
         slug(vd.digest.title + " " + vd.id);
       vd.save();
     }
