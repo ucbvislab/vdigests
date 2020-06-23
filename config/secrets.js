@@ -6,5 +6,10 @@ module.exports = {
 
   sessionSecret: process.env.SESSION_SECRET || "somesessionsecret",
 
+  mailgun: {
+    user: process.env.MAILGUN_USER,
+    password: process.env.MAILGUN_PASSWORD,
+  },
+
   adminEmail: "amypavel@gmail.com",
 };
