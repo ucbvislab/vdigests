@@ -8,6 +8,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon node app.js",
+    "build": "cd public/js && r.js -o build.js",
     "test": "mocha"
   },
   "dependencies": {
@@ -57,6 +58,7 @@
     "passport-oauth": "^1.0.0",
     "passport-twitter": "^1.0.2",
     "request": "^2.36.0",
+    "requirejs": "^2.3.6",
     "slug": "~0.9.1",
     "stripe": "^2.6.3",
     "tumblr.js": "^0.0.4",
