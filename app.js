@@ -11,6 +11,7 @@ var logger = require('morgan');
 var errorHandler = require('errorhandler');
 var csrf = require('lusca').csrf();
 var methodOverride = require('method-override');
+var sslRedirect = require('heroku-ssl-redirect');
 
 var fs = require('fs')
 var https = require('https')
@@ -76,6 +77,7 @@ function initServer() {
   app.set('port', process.env.PORT || 3000);
   app.set('views', path.join(__dirname, 'views'));
   app.set('view engine', 'jade');
+  app.use(sslRedirect());
   app.use(connectAssets({
     paths: ['public/css', 'public/js', 'public/img'],
     helperContext: app.locals,
