@@ -130,7 +130,6 @@ function getAlignmentForVtt(vttText) {
     } else if (cardStart !== cardEnd && line.indexOf("<c>") >= 0) {
       let wordStart = cardStart;
       let wordEnd = cardStart;
-      console.log(line);
       for (const part of line.split("<c>")) {
         const match = part.match(/([^<>]+)(<\/c>)?(<(\d\d):(\d\d):(\d\d\.\d\d\d)>)?/);
         let word = part.trim();
@@ -155,7 +154,6 @@ function getAlignmentForVtt(vttText) {
           sentenceNumber,
         });
         wordStart = wordEnd;
-        console.log(words[words.length - 1])
       }
       sentenceNumber++; // crude...
     }
@@ -254,29 +252,6 @@ async function getTranscriptAndCreateDigest({ res, userId, title, imageUrl, vide
     next
   });
 }
-
-// async function getAlignmentFromYoutubeVTT(ytid) {
-//   let data = undefined;
-//   let writeData = undefined;
-//   try {
-//     console.log(
-//       "Looking for ",
-//       path.join(spaths.videos, ytid + ".en.vtt")
-//     );
-//     data = await fs.readFile(
-//       path.join(spaths.videos, ytid + ".en.vtt"),
-//       "utf8"
-//     );
-//     writeData = vttToText(data);
-
-//     alignTrans = getAlignmentForVtt(data);
-//   } catch (err) {
-//     console.log(err);
-//     console.log("No downloaded VTT transcript available", err);
-//     return returnError(res, "unable to get YouTube transcript");
-//   }
-//   return alignTrans;
-// }
 
 async function getTranscript({ res, userId, title, imageUrl, videoLength, next, ytid }) {
   console.log("Trying to get video file for: " + ytid);
