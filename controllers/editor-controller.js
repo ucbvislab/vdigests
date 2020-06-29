@@ -352,7 +352,6 @@ exports.getDigestData = function (req, res, next) {
   console.log('Getting digest data...');
   const vdid = req.params.vdid;
   const userCanEdit = getCanUserEdit(req.user, vdid);
-  const cachedData = cache.get(vdid);
   const task = req.query.task;
 
   if (task !== 'edit' && task !== 'view') {
@@ -363,6 +362,8 @@ exports.getDigestData = function (req, res, next) {
     returnError(res, 'user does not have access to digest', next);
     return;
   }
+
+  const cachedData = cache.get(vdid);
 
   if (
     cachedData &&

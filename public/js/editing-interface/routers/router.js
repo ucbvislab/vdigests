@@ -41,11 +41,6 @@ define([
     });
     setMCHeight($window.height() - navHeight);
     setBodyHeight($window.height());
-    if (!window.onbeforeunload && window.onbeforeunload !== false) {
-      window.onbeforeunload = function () {
-        return 'Did you save your video digest?';
-      };
-    }
   };
 
   /**
@@ -107,7 +102,6 @@ define([
           var IDLEN = 7;
           $(document.body).addClass(consts.pubClass);
           thisRoute.viewRoute(vtitle.substr(vtitle.length - IDLEN));
-          window.onbeforeunload = false;
           $('#loading-image').show();
         } else {
           toastr.error(
