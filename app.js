@@ -144,7 +144,7 @@ function initServer() {
   app.get('/' + extraPath + 'checkstatus', editorController.getStatus);
   app.get('/' + extraPath + 'screenshot', screenShotController.getScreenShot);
   app.post('/' + extraPath + 'newvd', editorController.postNewVD);
-  app.get('/' + extraPath + 'vdigests', vdlistController.getVDList);
+  app.get('/' + extraPath + 'latest', vdlistController.getVDList);
   app.get('/' + extraPath + 'login', userController.getLogin);
   app.post('/' + extraPath + 'login', userController.postLogin);
   app.get('/' + extraPath + 'logout', userController.logout);
