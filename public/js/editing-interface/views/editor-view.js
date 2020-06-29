@@ -11,6 +11,7 @@ define([
   'editing-interface/models/section-model',
   'editing-interface/utils/utils',
   'toastr',
+  'micromodal',
 ], function (
   Backbone,
   _,
@@ -22,7 +23,8 @@ define([
   ChapterModel,
   SectionModel,
   Utils,
-  toastr
+  toastr,
+  micromodal
 ) {
   var consts = {
     digestWrapId: 'digest-wrap',
@@ -49,12 +51,22 @@ define([
       },
       'click #preview-vdigest': 'previewVDigest',
       'click #save-vdigest': 'saveVDigest',
-      'click #publish-vdigest': 'publishVDigest',
+      'click #publish-vdigest': 'showPublishModal',
       'click #to-edit-vdigest': 'toEditVDigest',
     },
 
     initialize: function () {
       var thisView = this;
+
+      $('#publish-modal-publish').off('click');
+      $('#publish-modal-publish').on('click', function (evt) {
+        thisView.publishVDigest();
+      });
+
+      $('#publish-modal-unpublish').off('click');
+      $('#publish-modal-unpublish').on('click', function (evt) {
+        thisView.unpublishVDigest();
+      });
 
       $(document.body).on('keyup', function (evt) {
         if (evt.keyCode === consts.ESCAPE_KEYCODE) {
@@ -206,28 +218,61 @@ define([
       window.location.hash = 'preview/' + locSplit.slice(1).join('/');
     },
 
-    publishVDigest: function () {
-      var thisView = this;
-      if (window.confirm('are you ready to publish this digest?')) {
-        $.ajax({
+    unpublishVDigest: async function () {
+      try {
+        const resp = await $.ajax({
           url: '/digestpublish/' + window.dataname,
-          data: JSON.stringify({ publish: true, _csrf: window._csrf }),
+          data: JSON.stringify({
+            publish: false,
+            _csrf: window._csrf,
+          }),
           type: 'post',
           contentType: 'application/json',
-          success: function (resp) {
-            toastr.success('published!');
-            if (resp && resp.puburl) {
-              window.open(resp.puburl, '_blank');
-            }
-          },
-          error: function (resp) {
-            toastr.error(
-              (resp && resp.responseJSON && resp.responseJSON.error) ||
-                'unable to publish -- please try again'
-            );
-          },
         });
+        toastr.success('unpublished!');
+        if (resp && resp.puburl) {
+          window.open(resp.puburl, '_blank');
+        }
+      } catch (resp) {
+        toastr.error(
+          (resp && resp.responseJSON && resp.responseJSON.error) ||
+            'unable to publish -- please try again'
+        );
       }
+    },
+
+    publishVDigest: async function () {
+      const unlisted = $('#publish-modal-unlisted').is(':checked');
+
+      // save before publishing
+      await this.saveVDigest();
+
+      try {
+        const resp = await $.ajax({
+          url: '/digestpublish/' + window.dataname,
+          data: JSON.stringify({
+            publish: true,
+            unlisted,
+            _csrf: window._csrf,
+          }),
+          type: 'post',
+          contentType: 'application/json',
+        });
+        toastr.success('published!');
+        if (resp && resp.puburl) {
+          window.open(resp.puburl, '_blank');
+        }
+      } catch (resp) {
+        toastr.error(
+          (resp && resp.responseJSON && resp.responseJSON.error) ||
+            'unable to publish -- please try again'
+        );
+      }
+    },
+
+    showPublishModal: function () {
+      var thisView = this;
+      micromodal.show('modal-1');
     },
 
     toEditVDigest: function () {
@@ -235,26 +280,25 @@ define([
       window.location.hash = 'edit/' + locSplit.slice(1).join('/');
     },
 
-    saveVDigest: function () {
+    saveVDigest: async function () {
       var thisView = this,
         outpjson = {};
       outpjson.object = thisView.model.get('digest').toJSON();
       outpjson['_csrf'] = window._csrf;
-      $.ajax({
-        url: '/digestdata/' + window.dataname,
-        data: JSON.stringify(outpjson),
-        type: 'post',
-        contentType: 'application/json',
-        success: function () {
-          toastr.success('save successful');
-        },
-        error: function (resp) {
-          toastr.error(
-            (resp && resp.responseJSON && resp.responseJSON.error) ||
-              'unable to save -- please try again'
-          );
-        },
-      });
+      try {
+        await $.ajax({
+          url: '/digestdata/' + window.dataname,
+          data: JSON.stringify(outpjson),
+          type: 'post',
+          contentType: 'application/json',
+        });
+        toastr.success('save successful');
+      } catch (resp) {
+        toastr.error(
+          (resp && resp.responseJSON && resp.responseJSON.error) ||
+            'unable to save -- please try again'
+        );
+      }
     },
   });
 });

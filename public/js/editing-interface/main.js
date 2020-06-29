@@ -20,6 +20,7 @@ requirejs.config({
     jform: 'lib/jquery.form.min',
     toastr: 'lib/toastr',
     jmenu: 'lib/jquery.contextmenu',
+    micromodal: 'lib/micromodal.min',
   },
   shim: {
     jmenu: ['jquery'],
@@ -58,6 +59,7 @@ requirejs(
     'filesaver',
     'jform',
     'jmenu',
+    'micromodal',
   ],
   function ($, _, Backbone, AppRouter, Utils, Player) {
     'use strict';

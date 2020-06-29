@@ -14,6 +14,7 @@
     jform: 'lib/jquery.form.min',
     toastr: 'lib/toastr',
     jmenu: 'lib/jquery.contextmenu',
+    micromodal: 'lib/micromodal.min',
   },
   shim: {
     jmenu: ['jquery'],

@@ -388,14 +388,24 @@ exports.postPublishDigest = function (req, res, next) {
     return;
   }
 
+  const publish = Boolean(req.body.publish);
+  const unlisted = Boolean(req.body.unlisted);
+
   VDigest.findById(vdid, function (err, vd) {
     if (err || !vd) {
       returnError(res, 'unable to save the video digest data', next);
       return;
     }
-    if (!vd.pubdisplay) {
-      vd.pubdisplay = true;
-      vd.puburl = '/view/' + slug(vd.digest.title + ' ' + vd.id);
+    let changed = false;
+    if (publish) {
+      vd.pubdisplay = !unlisted;
+      if (!vd.puburl) {
+        vd.puburl = '/view/' + slug(vd.digest.title + ' ' + vd.id);
+      }
+      vd.save()
+    } else {
+      vd.pubdisplay = false;
+      vd.puburl = undefined;
       vd.save();
     }
     res.writeHead(200, { 'content-type': 'application/json' });
