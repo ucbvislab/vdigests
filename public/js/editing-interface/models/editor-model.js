@@ -54,7 +54,7 @@ define([
     },
 
     url: function () {
-      return '/digestdata/' + this.id;
+      return `/digestdata/${this.id}?task=${this.attributes.task}`;
     },
 
     initialize: function () {

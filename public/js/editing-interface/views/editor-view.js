@@ -230,9 +230,6 @@ define([
           contentType: 'application/json',
         });
         toastr.success('unpublished!');
-        if (resp && resp.puburl) {
-          window.open(resp.puburl, '_blank');
-        }
       } catch (resp) {
         toastr.error(
           (resp && resp.responseJSON && resp.responseJSON.error) ||
@@ -260,7 +257,7 @@ define([
         });
         toastr.success('published!');
         if (resp && resp.puburl) {
-          window.open(resp.puburl, '_blank');
+          window.open(`/view/${resp.puburl}`, '_blank');
         }
       } catch (resp) {
         toastr.error(

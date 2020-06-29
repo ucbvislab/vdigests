@@ -165,7 +165,10 @@ define([
         };
 
         if (!thisRoute.editorModel) {
-          thisRoute.editorModel = new EditorModel({ id: dataname });
+          thisRoute.editorModel = new EditorModel({
+            id: dataname,
+            task: toView ? 'view' : 'edit',
+          });
           thisRoute.editorView = new EditorView({
             model: thisRoute.editorModel,
           });

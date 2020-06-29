@@ -136,7 +136,7 @@ function initServer() {
   // var extraPath = "";
   app.get('/:extra(videodigests)?', homeController.index);
   // TODO separate editor from the viewer
-  app.get('/' + extraPath + 'view/:ptitle', editorController.getEditor);
+  app.get('/' + extraPath + 'view/:slug', editorController.getEditor);
   app.get('/' + extraPath + 'editor', editorController.getEditor);
   app.get('/' + extraPath + 'tutorial', homeController.tutorial);
 

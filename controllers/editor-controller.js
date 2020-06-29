@@ -310,6 +310,7 @@ async function getTranscript({
  * Returns the editor js template (TODO consider bootstraping data)
  */
 exports.getEditor = function (req, res) {
+  console.log(req.params);
   res.render('editor', {
     title: 'Video Digest Editor',
   });
@@ -340,22 +341,46 @@ exports.getStatus = function (req, res) {
   });
 };
 
+function getCanUserEdit(user, vdid) {
+  return Boolean(user && user.vdigests.indexOf(vdid) !== -1);
+}
+
 /**
  * Returns the digest data needed for the editor /digestdata/:vid
  */
 exports.getDigestData = function (req, res, next) {
   console.log('Getting digest data...');
+  const vdid = req.params.vdid;
+  const userCanEdit = getCanUserEdit(req.user, vdid);
+  const cachedData = cache.get(vdid);
+  const task = req.query.task;
 
-  var vdid = req.params.vdid;
-  if (cache.get(vdid)) {
+  if (task !== 'edit' && task !== 'view') {
+    returnError(res, `invalid data task: ${task}`);
+    return;
+  }
+  if (task === 'edit' && !userCanEdit) {
+    returnError(res, 'user does not have access to digest', next);
+    return;
+  }
+
+  if (
+    cachedData &&
+    ((task === 'view' && cachedData.pubdisplay) ||
+      (task === 'edit' && userCanEdit))
+  ) {
     console.log('using vdid cache for: ' + vdid);
     res.writeHead(200, { 'content-type': 'application/json' });
-    return res.end(cache.get(vdid));
+    return res.end(cachedData);
   }
 
   VDigest.findById(vdid, function (err, vd) {
     if (err || !vd) {
       returnError(res, 'unable to load the specified video digest data', next);
+    } else if (task === 'view' && !vd.pubdisplay) {
+      returnError(res, 'video digest is not published', next);
+    } else if (task === 'edit' && !userCanEdit) {
+      returnError(res, 'user does not have access to digest', next);
     } else if (vd.isProcessing()) {
       returnError(res, 'the video digest is currently processing', next);
     } else if (!vd.isReady()) {
@@ -383,7 +408,7 @@ exports.getDigestData = function (req, res, next) {
  */
 exports.postPublishDigest = function (req, res, next) {
   var vdid = req.params.vdid;
-  if (req.user.vdigests.indexOf(vdid) === -1) {
+  if (!getCanUserEdit(req.user, vdid)) {
     returnError(res, 'you do not have the access to publish this digest', next);
     return;
   }
@@ -400,12 +425,12 @@ exports.postPublishDigest = function (req, res, next) {
     if (publish) {
       vd.pubdisplay = !unlisted;
       if (!vd.puburl) {
-        vd.puburl = '/view/' + slug(vd.digest.title + ' ' + vd.id);
+        vd.puburl = slug(vd.digest.title + ' ' + vd.id);
       }
-      vd.save()
+      vd.save();
     } else {
       vd.pubdisplay = false;
-      vd.puburl = undefined;
+      vd.puburl = null;
       vd.save();
     }
     res.writeHead(200, { 'content-type': 'application/json' });
