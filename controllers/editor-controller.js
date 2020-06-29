@@ -4,29 +4,29 @@
  */
 /*global require exports*/
 
-var fs = require("fs").promises,
-  mkdirp = require("mkdirp"),
-  ytdl = require("ytdl-core"),
-  multiparty = require("multiparty"),
-  url = require("url"),
-  sys = require("sys"),
-  exec = require("child_process").exec,
-  User = require("../models/User"),
-  util = require("util"),
-  slug = require("slug"),
-  querystring = require("querystring"),
-  path = require("path"),
-  VDigest = require("../models/VDigest"),
-  settings = require("../config/settings"),
+var fs = require('fs').promises,
+  mkdirp = require('mkdirp'),
+  ytdl = require('ytdl-core'),
+  multiparty = require('multiparty'),
+  url = require('url'),
+  sys = require('sys'),
+  exec = require('child_process').exec,
+  User = require('../models/User'),
+  util = require('util'),
+  slug = require('slug'),
+  querystring = require('querystring'),
+  path = require('path'),
+  VDigest = require('../models/VDigest'),
+  settings = require('../config/settings'),
   spaths = settings.paths,
-  pathUtils = require("../utils/fpaths"),
-  returnError = require("../utils/errors").returnError,
-  cache = require("memory-cache");
+  pathUtils = require('../utils/fpaths'),
+  returnError = require('../utils/errors').returnError,
+  cache = require('memory-cache');
 
-var nodemailer = require("nodemailer");
-var secrets = require("../config/secrets");
-var smtpTransport = nodemailer.createTransport("SMTP", {
-  service: "Mailgun",
+var nodemailer = require('nodemailer');
+var secrets = require('../config/secrets');
+var smtpTransport = nodemailer.createTransport('SMTP', {
+  service: 'Mailgun',
   auth: {
     user: secrets.mailgun.user,
     pass: secrets.mailgun.password,
@@ -36,7 +36,7 @@ var smtpTransport = nodemailer.createTransport("SMTP", {
 // Helper functions
 var returnJson = function (res, data, code) {
   code = code || 200;
-  res.writeHead(code, { "content-type": "application/json" });
+  res.writeHead(code, { 'content-type': 'application/json' });
   res.write(JSON.stringify(data));
   res.end();
 };
@@ -44,7 +44,7 @@ var returnJson = function (res, data, code) {
 // Helper functions
 var returnErrorJson = function (res, data, code) {
   code = code || 400;
-  res.writeHead(code, { "content-type": "application/json" });
+  res.writeHead(code, { 'content-type': 'application/json' });
   res.write(JSON.stringify(data));
   res.end();
 };
@@ -55,11 +55,11 @@ function youtubeUrlFromId(ytid) {
 
 var srtToText = function (srtText) {
   var srtData = srtText.split(/\n\n/g),
-    writeData = "";
+    writeData = '';
   srtData.forEach(function (srCluster) {
     if (srCluster) {
-      writeData += srCluster.split("\n").slice(2).join(". ");
-      writeData += "\n";
+      writeData += srCluster.split('\n').slice(2).join('. ');
+      writeData += '\n';
     }
   });
   return writeData;
@@ -70,31 +70,31 @@ const cardTimingRegex = /^(\d\d):(\d\d):(\d\d\.\d\d\d) --> (\d\d):(\d\d):(\d\d\.
 function getTextForCurrentCard(cardText) {
   // Skip all VTT cards that contain a cue <c> tag, for now as the transcript is duplicated
   // in those cards
-  if (cardText.indexOf("<c>") >= 0 || cardText.length === 0) {
-    return "";
+  if (cardText.indexOf('<c>') >= 0 || cardText.length === 0) {
+    return '';
   }
   cardText = `${cardText.charAt(0).toUpperCase()}${cardText.slice(1)}`;
-  if (!cardText.endsWith(".")) {
-    cardText += ".";
+  if (!cardText.endsWith('.')) {
+    cardText += '.';
   }
   return cardText;
 }
 
 function vttToText(vttText) {
-  const vttLines = vttText.split("\n");
-  let result = "";
+  const vttLines = vttText.split('\n');
+  let result = '';
 
   let foundFirstTiming = false;
-  let currentCard = "";
+  let currentCard = '';
 
   for (const line of vttLines) {
     const timingMatch = line.match(cardTimingRegex);
     if (timingMatch) {
       foundFirstTiming = true;
       result += getTextForCurrentCard(currentCard);
-      currentCard = "";
+      currentCard = '';
     } else if (foundFirstTiming) {
-      currentCard += line + "\n";
+      currentCard += line + '\n';
     }
   }
   result += getTextForCurrentCard(currentCard);
@@ -102,7 +102,7 @@ function vttToText(vttText) {
 }
 
 function getAlignmentForVtt(vttText) {
-  const vttLines = vttText.split("\n");
+  const vttLines = vttText.split('\n');
   const words = [];
   let cardStart = 0;
   let cardEnd = 0;
@@ -127,11 +127,13 @@ function getAlignmentForVtt(vttText) {
         parseInt(toHours, 10) * 60 * 60 +
         parseInt(toMinutes, 10) * 60 +
         parseFloat(toSeconds);
-    } else if (cardStart !== cardEnd && line.indexOf("<c>") >= 0) {
+    } else if (cardStart !== cardEnd && line.indexOf('<c>') >= 0) {
       let wordStart = cardStart;
       let wordEnd = cardStart;
-      for (const part of line.split("<c>")) {
-        const match = part.match(/([^<>]+)(<\/c>)?(<(\d\d):(\d\d):(\d\d\.\d\d\d)>)?/);
+      for (const part of line.split('<c>')) {
+        const match = part.match(
+          /([^<>]+)(<\/c>)?(<(\d\d):(\d\d):(\d\d\.\d\d\d)>)?/
+        );
         let word = part.trim();
         if (match) {
           const [, w, , , hours, minutes, seconds] = match;
@@ -161,15 +163,10 @@ function getAlignmentForVtt(vttText) {
   return { words };
 }
 
-async function createVideoDigest(res, {
-  userId,
-  ytid,
-  tfname,
-  videoLength,
-  title,
-  imageUrl,
-  alignTrans,
-}) {
+async function createVideoDigest(
+  res,
+  { userId, ytid, tfname, videoLength, title, imageUrl, alignTrans }
+) {
   const vd = new VDigest({
     ytid,
     rawTransName: tfname,
@@ -185,7 +182,7 @@ async function createVideoDigest(res, {
   } catch (err) {
     returnError(
       res,
-      "problem saving video digest to the database -- please try again",
+      'problem saving video digest to the database -- please try again',
       next
     );
   }
@@ -198,47 +195,52 @@ async function createVideoDigest(res, {
       await user.save();
     }
 
-    const payload = { intrmid: vd._id, iurl: imageUrl, title, };
+    const payload = { intrmid: vd._id, iurl: imageUrl, title };
 
-    res.writeHead(200, { "content-type": "application/json" });
+    res.writeHead(200, { 'content-type': 'application/json' });
     res.write(JSON.stringify(payload));
     res.end();
   });
 }
 
-async function getTranscriptAndCreateDigest({ res, userId, title, imageUrl, videoLength, ytid, next }) {
+async function getTranscriptAndCreateDigest({
+  res,
+  userId,
+  title,
+  imageUrl,
+  videoLength,
+  ytid,
+  next,
+}) {
   // read the text so we can store it into
   var tfname, rawTransFile, alignTrans;
 
-  tfname = ytid + ".srt";
+  tfname = ytid + '.srt';
 
   let data = undefined;
   let writeData = undefined;
   try {
-    console.log(
-      "Looking for ",
-      path.join(spaths.videos, ytid + ".en.vtt")
-    );
+    console.log('Looking for ', path.join(spaths.videos, ytid + '.en.vtt'));
     data = await fs.readFile(
-      path.join(spaths.videos, ytid + ".en.vtt"),
-      "utf8"
+      path.join(spaths.videos, ytid + '.en.vtt'),
+      'utf8'
     );
     writeData = vttToText(data);
 
     alignTrans = getAlignmentForVtt(data);
   } catch (err) {
     console.log(err);
-    console.log("No downloaded VTT transcript available", err);
-    return returnError(res, "unable to get YouTube transcript");
+    console.log('No downloaded VTT transcript available', err);
+    return returnError(res, 'unable to get YouTube transcript');
   }
 
-  tfname = ytid + ".txt";
-  rawTransFile = path.join(spaths.rawTrans, ytid + ".txt");
+  tfname = ytid + '.txt';
+  rawTransFile = path.join(spaths.rawTrans, ytid + '.txt');
   try {
     await fs.writeFile(rawTransFile, writeData);
   } catch (err) {
     console.log(err);
-    return returnError(res, "unable to get YouTube transcript");
+    return returnError(res, 'unable to get YouTube transcript');
   }
 
   createVideoDigest(res, {
@@ -249,42 +251,58 @@ async function getTranscriptAndCreateDigest({ res, userId, title, imageUrl, vide
     title,
     alignTrans,
     imageUrl,
-    next
+    next,
   });
 }
 
-async function getTranscript({ res, userId, title, imageUrl, videoLength, next, ytid }) {
-  console.log("Trying to get video file for: " + ytid);
+async function getTranscript({
+  res,
+  userId,
+  title,
+  imageUrl,
+  videoLength,
+  next,
+  ytid,
+}) {
+  console.log('Trying to get video file for: ' + ytid);
 
   // download the video transcript
   var ytdlCommand =
     "youtube-dl --skip-download --write-auto-sub -o '" +
     path.join(spaths.videos, ytid) +
     ".%(ext)s'" +
-    " " +
+    ' ' +
     youtubeUrlFromId(ytid);
 
   if (videoLength > settings.max_yt_length) {
     returnError(
       res,
-      "Video length exceeds " +
-      Math.floor(settings.max_yt_length / 60) +
-      " minutes",
+      'Video length exceeds ' +
+        Math.floor(settings.max_yt_length / 60) +
+        ' minutes',
       next
     );
     return;
   }
 
   downloading = true;
-  console.log("cmd: " + ytdlCommand);
+  console.log('cmd: ' + ytdlCommand);
   exec(ytdlCommand, function (error, stdout, stderr) {
     downloading = false;
     if (error) {
-      console.log("error: " + error);
-      console.log("stderror: " + stderr);
-      return returnError(res, "unable to load YouTube video properly");
+      console.log('error: ' + error);
+      console.log('stderror: ' + stderr);
+      return returnError(res, 'unable to load YouTube video properly');
     }
-    getTranscriptAndCreateDigest({ res, userId, title, ytid, imageUrl, videoLength, next });
+    getTranscriptAndCreateDigest({
+      res,
+      userId,
+      title,
+      ytid,
+      imageUrl,
+      videoLength,
+      next,
+    });
   });
 }
 
@@ -292,8 +310,8 @@ async function getTranscript({ res, userId, title, imageUrl, videoLength, next, 
  * Returns the editor js template (TODO consider bootstraping data)
  */
 exports.getEditor = function (req, res) {
-  res.render("editor", {
-    title: "Video Digest Editor",
+  res.render('editor', {
+    title: 'Video Digest Editor',
   });
 };
 
@@ -306,18 +324,18 @@ exports.getStatus = function (req, res) {
 
   VDigest.findById(did, function (err, vd) {
     var vstatus = 0;
-    var msg = "";
+    var msg = '';
     console.log(vd.state);
     if (err || !vd) {
-      msg = "unable to load the video digest";
+      msg = 'unable to load the video digest';
     } else if (vd.isProcessing()) {
       vstatus = 3;
-      msg = "video digest is processing";
+      msg = 'video digest is processing';
     } else if (vd.isReady()) {
       vstatus = 1;
-      msg = "video digest is ready for editing";
+      msg = 'video digest is ready for editing';
     }
-    res.writeHead(200, { "content-type": "application/json" });
+    res.writeHead(200, { 'content-type': 'application/json' });
     res.end(JSON.stringify({ status: vstatus, message: msg }));
   });
 };
@@ -330,24 +348,24 @@ exports.getDigestData = function (req, res, next) {
 
   var vdid = req.params.vdid;
   if (cache.get(vdid)) {
-    console.log("using vdid cache for: " + vdid);
-    res.writeHead(200, { "content-type": "application/json" });
+    console.log('using vdid cache for: ' + vdid);
+    res.writeHead(200, { 'content-type': 'application/json' });
     return res.end(cache.get(vdid));
   }
 
   VDigest.findById(vdid, function (err, vd) {
     if (err || !vd) {
-      returnError(res, "unable to load the specified video digest data", next);
+      returnError(res, 'unable to load the specified video digest data', next);
     } else if (vd.isProcessing()) {
-      returnError(res, "the video digest is currently processing", next);
+      returnError(res, 'the video digest is currently processing', next);
     } else if (!vd.isReady()) {
       returnError(
         res,
-        "the transcript did not upload correctly: please create the video digest from scratch",
+        'the transcript did not upload correctly: please create the video digest from scratch',
         next
       );
     } else {
-      res.writeHead(200, { "content-type": "application/json" });
+      res.writeHead(200, { 'content-type': 'application/json' });
       var jsonStrResp = JSON.stringify({
         digest: vd.digest,
         transcript: vd.alignTrans,
@@ -366,27 +384,25 @@ exports.getDigestData = function (req, res, next) {
 exports.postPublishDigest = function (req, res, next) {
   var vdid = req.params.vdid;
   if (req.user.vdigests.indexOf(vdid) === -1) {
-    returnError(res, "you do not have the access to publish this digest", next);
+    returnError(res, 'you do not have the access to publish this digest', next);
     return;
   }
 
   VDigest.findById(vdid, function (err, vd) {
     if (err || !vd) {
-      returnError(res, "unable to save the video digest data", next);
+      returnError(res, 'unable to save the video digest data', next);
       return;
     }
     if (!vd.pubdisplay) {
       vd.pubdisplay = true;
-      vd.puburl =
-        "/view/" +
-        slug(vd.digest.title + " " + vd.id);
+      vd.puburl = '/view/' + slug(vd.digest.title + ' ' + vd.id);
       vd.save();
     }
-    res.writeHead(200, { "content-type": "application/json" });
+    res.writeHead(200, { 'content-type': 'application/json' });
     res.end(
       JSON.stringify({
-        status: "success",
-        message: "published the video digest",
+        status: 'success',
+        message: 'published the video digest',
         puburl: vd.puburl,
       })
     );
@@ -401,18 +417,18 @@ exports.postDigestData = function (req, res, next) {
 
   VDigest.findById(vdid, function (err, vd) {
     if (err || !vd) {
-      returnError(res, "unable to save the video digest data", next);
+      returnError(res, 'unable to save the video digest data', next);
       return;
     }
 
     // TODO remove audioName check used for VD experiment
     if (
       (!req.user || req.user.vdigests.indexOf(vdid) === -1) &&
-      vd.audioName != "Fpz-stC1uh8"
+      vd.audioName != 'Fpz-stC1uh8'
     ) {
       returnError(
         res,
-        "you do not have the access to change this digest",
+        'you do not have the access to change this digest',
         next
       );
       return;
@@ -422,7 +438,7 @@ exports.postDigestData = function (req, res, next) {
     vd.save(function (err) {
       // TODO check that the the user can save the data
       if (err) {
-        returnError(res, "unable to save the video digest data", next);
+        returnError(res, 'unable to save the video digest data', next);
         return;
       }
 
@@ -435,11 +451,11 @@ exports.postDigestData = function (req, res, next) {
       });
       cache.put(vdid, jsonStrResp, 10000000);
 
-      res.writeHead(200, { "content-type": "application/json" });
+      res.writeHead(200, { 'content-type': 'application/json' });
       res.end(
         JSON.stringify({
-          status: "success",
-          message: "saved the video digest data",
+          status: 'success',
+          message: 'saved the video digest data',
         })
       );
     });
@@ -448,10 +464,10 @@ exports.postDigestData = function (req, res, next) {
 
 // multipart process for loading a new video
 exports.postNewVD = function (req, res, next) {
-  req.assert("yturl", "YouTube URL is not a valid URL").isURL();
+  req.assert('yturl', 'YouTube URL is not a valid URL').isURL();
 
   if (!req.user) {
-    returnError(res, "You must be logged in to create a video digest", next);
+    returnError(res, 'You must be logged in to create a video digest', next);
     return;
   }
 
@@ -474,15 +490,15 @@ exports.postNewVD = function (req, res, next) {
 
     if (
       !(
-        ytparsed.hostname === "youtube.com" ||
-        ytparsed.hostname === "www.youtube.com"
+        ytparsed.hostname === 'youtube.com' ||
+        ytparsed.hostname === 'www.youtube.com'
       ) ||
       !ytid
     ) {
       //  TODO return informative messages to the user (how to do this?)
       returnError(
         res,
-        "You must provide a YouTube url in the format: https://www.youtube.com/watch?v=someIdValue",
+        'You must provide a YouTube url in the format: https://www.youtube.com/watch?v=someIdValue',
         next
       );
       return;
@@ -492,11 +508,7 @@ exports.postNewVD = function (req, res, next) {
       await getTranscript({ res, fields, next, ytid });
     } else if (fields.intrmid && fields.intrmid[0]) {
       // no longer possible
-      returnError(
-        res,
-        "Unknown error! Please try again",
-        next
-      );
+      returnError(res, 'Unknown error! Please try again', next);
     } else {
       // No files: first upload
       // TODO check/handle for existing transcript
@@ -511,7 +523,7 @@ exports.postNewVD = function (req, res, next) {
         console.log(err.message);
         returnError(
           res,
-          "Unable to find a YouTube Video with the given URL",
+          'Unable to find a YouTube Video with the given URL',
           next
         );
         return;
@@ -525,7 +537,15 @@ exports.postNewVD = function (req, res, next) {
 
       const userId = req.user.id;
 
-      await getTranscript({ res, userId, title, imageUrl, videoLength: parseInt(lengthSeconds, 10), next, ytid });
+      await getTranscript({
+        res,
+        userId,
+        title,
+        imageUrl,
+        videoLength: parseInt(lengthSeconds, 10),
+        next,
+        ytid,
+      });
     }
   });
 
@@ -544,9 +564,9 @@ exports.getAutoSeg = function (req, res, next) {
         .map(function (wrd) {
           return wrd.word;
         })
-        .join(" ")
-        .replace(" {p}", "");
-      vdigest.rawTransName = Math.random().toString(36).substr(6) + ".txt";
+        .join(' ')
+        .replace(' {p}', '');
+      vdigest.rawTransName = Math.random().toString(36).substr(6) + '.txt';
       var outfile = path.join(spaths.rawTrans, vdigest.rawTransName);
       try {
         await fs.writeFile(outfile, transText);
@@ -559,20 +579,20 @@ exports.getAutoSeg = function (req, res, next) {
     function doSysCall() {
       var rtxtfile = vdigest.getSSFile();
       var segSysCall =
-        "python adv_seg.py eval " + spaths.segConfigFile + " " + rtxtfile;
+        'python adv_seg.py eval ' + spaths.segConfigFile + ' ' + rtxtfile;
       // execute system call
       if (!vdigest.sentSepTransName) {
-        console.log("trying to generate separated transcript");
-        var scmd = "python add_sentences.py " + vdigest.id;
+        console.log('trying to generate separated transcript');
+        var scmd = 'python add_sentences.py ' + vdigest.id;
         console.log(scmd);
 
         exec(scmd, { cwd: spaths.utils }, function (err, stdout, stderr) {
-          console.log("error: " + err);
-          console.log("error: " + stderr);
+          console.log('error: ' + err);
+          console.log('error: ' + stderr);
           if (err || !vdigest.sentSepTransName) {
             return returnErrorJson(
               res,
-              { msg: "error processing transcript - please try again later" },
+              { msg: 'error processing transcript - please try again later' },
               500
             );
           } else {
@@ -586,23 +606,23 @@ exports.getAutoSeg = function (req, res, next) {
           stdout,
           stderr
         ) {
-          console.log("finished segmentation");
-          console.log("error: " + error);
-          console.log("stderror: " + stderr);
-          console.log("stdout: " + stdout);
+          console.log('finished segmentation');
+          console.log('error: ' + error);
+          console.log('stderror: ' + stderr);
+          console.log('stdout: ' + stdout);
           // get sentence breaks from stdout
           if (error || stderr) {
             return returnErrorJson(res, {
-              msg: "Segmentation error -- please try again: " + stderr,
+              msg: 'Segmentation error -- please try again: ' + stderr,
             });
           }
           try {
-            var sps = stdout.split("\n");
+            var sps = stdout.split('\n');
             var sentBreaks = sps[sps.length - 4];
             return returnJson(res, { breaks: sentBreaks });
           } catch (e) {
             return returnErrorJson(res, {
-              msg: "Segmentation error -- please try again",
+              msg: 'Segmentation error -- please try again',
             });
           }
           // read results from system call or return error

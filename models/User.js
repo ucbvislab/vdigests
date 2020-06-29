@@ -20,13 +20,13 @@ var userSchema = new mongoose.Schema({
     gender: { type: String, default: '' },
     location: { type: String, default: '' },
     website: { type: String, default: '' },
-    picture: { type: String, default: '' }
+    picture: { type: String, default: '' },
   },
 
   vdigests: [{ type: ShortId, ref: 'VDigest' }],
 
   resetPasswordToken: String,
-  resetPasswordExpires: Date
+  resetPasswordExpires: Date,
 });
 
 /**
@@ -34,15 +34,15 @@ var userSchema = new mongoose.Schema({
  * "Pre" is a Mongoose middleware that executes before each user.save() call.
  */
 
-userSchema.pre('save', function(next) {
+userSchema.pre('save', function (next) {
   var user = this;
 
   if (!user.isModified('password')) return next();
 
-  bcrypt.genSalt(5, function(err, salt) {
+  bcrypt.genSalt(5, function (err, salt) {
     if (err) return next(err);
 
-    bcrypt.hash(user.password, salt, null, function(err, hash) {
+    bcrypt.hash(user.password, salt, null, function (err, hash) {
       if (err) return next(err);
       user.password = hash;
       next();
@@ -55,8 +55,8 @@ userSchema.pre('save', function(next) {
  * Used by Passport-Local Strategy for password validation.
  */
 
-userSchema.methods.comparePassword = function(candidatePassword, cb) {
-  bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
+userSchema.methods.comparePassword = function (candidatePassword, cb) {
+  bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
     if (err) return cb(err);
     cb(null, isMatch);
   });
@@ -67,7 +67,7 @@ userSchema.methods.comparePassword = function(candidatePassword, cb) {
  * Used in Navbar and Account Management page.
  */
 
-userSchema.methods.gravatar = function(size) {
+userSchema.methods.gravatar = function (size) {
   if (!size) size = 200;
 
   if (!this.email) {

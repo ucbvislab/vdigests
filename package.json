@@ -9,7 +9,10 @@
     "start": "node app.js",
     "dev": "nodemon node app.js",
     "build": "cd public/js && r.js -o build.js",
-    "test": "mocha"
+    "test": "mocha",
+    "precommit": "pretty-quick --staged",
+    "postcommit": "git update-index -g",
+    "pretty": "prettier --write \"./**/*.{js,jsx,json}\""
   },
   "dependencies": {
     "async": "^0.9.0",
@@ -58,6 +61,7 @@
     "passport-local": "^1.0.0",
     "passport-oauth": "^1.0.0",
     "passport-twitter": "^1.0.2",
+    "prettier": "^2.0.5",
     "request": "^2.36.0",
     "requirejs": "^2.3.6",
     "slug": "~0.9.1",
@@ -74,8 +78,10 @@
   "devDependencies": {
     "blessed": "0.0.29",
     "chai": "^1.9.1",
+    "husky": "^4.2.5",
     "mocha": "^1.19.0",
     "multiline": "^0.3.4",
+    "pretty-quick": "^2.0.1",
     "supertest": "^0.13.0"
   },
   "description": "placeholder",

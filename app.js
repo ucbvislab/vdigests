@@ -13,8 +13,8 @@ var csrf = require('lusca').csrf();
 var methodOverride = require('method-override');
 var sslRedirect = require('heroku-ssl-redirect');
 
-var fs = require('fs')
-var https = require('https')
+var fs = require('fs');
+var https = require('https');
 
 var MongoStore = require('connect-mongo')(session);
 var flash = require('express-flash');
@@ -52,62 +52,68 @@ function initServer() {
   var hour = 3600000;
   var day = hour * 24;
   var week = day * 7;
-  
+
   /**
    * CSRF Whitelist
    */
-  
+
   // TODO fix
   var whitelist = ['/newvd'];
-  
+
   /**
    * Express configuration.
    */
-  
+
   /**
    * CORS
    */
-  app.all("/*",  function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  app.all('/*', function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept'
+    );
     next();
   });
-  
-  
+
   app.set('port', process.env.PORT || 3000);
   app.set('views', path.join(__dirname, 'views'));
   app.set('view engine', 'jade');
   app.use(sslRedirect());
-  app.use(connectAssets({
-    paths: ['public/css', 'public/js', 'public/img'],
-    helperContext: app.locals,
-    servePath: 'vdstatic'
-  }));
+  app.use(
+    connectAssets({
+      paths: ['public/css', 'public/js', 'public/img'],
+      helperContext: app.locals,
+      servePath: 'vdstatic',
+    })
+  );
   app.use(compress());
   app.use(logger('dev'));
-  app.use(bodyParser.json({limit: "100mb"}));
-  app.use(bodyParser.urlencoded({limit: "100mb"}));
+  app.use(bodyParser.json({ limit: '100mb' }));
+  app.use(bodyParser.urlencoded({ limit: '100mb' }));
   app.use(expressValidator());
   app.use(methodOverride());
   app.use(cookieParser());
   app.use(passport.initialize());
   app.use(passport.session());
-  app.use(function(req, res, next) {
-
+  app.use(function (req, res, next) {
     // AMy change
     next();
     // if (whitelist.indexOf(req.path) !== -1) next();
     // else csrf(req, res, next);
   });
-  app.use(function(req, res, next) {
+  app.use(function (req, res, next) {
     res.locals.user = req.user;
     res.locals.prod = process.env.NODE_ENV === 'production';
     next();
   });
   app.use(flash());
-  
-  app.use('/:extra(videodigests)?', express.static(path.join(__dirname, 'public'), { maxAge: week }));
-  app.use(function(req, res, next) {
+
+  app.use(
+    '/:extra(videodigests)?',
+    express.static(path.join(__dirname, 'public'), { maxAge: week })
+  );
+  app.use(function (req, res, next) {
     // Keep track of previous URL to redirect back to
     // original destination after a successful login.
     if (req.method !== 'GET') return next();
@@ -116,31 +122,38 @@ function initServer() {
     req.session.returnTo = req.path;
     next();
   });
-  
+
   // TODO: make this more informative
-  app.use(function(err, req, res, next){
+  app.use(function (err, req, res, next) {
     console.error(err.stack);
     res.status(500).send('Sorry, something broke!');
   });
-  
+
   /**
    * Application routes.
    */
-  var extraPath = ":extra?/?";
+  var extraPath = ':extra?/?';
   // var extraPath = "";
   app.get('/:extra(videodigests)?', homeController.index);
   // TODO separate editor from the viewer
   app.get('/' + extraPath + 'view/:ptitle', editorController.getEditor);
   app.get('/' + extraPath + 'editor', editorController.getEditor);
   app.get('/' + extraPath + 'tutorial', homeController.tutorial);
-  
+
   // TODO make more restful
   app.get('/' + extraPath + 'digestdata/:vdid', editorController.getDigestData);
-  app.post('/' + extraPath + 'digestpublish/:vdid', passportConf.isAuthenticated, editorController.postPublishDigest);
+  app.post(
+    '/' + extraPath + 'digestpublish/:vdid',
+    passportConf.isAuthenticated,
+    editorController.postPublishDigest
+  );
   app.get('/' + extraPath + 'autoseg/:vdid', editorController.getAutoSeg);
-  
+
   // TODO add Authorization
-  app.post('/' + extraPath + 'digestdata/:vdid', editorController.postDigestData);
+  app.post(
+    '/' + extraPath + 'digestdata/:vdid',
+    editorController.postDigestData
+  );
   app.get('/' + extraPath + 'checkstatus', editorController.getStatus);
   app.get('/' + extraPath + 'screenshot', screenShotController.getScreenShot);
   app.post('/' + extraPath + 'newvd', editorController.postNewVD);
@@ -156,12 +169,32 @@ function initServer() {
   app.post('/' + extraPath + 'signup', userController.postSignup);
   app.get('/' + extraPath + 'contact', contactController.getContact);
   app.post('/' + extraPath + 'contact', contactController.postContact);
-  app.get('/' + extraPath + 'account', passportConf.isAuthenticated, userController.getAccount);
-  app.post('/' + extraPath + 'account/profile', passportConf.isAuthenticated, userController.postUpdateProfile);
-  app.post('/' + extraPath + 'account/password', passportConf.isAuthenticated, userController.postUpdatePassword);
-  app.post('/' + extraPath + 'account/delete', passportConf.isAuthenticated, userController.postDeleteAccount);
-  app.get('/' + extraPath + 'account/unlink/:provider', passportConf.isAuthenticated, userController.getOauthUnlink);
-  
+  app.get(
+    '/' + extraPath + 'account',
+    passportConf.isAuthenticated,
+    userController.getAccount
+  );
+  app.post(
+    '/' + extraPath + 'account/profile',
+    passportConf.isAuthenticated,
+    userController.postUpdateProfile
+  );
+  app.post(
+    '/' + extraPath + 'account/password',
+    passportConf.isAuthenticated,
+    userController.postUpdatePassword
+  );
+  app.post(
+    '/' + extraPath + 'account/delete',
+    passportConf.isAuthenticated,
+    userController.postDeleteAccount
+  );
+  app.get(
+    '/' + extraPath + 'account/unlink/:provider',
+    passportConf.isAuthenticated,
+    userController.getOauthUnlink
+  );
+
   app.use(errorHandler());
 }
 
@@ -174,17 +207,19 @@ mongoose.connect(secrets.db);
 var MongoClient = require('mongodb').MongoClient;
 // Connect to the db
 MongoClient.connect(secrets.db, function (err, db) {
-  if(err) throw err;
+  if (err) throw err;
 
   var sessionStore = new MongoStore({
     client: db,
-    auto_reconnect: true 
+    auto_reconnect: true,
   });
 
-  app.use(session({
-    secret: secrets.sessionSecret,
-    store: sessionStore,
-  }));
+  app.use(
+    session({
+      secret: secrets.sessionSecret,
+      store: sessionStore,
+    })
+  );
 
   /**
    * Start Express server.
@@ -192,8 +227,12 @@ MongoClient.connect(secrets.db, function (err, db) {
 
   initServer();
 
-  app.listen(app.get('port'), function() {
-    console.log(" ✔ Express server listening on port %d in %s mode", app.get('port'), app.get('env'));
+  app.listen(app.get('port'), function () {
+    console.log(
+      ' ✔ Express server listening on port %d in %s mode',
+      app.get('port'),
+      app.get('env')
+    );
   });
 });
 
