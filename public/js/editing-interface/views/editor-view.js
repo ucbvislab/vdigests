@@ -56,57 +56,72 @@ define([
       'click #to-edit-vdigest': 'toEditVDigest',
     },
 
+    onKeydown: function (evt) {
+      const thisView = this;
+      if (evt.keyCode === consts.ESCAPE_KEYCODE) {
+        var wasPlaying = false;
+        $('video').each(function (i, vid) {
+          if (!vid.paused) {
+            wasPlaying = true;
+            vid.pause();
+          }
+        });
+        if (!wasPlaying) {
+          if (window.prevPlayVid) {
+            window.prevPlayVid.play();
+            evt.stopPropagation();
+          } else {
+            var thevid = $('video')[0];
+            thevid && thevid.play();
+          }
+        }
+      } else if (evt.keyCode === consts.F1_KEYCODE) {
+        var blob = new window.Blob(
+          [window.JSON.stringify(thisView.model.getOutputJSON())],
+          { type: 'text/plain;charset=utf-8' }
+        );
+        window.saveAs(blob, 'video-digest.json');
+      } else if (evt.keyCode === consts.F2_KEY_CODE) {
+        $('input[type=file]').one('change', function () {
+          thisView.handleUpload(this);
+        });
+        $('input[type=file]').trigger('click');
+      } else if (
+        evt.keyCode === consts.S_KEYCODE &&
+        (evt.metaKey || evt.ctrlKey)
+      ) {
+        thisView.saveVDigest();
+        evt.stopPropagation();
+        evt.preventDefault();
+      }
+    },
+
     initialize: function () {
       var thisView = this;
 
-      $('#publish-modal-publish').off('click');
       $('#publish-modal-publish').on('click', function (evt) {
         thisView.publishVDigest();
       });
-
-      $('#publish-modal-unpublish').off('click');
       $('#publish-modal-unpublish').on('click', function (evt) {
         thisView.unpublishVDigest();
       });
-
       $(document.body).on('keydown', function (evt) {
-        if (evt.keyCode === consts.ESCAPE_KEYCODE) {
-          var wasPlaying = false;
-          $('video').each(function (i, vid) {
-            if (!vid.paused) {
-              wasPlaying = true;
-              vid.pause();
-            }
-          });
-          if (!wasPlaying) {
-            if (window.prevPlayVid) {
-              window.prevPlayVid.play();
-              evt.stopPropagation();
-            } else {
-              var thevid = $('video')[0];
-              thevid && thevid.play();
-            }
-          }
-        } else if (evt.keyCode === consts.F1_KEYCODE) {
-          var blob = new window.Blob(
-            [window.JSON.stringify(thisView.model.getOutputJSON())],
-            { type: 'text/plain;charset=utf-8' }
-          );
-          window.saveAs(blob, 'video-digest.json');
-        } else if (evt.keyCode === consts.F2_KEY_CODE) {
-          $('input[type=file]').one('change', function () {
-            thisView.handleUpload(this);
-          });
-          $('input[type=file]').trigger('click');
-        } else if (
-          evt.keyCode === consts.S_KEYCODE &&
-          (evt.metaKey || evt.ctrlKey)
-        ) {
-          thisView.saveVDigest();
-          evt.stopPropagation();
-          evt.preventDefault();
-        }
+        thisView.onKeypress(evt);
       });
+      // Attempt autosave every 30s
+      thisView.interval = setInterval(
+        thisView.autosaveVDigest.bind(thisView),
+        30_000
+      );
+    },
+
+    close: function () {
+      var thisView = this;
+
+      $('#publish-modal-publish').off('click');
+      $('#publish-modal-unpublish').off('click');
+      $(document.body).off('keydown');
+      clearInterval(thisView.interval);
     },
 
     /**
@@ -285,15 +300,38 @@ define([
       window.location.hash = 'edit/' + locSplit.slice(1).join('/');
     },
 
-    saveVDigest: async function () {
-      var thisView = this,
-        outpjson = {};
+    makeVDigestJsonStr: function () {
+      const thisView = this;
+      const outpjson = {};
       outpjson.object = thisView.model.get('digest').toJSON();
       outpjson['_csrf'] = window._csrf;
+      return JSON.stringify(outpjson);
+    },
+
+    lastAttemptedSavePayloadStr: undefined,
+
+    autosaveVDigest: async function () {
+      const thisView = this;
+      const payloadStr = thisView.makeVDigestJsonStr();
+      if (payloadStr === thisView.lastAttemptedSavePayloadStr) {
+        return;
+      }
+      await thisView.saveVDigestJsonStr(payloadStr);
+    },
+
+    saveVDigest: async function () {
+      const thisView = this;
+      const payloadStr = thisView.makeVDigestJsonStr();
+      await thisView.saveVDigestJsonStr(payloadStr);
+    },
+
+    saveVDigestJsonStr: async function (payloadStr) {
+      const thisView = this;
+      thisView.lastAttemptedSavePayloadStr = payloadStr;
       try {
         await $.ajax({
           url: '/digestdata/' + window.dataname,
-          data: JSON.stringify(outpjson),
+          data: payloadStr,
           type: 'post',
           contentType: 'application/json',
         });
