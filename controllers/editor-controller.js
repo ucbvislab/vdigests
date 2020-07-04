@@ -147,7 +147,7 @@ function getAlignmentForVttWithoutCues(vttText) {
           alignedWord: currentCardParts.join(' ').toUpperCase(),
           start: cardStart,
           end: cardEnd,
-          speaker: 0,
+          speaker: sentenceNumber,
           sentenceNumber,
         });
         sentenceNumber++;
@@ -267,7 +267,7 @@ function getAlignmentForSrt(srtText) {
           alignedWord: currentCardParts.join(' ').toUpperCase(),
           start: cardStart,
           end: cardEnd,
-          speaker: 0,
+          speaker: sentenceNumber,
           sentenceNumber,
         });
         sentenceNumber++;
@@ -750,7 +750,7 @@ exports.postNewVD = function (req, res, next) {
         return;
       }
     } else if (step === '3') {
-      // handle transcript upload
+      // handle custom captions upload
       if (files.tranupload && files.tranupload[0]) {
         const captionsPath = files.tranupload[0].path;
         console.log(files.tranupload, captionsPath);
@@ -767,15 +767,6 @@ exports.postNewVD = function (req, res, next) {
     }
 
     returnError(res, 'Unknown error! Please try again', next);
-
-    // if (files.tranupload || (fields.usegtrans && fields.usegtrans[0])) {
-    //   await getTranscript({ res, fields, next, ytid });
-    // } else if (fields.intrmid && fields.intrmid[0]) {
-    //   // no longer possible
-    //   returnError(res, 'Unknown error! Please try again', next);
-    // } else {
-     
-    // }
   });
 
   return;
