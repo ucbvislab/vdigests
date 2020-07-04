@@ -28,7 +28,7 @@ define([
     if (addThumb.data) {
       // thumbnail data already present
       _postAddThumb(addThumb.data, addThumb, toAddThumbs);
-    } else {
+    } else if (typeof addThumb.time === 'number') {
       // capture the thumbnail
       Utils.getScreenShot(addThumb.vdid, addThumb.time, function (data) {
         _postAddThumb(data, addThumb, toAddThumbs);
@@ -217,8 +217,8 @@ define([
           var outsec = {
             summary: sec.summary[0],
             startWord: null,
-            image_time: sec.thumbnail.time,
-            image_data: sec.thumbnail.data,
+            image_time: sec.thumbnail && sec.thumbnail.time,
+            image_data: sec.thumbnail && sec.thumbnail.data,
           };
 
           // find the start word

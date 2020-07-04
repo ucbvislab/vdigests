@@ -298,6 +298,8 @@ define([
           .focus();
       }, 200);
 
+      sec.set('thumbnail', new ThumbnailModel({ time: time }));
+
       Utils.getScreenShot(
         window.dataname,
         time,

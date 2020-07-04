@@ -468,6 +468,7 @@ div.section-row:last-child {
   position: relative;
   border: 1px solid #555555;
   width: 100%;
+  min-height: 38px;
 }
 
 .take-thumbnail-image {
