@@ -20,7 +20,7 @@ define([
   Utils,
   ThumbnailModel
 ) {
-  var addThumbnails = function (toAddThumbs) {
+  const addThumbnails = async function (toAddThumbs) {
     if (toAddThumbs.length === 0) {
       return;
     }
@@ -30,13 +30,18 @@ define([
       _postAddThumb(addThumb.data, addThumb, toAddThumbs);
     } else if (typeof addThumb.time === 'number') {
       // capture the thumbnail
-      Utils.getScreenShot(addThumb.vdid, addThumb.time, function (data) {
+      try {
+        const data = await Utils.getScreenShot(addThumb.vdid, addThumb.time);
         _postAddThumb(data, addThumb, toAddThumbs);
-      });
+      } catch (err) {
+        _postAddThumb('', addThumb, toAddThumbs);
+      }
+    } else {
+      _postAddThumb('', addThumb, toAddThumbs);
     }
   };
 
-  var _postAddThumb = function (data, addThumb, toAddThumbs) {
+  const _postAddThumb = function (data, addThumb, toAddThumbs) {
     addThumb.addSec.set(
       'thumbnail',
       new ThumbnailModel({ data: data, time: addThumb.time })

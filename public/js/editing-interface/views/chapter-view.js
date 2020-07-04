@@ -289,7 +289,7 @@ define([
     /**
      * Place a thumbnail in the given section at the given time (optional time)
      */
-    placeThumbnailInSec: function (sec, time) {
+    placeThumbnailInSec: async function (sec, time) {
       var thisView = this;
       time = time || sec.getStartTime();
       window.setTimeout(function () {
@@ -300,18 +300,15 @@ define([
 
       sec.set('thumbnail', new ThumbnailModel({ time: time }));
 
-      Utils.getScreenShot(
-        window.dataname,
-        time,
-        function (newImgData) {
-          sec.set(
-            'thumbnail',
-            new ThumbnailModel({ data: newImgData, time: time })
-          );
-        },
-        consts.imgWidth,
-        consts.imgHeight
-      );
+      try {
+        const newImgData = await Utils.getScreenShot(window.dataname, time);
+        sec.set(
+          'thumbnail',
+          new ThumbnailModel({ data: newImgData, time: time })
+        );
+      } catch (err) {
+        // couldn't get the thumbnail - oh well!
+      }
     },
 
     /**

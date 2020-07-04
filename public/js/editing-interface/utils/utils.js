@@ -5,12 +5,12 @@ define(['underscore', 'jquery', 'canvas2Image'], function (_, $, Canvas2Image) {
   /**
    * Obtain a video screenshot from the server
    */
-  Utils.getScreenShot = function (vidid, time, callback) {
+  Utils.getScreenShot = async function (vidid, time) {
     if (vidid === undefined || time === undefined) {
       throw Error('must set vidid and time parameters');
     }
     var url = '/screenshot?id=' + vidid + '&time=' + time;
-    $.get(url, callback);
+    return await $.get(url);
   };
 
   // THX https://docs.djangoproject.com/en/dev/ref/contrib/csrf/
