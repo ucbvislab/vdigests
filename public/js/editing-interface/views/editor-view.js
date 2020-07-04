@@ -106,7 +106,7 @@ define([
         thisView.unpublishVDigest();
       });
       $(document.body).on('keydown', function (evt) {
-        thisView.onKeypress(evt);
+        thisView.onKeydown(evt);
       });
       // Attempt autosave every 30s
       thisView.interval = setInterval(
