@@ -35,6 +35,7 @@ define([
     F1_KEYCODE: 112,
     F2_KEY_CODE: 113,
     SPACE_KEYCODE: 32,
+    S_KEYCODE: 83,
   };
 
   return CompoundBackboneView.extend({
@@ -68,7 +69,7 @@ define([
         thisView.unpublishVDigest();
       });
 
-      $(document.body).on('keyup', function (evt) {
+      $(document.body).on('keydown', function (evt) {
         if (evt.keyCode === consts.ESCAPE_KEYCODE) {
           var wasPlaying = false;
           $('video').each(function (i, vid) {
@@ -97,6 +98,13 @@ define([
             thisView.handleUpload(this);
           });
           $('input[type=file]').trigger('click');
+        } else if (
+          evt.keyCode === consts.S_KEYCODE &&
+          (evt.metaKey || evt.ctrlKey)
+        ) {
+          thisView.saveVDigest();
+          evt.stopPropagation();
+          evt.preventDefault();
         }
       });
     },
