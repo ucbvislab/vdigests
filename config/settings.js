@@ -25,7 +25,7 @@ for (var pth in paths) {
 }
 
 module.exports = {
-  paths: paths,
+  paths,
   maxTransUploadSize: 21000000, // in bytes
   max_yt_length: 20000,
 };

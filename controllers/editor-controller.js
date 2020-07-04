@@ -5,34 +5,21 @@
 /*global require exports*/
 
 const { promises: fs } = require('fs');
-const { R_OK } = require('fs').constants;
-const mkdirp = require('mkdirp');
 const ytdl = require('ytdl-core');
 const multiparty = require('multiparty');
 const url = require('url');
-const sys = require('sys');
 const { exec } = require('child_process');
 const User = require('../models/User');
-const util = require('util');
 const slug = require('slug');
 const querystring = require('querystring');
 const path = require('path');
 const VDigest = require('../models/VDigest');
 const settings = require('../config/settings');
 const spaths = settings.paths;
-const pathUtils = require('../utils/fpaths');
 const { returnError } = require('../utils/errors');
 const cache = require('memory-cache');
-
-var nodemailer = require('nodemailer');
-var secrets = require('../config/secrets');
-var smtpTransport = nodemailer.createTransport('SMTP', {
-  service: 'Mailgun',
-  auth: {
-    user: secrets.mailgun.user,
-    pass: secrets.mailgun.password,
-  },
-});
+const { getSmallVideo } = require('./video-download');
+const { youtubeUrlFromId } = require('./url-helpers');
 
 // Helper functions
 var returnJson = function (res, data, code) {
@@ -48,10 +35,6 @@ var returnErrorJson = function (res, data, code) {
   res.write(JSON.stringify(data));
   res.end();
 };
-
-function youtubeUrlFromId(ytid) {
-  return `https://www.youtube.com/watch?v=${ytid}`;
-}
 
 const VALID_TRANSCRIPT_TYPES = new Set(['asr', 'manual', 'upload']);
 
@@ -413,47 +396,6 @@ async function getTranscriptAndCreateDigest({
   });
 }
 
-async function getSmallVideo({ ytid }) {
-  console.log('Checking video file for: ', ytid);
-  const filename = `${ytid}.mp4`;
-  const videoPath = path.join(spaths.videos, filename);
-  try {
-    await fs.access(videoPath, R_OK);
-    // The file already exists
-    console.log('Video file already downloaded for: ', ytid);
-    return;
-  } catch (err) {
-    // we need to download it
-  }
-
-  console.log('Downloading video file for: ', ytid);
-
-  // get the worst quality video because we only need it for screenshots
-  const ytdlCommand = `youtube-dl -f worst --recode-video mp4 -o '${path.join(
-    spaths.videos,
-    `${ytid}.%(ext)s`
-  )}' ${youtubeUrlFromId(ytid)}`;
-  console.log('cmd: ' + ytdlCommand);
-  return new Promise((resolve, reject) => {
-    exec(ytdlCommand, async function (error, stdout, stderr) {
-      if (error) {
-        console.log('error: ' + error);
-        console.log('stderror: ' + stderr);
-        reject('unable to get YouTube video video');
-      } else {
-        try {
-          // make sure it exists now
-          await fs.access(videoPath, R_OK);
-          console.log('Downloaded video file for: ', ytid);
-          resolve();
-        } catch (err) {
-          reject(err);
-        }
-      }
-    });
-  });
-}
-
 async function getTranscript({
   res,
   userId,
@@ -561,7 +503,7 @@ function getCanUserEdit(user, vdid) {
 /**
  * Returns the digest data needed for the editor /digestdata/:vid
  */
-exports.getDigestData = function (req, res, next) {
+exports.getDigestData = async function (req, res, next) {
   console.log('Getting digest data...');
   const vdid = req.params.vdid;
   const userCanEdit = getCanUserEdit(req.user, vdid);

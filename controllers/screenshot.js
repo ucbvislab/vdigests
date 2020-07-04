@@ -3,13 +3,14 @@
  * Return a screenshot of the given video at the given time
  */
 /*global require exports Buffer*/
-var fs = require('fs'),
-  VDigest = require('../models/VDigest'),
-  path = require('path'),
-  pathUtils = require('../utils/fpaths'),
-  spaths = require('../config/settings').paths,
-  exec = require('child_process').exec,
-  returnError = require('../utils/errors').returnError;
+const fs = require('fs');
+const VDigest = require('../models/VDigest');
+const path = require('path');
+const pathUtils = require('../utils/fpaths');
+const { paths: spaths } = require('../config/settings');
+const { exec } = require('child_process');
+const { returnError } = require('../utils/errors');
+const { getSmallVideo } = require('./video-download');
 
 exports.getScreenShot = function (req, res, next) {
   var vdid = req.query.id,
@@ -29,7 +30,7 @@ exports.getScreenShot = function (req, res, next) {
     );
   }
 
-  VDigest.findById(vdid, function (err, vd) {
+  VDigest.findById(vdid, async function (err, vd) {
     if (err || !vd || !vd.videoName) {
       returnError(
         res,
@@ -39,6 +40,19 @@ exports.getScreenShot = function (req, res, next) {
       return;
     }
     usetime = Math.min(usetime, vd.videoLength - 0.3); // TODO fix the screenshot edge case
+    const ytid = vd.videoName;
+    try {
+      await getSmallVideo({ ytid });
+    } catch (err) {
+      // file doesn't exist
+      returnError(
+        res,
+        'cannot create a screenshot: unable to get the given video',
+        next
+      );
+      return;
+    }
+
     var videoFile = vd.getVideoFile(),
       outssFile = pathUtils.getScreenShotFile(vd.videoName, usetime),
       cmd =
