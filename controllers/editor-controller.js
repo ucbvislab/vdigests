@@ -74,7 +74,7 @@ function getYouTubeSubtitleOptions(ytdlInfo) {
   }
   const asr = captionTracks.some((track) => track.kind === 'asr');
   const manual = captionTracks.some(
-    (track) => track.kind === undefined && track.languageCode === 'en'
+    (track) => track.kind === undefined && track.languageCode.startsWith('en')
   );
 
   return {
@@ -368,21 +368,13 @@ async function getTranscriptAndCreateDigest({
   let vttData = undefined;
 
   try {
-    if (captionsPath)  {
+    if (captionsPath) {
       const captionsPathData = await fs.readFile(captionsPath, 'utf-8');
       if (captionsPath.endsWith('.srt')) {
         srtData = captionsPathData;
       } else if (captionsPath.endsWith('.vtt')) {
         vttData = captionsPathData;
       }
-    }
-
-    if (!vttData && !srtData) {
-      console.log('Looking for ', path.join(spaths.videos, ytid + '.en.vtt'));
-      vttData = await fs.readFile(
-        path.join(spaths.videos, ytid + '.en.vtt'),
-        'utf-8'
-      );
     }
 
     if (vttData) {
@@ -420,16 +412,16 @@ async function getTranscriptAndCreateDigest({
   });
 }
 
-async function getTranscript({ res, userId, title, videoLength, next, ytid }) {
+async function getTranscript({
+  res,
+  userId,
+  title,
+  videoLength,
+  next,
+  ytid,
+  transcriptType,
+}) {
   console.log('Trying to get video file for: ' + ytid);
-
-  // download the video transcript
-  var ytdlCommand =
-    "youtube-dl --skip-download --write-auto-sub -o '" +
-    path.join(spaths.videos, ytid) +
-    ".%(ext)s'" +
-    ' ' +
-    youtubeUrlFromId(ytid);
 
   if (videoLength > settings.max_yt_length) {
     returnError(
@@ -442,15 +434,30 @@ async function getTranscript({ res, userId, title, videoLength, next, ytid }) {
     return;
   }
 
-  downloading = true;
+  // download the video transcript
+  const subCommand =
+    transcriptType === 'asr' ? '--write-auto-sub' : '--write-sub';
+  const filePrefix = `${ytid}-${transcriptType}`;
+  const ytdlCommand = `youtube-dl --skip-download ${subCommand} --sub-format vtt -o '${path.join(
+    spaths.videos,
+    `${filePrefix}.%(ext)s`
+  )}' ${youtubeUrlFromId(ytid)}`;
+
   console.log('cmd: ' + ytdlCommand);
-  exec(ytdlCommand, function (error, stdout, stderr) {
-    downloading = false;
+  exec(ytdlCommand, async function (error, stdout, stderr) {
     if (error) {
       console.log('error: ' + error);
       console.log('stderror: ' + stderr);
-      return returnError(res, 'unable to load YouTube video properly');
+      return returnError(res, 'unable to get YouTube video captions');
     }
+
+    // find the file we just wrote
+    const files = await fs.readdir(spaths.videos);
+    const transcriptFile = files.find((file) => file.startsWith(filePrefix));
+    if (transcriptFile === undefined) {
+      return returnError(res, 'unable to get YouTube video captions');
+    }
+
     getTranscriptAndCreateDigest({
       res,
       userId,
@@ -458,6 +465,7 @@ async function getTranscript({ res, userId, title, videoLength, next, ytid }) {
       ytid,
       videoLength,
       next,
+      captionsPath: path.join(spaths.videos, transcriptFile),
     });
   });
 }
@@ -746,6 +754,7 @@ exports.postNewVD = function (req, res, next) {
           videoLength: parseInt(fields.lengthSeconds[0], 10),
           next,
           ytid,
+          transcriptType,
         });
         return;
       }
@@ -762,7 +771,7 @@ exports.postNewVD = function (req, res, next) {
           ytid,
           captionsPath,
           next,
-        })
+        });
       }
     }
 
