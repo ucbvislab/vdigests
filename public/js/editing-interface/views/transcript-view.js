@@ -276,6 +276,10 @@ define([
       else {
         // mouse down without modifier
         var $fWord = thisView.$mdel.next();
+        if ($fWord.size() === 0) {
+          // try the next paragraph
+          $fWord = thisView.$mdel.parent().next().children().first();
+        }
         thisView.$mdel.origIndex = $fWord.data('idx');
 
         // make sure we leave the original segment
