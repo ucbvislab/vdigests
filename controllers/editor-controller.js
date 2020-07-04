@@ -4,24 +4,25 @@
  */
 /*global require exports*/
 
-var fs = require('fs').promises,
-  mkdirp = require('mkdirp'),
-  ytdl = require('ytdl-core'),
-  multiparty = require('multiparty'),
-  url = require('url'),
-  sys = require('sys'),
-  exec = require('child_process').exec,
-  User = require('../models/User'),
-  util = require('util'),
-  slug = require('slug'),
-  querystring = require('querystring'),
-  path = require('path'),
-  VDigest = require('../models/VDigest'),
-  settings = require('../config/settings'),
-  spaths = settings.paths,
-  pathUtils = require('../utils/fpaths'),
-  returnError = require('../utils/errors').returnError,
-  cache = require('memory-cache');
+const { promises: fs } = require('fs');
+const { R_OK } = require('fs').constants;
+const mkdirp = require('mkdirp');
+const ytdl = require('ytdl-core');
+const multiparty = require('multiparty');
+const url = require('url');
+const sys = require('sys');
+const { exec } = require('child_process');
+const User = require('../models/User');
+const util = require('util');
+const slug = require('slug');
+const querystring = require('querystring');
+const path = require('path');
+const VDigest = require('../models/VDigest');
+const settings = require('../config/settings');
+const spaths = settings.paths;
+const pathUtils = require('../utils/fpaths');
+const { returnError } = require('../utils/errors');
+const cache = require('memory-cache');
 
 var nodemailer = require('nodemailer');
 var secrets = require('../config/secrets');
@@ -412,6 +413,47 @@ async function getTranscriptAndCreateDigest({
   });
 }
 
+async function getSmallVideo({ ytid }) {
+  console.log('Checking video file for: ', ytid);
+  const filename = `${ytid}.mp4`;
+  const videoPath = path.join(spaths.videos, filename);
+  try {
+    await fs.access(videoPath, R_OK);
+    // The file already exists
+    console.log('Video file already downloaded for: ', ytid);
+    return;
+  } catch (err) {
+    // we need to download it
+  }
+
+  console.log('Downloading video file for: ', ytid);
+
+  // get the worst quality video because we only need it for screenshots
+  const ytdlCommand = `youtube-dl -f worst --recode-video mp4 -o '${path.join(
+    spaths.videos,
+    `${ytid}.%(ext)s`
+  )}' ${youtubeUrlFromId(ytid)}`;
+  console.log('cmd: ' + ytdlCommand);
+  return new Promise((resolve, reject) => {
+    exec(ytdlCommand, async function (error, stdout, stderr) {
+      if (error) {
+        console.log('error: ' + error);
+        console.log('stderror: ' + stderr);
+        reject('unable to get YouTube video video');
+      } else {
+        try {
+          // make sure it exists now
+          await fs.access(videoPath, R_OK);
+          console.log('Downloaded video file for: ', ytid);
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      }
+    });
+  });
+}
+
 async function getTranscript({
   res,
   userId,
@@ -421,7 +463,7 @@ async function getTranscript({
   ytid,
   transcriptType,
 }) {
-  console.log('Trying to get video file for: ' + ytid);
+  console.log('Trying to download subtitle file for: ' + ytid);
 
   if (videoLength > settings.max_yt_length) {
     returnError(
@@ -444,28 +486,35 @@ async function getTranscript({
   )}' ${youtubeUrlFromId(ytid)}`;
 
   console.log('cmd: ' + ytdlCommand);
-  exec(ytdlCommand, async function (error, stdout, stderr) {
-    if (error) {
-      console.log('error: ' + error);
-      console.log('stderror: ' + stderr);
-      return returnError(res, 'unable to get YouTube video captions');
-    }
+  return new Promise((resolve) => {
+    exec(ytdlCommand, async function (error, stdout, stderr) {
+      if (error) {
+        console.log('error: ' + error);
+        console.log('stderror: ' + stderr);
+        return resolve(
+          returnError(res, 'unable to get YouTube video captions')
+        );
+      }
 
-    // find the file we just wrote
-    const files = await fs.readdir(spaths.videos);
-    const transcriptFile = files.find((file) => file.startsWith(filePrefix));
-    if (transcriptFile === undefined) {
-      return returnError(res, 'unable to get YouTube video captions');
-    }
+      // find the file we just wrote
+      const files = await fs.readdir(spaths.videos);
+      const transcriptFile = files.find((file) => file.startsWith(filePrefix));
+      if (transcriptFile === undefined) {
+        return resolve(
+          returnError(res, 'unable to get YouTube video captions')
+        );
+      }
 
-    getTranscriptAndCreateDigest({
-      res,
-      userId,
-      title,
-      ytid,
-      videoLength,
-      next,
-      captionsPath: path.join(spaths.videos, transcriptFile),
+      await getTranscriptAndCreateDigest({
+        res,
+        userId,
+        title,
+        ytid,
+        videoLength,
+        next,
+        captionsPath: path.join(spaths.videos, transcriptFile),
+      });
+      resolve();
     });
   });
 }
@@ -747,6 +796,15 @@ exports.postNewVD = function (req, res, next) {
           res.end();
           return;
         }
+        try {
+          await getSmallVideo({ ytid });
+        } catch (err) {
+          returnError(
+            res,
+            'Unable to get YouTube Video with the given URL',
+            next
+          );
+        }
         await getTranscript({
           res,
           userId,
@@ -763,6 +821,15 @@ exports.postNewVD = function (req, res, next) {
       if (files.tranupload && files.tranupload[0]) {
         const captionsPath = files.tranupload[0].path;
         console.log(files.tranupload, captionsPath);
+        try {
+          await getSmallVideo({ ytid });
+        } catch (err) {
+          returnError(
+            res,
+            'Unable to get YouTube Video with the given URL',
+            next
+          );
+        }
         return await getTranscriptAndCreateDigest({
           res,
           userId,
