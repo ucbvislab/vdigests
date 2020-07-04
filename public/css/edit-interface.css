@@ -59,6 +59,7 @@ body.published .toolbar {
 
 .yturlgroup,
 .trangroup,
+.uploadtrangroup,
 .confirmgroup,
 .processinggroup {
   display: none;
@@ -72,7 +73,7 @@ body.published .toolbar {
   display: block;
 }
 
-.third-form .confirmgroup {
+.third-form .uploadtrangroup {
   display: block;
 }
 

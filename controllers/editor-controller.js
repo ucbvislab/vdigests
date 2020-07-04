@@ -41,7 +41,6 @@ var returnJson = function (res, data, code) {
   res.end();
 };
 
-// Helper functions
 var returnErrorJson = function (res, data, code) {
   code = code || 400;
   res.writeHead(code, { 'content-type': 'application/json' });
@@ -53,7 +52,38 @@ function youtubeUrlFromId(ytid) {
   return `https://www.youtube.com/watch?v=${ytid}`;
 }
 
-var srtToText = function (srtText) {
+const VALID_TRANSCRIPT_TYPES = new Set(['asr', 'manual', 'upload']);
+
+const DEFAULT_CAPTION_OPTIONS = { asr: false, manual: false };
+function getYouTubeSubtitleOptions(ytdlInfo) {
+  const { playerResponse } = ytdlInfo;
+  if (!playerResponse) {
+    return DEFAULT_CAPTION_OPTIONS;
+  }
+  const { captions } = playerResponse;
+  if (!captions) {
+    return DEFAULT_CAPTION_OPTIONS;
+  }
+  const { playerCaptionsTracklistRenderer } = captions;
+  if (!playerCaptionsTracklistRenderer) {
+    return DEFAULT_CAPTION_OPTIONS;
+  }
+  const { captionTracks } = playerCaptionsTracklistRenderer;
+  if (!captionTracks) {
+    return DEFAULT_CAPTION_OPTIONS;
+  }
+  const asr = captionTracks.some((track) => track.kind === 'asr');
+  const manual = captionTracks.some(
+    (track) => track.kind === undefined && track.languageCode === 'en'
+  );
+
+  return {
+    asr,
+    manual,
+  };
+}
+
+function srtToText(srtText) {
   var srtData = srtText.split(/\n\n/g),
     writeData = '';
   srtData.forEach(function (srCluster) {
@@ -63,9 +93,9 @@ var srtToText = function (srtText) {
     }
   });
   return writeData;
-};
+}
 
-const cardTimingRegex = /^(\d\d):(\d\d):(\d\d\.\d\d\d) --> (\d\d):(\d\d):(\d\d\.\d\d\d)/;
+const cardTimingRegex = /^(\d\d):(\d\d):(\d\d[\.,]\d\d\d) --> (\d\d):(\d\d):(\d\d[\.,]\d\d\d)/;
 
 function getTextForCurrentCard(cardText) {
   // Skip all VTT cards that contain a cue <c> tag, for now as the transcript is duplicated
@@ -101,7 +131,61 @@ function vttToText(vttText) {
   return result;
 }
 
-function getAlignmentForVtt(vttText) {
+function getAlignmentForVttWithoutCues(vttText) {
+  const vttLines = vttText.split('\n');
+  const words = [];
+  let cardStart = 0;
+  let cardEnd = 0;
+  let sentenceNumber = 0;
+  let currentCardParts = [];
+
+  function flushCurrentCard() {
+    if (currentCardParts.length > 0) {
+      if (cardEnd > cardStart) {
+        words.push({
+          word: currentCardParts.join(' '),
+          alignedWord: currentCardParts.join(' ').toUpperCase(),
+          start: cardStart,
+          end: cardEnd,
+          speaker: 0,
+          sentenceNumber,
+        });
+        sentenceNumber++;
+      }
+      currentCardParts = [];
+    }
+  }
+
+  for (const line of vttLines) {
+    const timingMatch = line.match(cardTimingRegex);
+    if (timingMatch) {
+      flushCurrentCard();
+      const [
+        ,
+        fromHours,
+        fromMinutes,
+        fromSeconds,
+        toHours,
+        toMinutes,
+        toSeconds,
+      ] = timingMatch;
+      cardStart =
+        parseInt(fromHours, 10) * 60 * 60 +
+        parseInt(fromMinutes, 10) * 60 +
+        parseFloat(fromSeconds);
+      cardEnd =
+        parseInt(toHours, 10) * 60 * 60 +
+        parseInt(toMinutes, 10) * 60 +
+        parseFloat(toSeconds);
+    } else if (line.length > 0) {
+      currentCardParts.push(line.trim());
+    }
+  }
+  flushCurrentCard();
+  return { words };
+}
+
+function getAlignmentForVttWithCues(vttText) {
   const vttLines = vttText.split('\n');
   const words = [];
   let cardStart = 0;
@@ -163,9 +247,70 @@ function getAlignmentForVtt(vttText) {
   return { words };
 }
 
+function getAlignmentForVtt(vttText) {
+  return vttText.indexOf('<c>') === -1
+    ? getAlignmentForVttWithoutCues(vttText)
+    : getAlignmentForVttWithCues(vttText);
+}
+
+function getAlignmentForSrt(srtText) {
+  let shouldAdd = false;
+  let cardStart = 0;
+  let cardEnd = 0;
+  let currentCardParts = [];
+
+  function flushCurrentCard() {
+    if (currentCardParts.length > 0) {
+      if (cardEnd > cardStart) {
+        words.push({
+          word: currentCardParts.join(' '),
+          alignedWord: currentCardParts.join(' ').toUpperCase(),
+          start: cardStart,
+          end: cardEnd,
+          speaker: 0,
+          sentenceNumber,
+        });
+        sentenceNumber++;
+      }
+      currentCardParts = [];
+    }
+  }
+
+  for (const line of srtText.split('\n')) {
+    const timingMatch = line.match(cardTimingRegex);
+    if (timingMatch) {
+      const [
+        ,
+        fromHours,
+        fromMinutes,
+        fromSeconds,
+        toHours,
+        toMinutes,
+        toSeconds,
+      ] = timingMatch;
+      cardStart =
+        parseInt(fromHours, 10) * 60 * 60 +
+        parseInt(fromMinutes, 10) * 60 +
+        parseFloat(fromSeconds);
+      cardEnd =
+        parseInt(toHours, 10) * 60 * 60 +
+        parseInt(toMinutes, 10) * 60 +
+        parseFloat(toSeconds);
+      shouldAdd = true;
+    } else if (line === '') {
+      flushCurrentCard();
+      shouldAdd = false;
+    } else if (shouldAdd) {
+      currentCardParts.push(line);
+    }
+  }
+  flushCurrentCard();
+  return { words };
+}
+
 async function createVideoDigest(
   res,
-  { userId, ytid, tfname, videoLength, title, imageUrl, alignTrans }
+  { userId, ytid, tfname, videoLength, title, alignTrans }
 ) {
   const vd = new VDigest({
     ytid,
@@ -178,6 +323,7 @@ async function createVideoDigest(
   });
 
   try {
+    await vd.validate();
     await vd.save();
   } catch (err) {
     returnError(
@@ -195,7 +341,7 @@ async function createVideoDigest(
       await user.save();
     }
 
-    const payload = { intrmid: vd._id, iurl: imageUrl, title };
+    const payload = { intrmid: vd._id, title };
 
     res.writeHead(200, { 'content-type': 'application/json' });
     res.write(JSON.stringify(payload));
@@ -207,9 +353,9 @@ async function getTranscriptAndCreateDigest({
   res,
   userId,
   title,
-  imageUrl,
   videoLength,
   ytid,
+  captionsPath,
   next,
 }) {
   // read the text so we can store it into
@@ -217,21 +363,41 @@ async function getTranscriptAndCreateDigest({
 
   tfname = ytid + '.srt';
 
-  let data = undefined;
   let writeData = undefined;
-  try {
-    console.log('Looking for ', path.join(spaths.videos, ytid + '.en.vtt'));
-    data = await fs.readFile(
-      path.join(spaths.videos, ytid + '.en.vtt'),
-      'utf8'
-    );
-    writeData = vttToText(data);
+  let srtData = undefined;
+  let vttData = undefined;
 
-    alignTrans = getAlignmentForVtt(data);
+  try {
+    if (captionsPath)  {
+      const captionsPathData = await fs.readFile(captionsPath, 'utf-8');
+      if (captionsPath.endsWith('.srt')) {
+        srtData = captionsPathData;
+      } else if (captionsPath.endsWith('.vtt')) {
+        vttData = captionsPathData;
+      }
+    }
+
+    if (!vttData && !srtData) {
+      console.log('Looking for ', path.join(spaths.videos, ytid + '.en.vtt'));
+      vttData = await fs.readFile(
+        path.join(spaths.videos, ytid + '.en.vtt'),
+        'utf-8'
+      );
+    }
+
+    if (vttData) {
+      writeData = vttToText(vttData);
+      alignTrans = getAlignmentForVtt(vttData);
+    } else if (srtData) {
+      writeData = srtToText(srtData);
+      alignTrans = getAlignmentForSrt(srtData);
+    } else {
+      throw new Error('No vttData or srtData');
+    }
   } catch (err) {
     console.log(err);
-    console.log('No downloaded VTT transcript available', err);
-    return returnError(res, 'unable to get YouTube transcript');
+    console.log('No transcript available', err);
+    return returnError(res, 'unable to retrieve or parse captions');
   }
 
   tfname = ytid + '.txt';
@@ -250,20 +416,11 @@ async function getTranscriptAndCreateDigest({
     videoLength,
     title,
     alignTrans,
-    imageUrl,
     next,
   });
 }
 
-async function getTranscript({
-  res,
-  userId,
-  title,
-  imageUrl,
-  videoLength,
-  next,
-  ytid,
-}) {
+async function getTranscript({ res, userId, title, videoLength, next, ytid }) {
   console.log('Trying to get video file for: ' + ytid);
 
   // download the video transcript
@@ -299,7 +456,6 @@ async function getTranscript({
       userId,
       title,
       ytid,
-      imageUrl,
       videoLength,
       next,
     });
@@ -310,7 +466,7 @@ async function getTranscript({
  * Returns the editor js template (TODO consider bootstraping data)
  */
 exports.getEditor = function (req, res) {
-  console.log(req.params);
+  // console.log(req.params);
   res.render('editor', {
     title: 'Video Digest Editor',
   });
@@ -521,8 +677,9 @@ exports.postNewVD = function (req, res, next) {
       return;
     }
 
-    var ytparsed = url.parse(fields.yturl && fields.yturl[0]),
-      ytid = ytparsed.query && querystring.parse(ytparsed.query).v;
+    const ytparsed = url.parse(fields.yturl && fields.yturl[0]);
+    const ytid = ytparsed.query && querystring.parse(ytparsed.query).v;
+    const userId = req.user.id;
 
     if (
       !(
@@ -540,20 +697,12 @@ exports.postNewVD = function (req, res, next) {
       return;
     }
 
-    if (files.tranupload || (fields.usegtrans && fields.usegtrans[0])) {
-      await getTranscript({ res, fields, next, ytid });
-    } else if (fields.intrmid && fields.intrmid[0]) {
-      // no longer possible
-      returnError(res, 'Unknown error! Please try again', next);
-    } else {
-      // No files: first upload
-      // TODO check/handle for existing transcript
-      // obtain video info and save to DB if video does not exist
-      // TODO handle incorrect urls ? what happens?
+    const step = fields.step[0];
 
+    if (step === '1') {
       let info = undefined;
       try {
-        info = await ytdl.getBasicInfo(youtubeUrlFromId(ytid));
+        info = await ytdl.getInfo(youtubeUrlFromId(ytid));
       } catch (err) {
         console.log(err);
         console.log(err.message);
@@ -569,20 +718,64 @@ exports.postNewVD = function (req, res, next) {
       const imageUrl = videoDetails.thumbnail.thumbnails[0].url;
       const { title, lengthSeconds } = videoDetails;
 
-      // TODO: some escape hatch if the video doesn't have a transcript
+      const subopts = getYouTubeSubtitleOptions(info);
 
-      const userId = req.user.id;
-
-      await getTranscript({
-        res,
-        userId,
+      const payload = {
+        iurl: imageUrl,
         title,
-        imageUrl,
-        videoLength: parseInt(lengthSeconds, 10),
-        next,
-        ytid,
-      });
+        subopts,
+        lengthSeconds: parseInt(lengthSeconds, 10),
+      };
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.write(JSON.stringify(payload));
+      res.end();
+      return;
+    } else if (step === '2') {
+      if (fields.trantype && VALID_TRANSCRIPT_TYPES.has(fields.trantype[0])) {
+        const transcriptType = fields.trantype[0];
+        if (transcriptType === 'upload') {
+          res.writeHead(200, { 'content-type': 'application/json' });
+          res.write(JSON.stringify({ tranupload: true }));
+          res.end();
+          return;
+        }
+        await getTranscript({
+          res,
+          userId,
+          title: fields.yttitle[0],
+          videoLength: parseInt(fields.lengthSeconds[0], 10),
+          next,
+          ytid,
+        });
+        return;
+      }
+    } else if (step === '3') {
+      // handle transcript upload
+      if (files.tranupload && files.tranupload[0]) {
+        const captionsPath = files.tranupload[0].path;
+        console.log(files.tranupload, captionsPath);
+        return await getTranscriptAndCreateDigest({
+          res,
+          userId,
+          title: fields.yttitle[0],
+          videoLength: parseInt(fields.lengthSeconds[0], 10),
+          ytid,
+          captionsPath,
+          next,
+        })
+      }
     }
+
+    returnError(res, 'Unknown error! Please try again', next);
+
+    // if (files.tranupload || (fields.usegtrans && fields.usegtrans[0])) {
+    //   await getTranscript({ res, fields, next, ytid });
+    // } else if (fields.intrmid && fields.intrmid[0]) {
+    //   // no longer possible
+    //   returnError(res, 'Unknown error! Please try again', next);
+    // } else {
+     
+    // }
   });
 
   return;

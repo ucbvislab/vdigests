@@ -13,12 +13,15 @@ define([
     secondFormClass: 'second-form',
     thirdFormClass: 'third-form',
     loadingClass: 'loading',
+    stepId: 'formstep',
     tranUploadId: 'tranupload',
-    gtransId: 'usegtrans',
+    useAsrId: 'use-asr',
+    useManualId: 'use-manual',
     processingFormClass: 'processing-form',
     finalUrlClass: 'finalurl',
     intrmId: 'intrmid',
     yttitleId: 'yttitle',
+    lengthSeconds: 'lengthSeconds',
   };
   return Backbone.View.extend({
     el: document.getElementById(consts.viewId),
@@ -59,23 +62,38 @@ define([
         return;
       }
 
-      if ($el.hasClass(consts.firstFormClass)) {
+      if ($el.hasClass(consts.firstFormClass) && resobj.subopts) {
+        // user needs to select subtitle/caption
         var ytinfoHtml = _.template(ytinfoTemplate, resobj);
         thisView.$el.find('.' + consts.pageHeaderClass).html(ytinfoHtml);
         thisView.$el.find('#' + consts.yttitleId).val(resobj.title);
+        thisView.$el.find('#' + consts.lengthSeconds).val(resobj.lengthSeconds);
+        thisView.$el.find('#' + consts.stepId).val('2');
         thisView.$el.removeClass(consts.firstFormClass);
         thisView.$el.addClass(consts.secondFormClass);
-      } else if ($el.hasClass(consts.secondFormClass)) {
-        if (resobj.intrmid) {
-          thisView.intrmid = resobj.intrmid;
-          var $finalUrls = thisView.$el.find('.' + consts.finalUrlClass);
-          window.location = window.location.href + '#edit/' + resobj.intrmid;
+        const $useAsr = thisView.$el.find(`#${consts.useAsrId}`);
+        if (resobj.subopts.asr) {
+          $useAsr.show();
         } else {
-          toastr.error('Unable to process request correctly: try again');
+          $useAsr.hide();
         }
-      } else {
-        toastr.error('Unable to process request: try again');
+        const $useManual = thisView.$el.find(`#${consts.useManualId}`);
+        if (resobj.subopts.manual)  {
+          $useManual.show();
+        } else {
+          $useManual.hide();
+        }
+        return;
       }
+
+      if ($el.hasClass(consts.secondFormClass) && resobj.tranupload) {
+        thisView.$el.find('#' + consts.stepId).val('3');
+        thisView.$el.removeClass(consts.secondFormClass);
+        thisView.$el.addClass(consts.thirdFormClass);
+        return;
+      }
+    
+      toastr.error('Unable to process request: try again');
     },
 
     handleFormError: function (errResp) {
