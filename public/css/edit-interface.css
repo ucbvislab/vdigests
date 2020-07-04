@@ -591,7 +591,7 @@ body.viewing .section-row .remove-section {
 }
 
 .transcript-words p + p {
-  padding-top: 20px;
+  padding-top: 10px;
 }
 
 /* so clicking near the word activates the word */
