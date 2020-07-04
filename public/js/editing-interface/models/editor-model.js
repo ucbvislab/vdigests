@@ -21,32 +21,25 @@ define([
   ThumbnailModel
 ) {
   const addThumbnails = async function (toAddThumbs) {
-    if (toAddThumbs.length === 0) {
-      return;
+    for (const addThumb of toAddThumbs) {
+      addThumb.addSec.set(
+        'thumbnail',
+        new ThumbnailModel({ data: addThumb.data, time: addThumb.time })
+      );
     }
-    var addThumb = toAddThumbs.pop();
-    if (addThumb.data) {
-      // thumbnail data already present
-      _postAddThumb(addThumb.data, addThumb, toAddThumbs);
-    } else if (typeof addThumb.time === 'number') {
-      // capture the thumbnail
+
+    const thumbsWithoutData = toAddThumbs.filter((addThumb) => !addThumb.data);
+    for (const addThumb of thumbsWithoutData) {
       try {
         const data = await Utils.getScreenShot(addThumb.vdid, addThumb.time);
-        _postAddThumb(data, addThumb, toAddThumbs);
+        addThumb.addSec.set(
+          'thumbnail',
+          new ThumbnailModel({ data, time: addThumb.time })
+        );
       } catch (err) {
-        _postAddThumb('', addThumb, toAddThumbs);
+        // couldn't get the thumbnail - oh well!
       }
-    } else {
-      _postAddThumb('', addThumb, toAddThumbs);
     }
-  };
-
-  const _postAddThumb = function (data, addThumb, toAddThumbs) {
-    addThumb.addSec.set(
-      'thumbnail',
-      new ThumbnailModel({ data: data, time: addThumb.time })
-    );
-    addThumbnails(toAddThumbs);
   };
 
   return Backbone.Model.extend({
