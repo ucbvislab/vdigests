@@ -111,7 +111,7 @@ define([
       // Attempt autosave every 30s
       thisView.interval = setInterval(
         thisView.autosaveVDigest.bind(thisView),
-        30_000
+        30000
       );
     },
 
