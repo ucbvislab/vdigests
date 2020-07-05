@@ -8,7 +8,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon node app.js",
-    "build": "cd public/js && r.js -o build.js",
+    "build": "cd public/js && r.js -o build.js optimize=none && terser main-built.js --compress --mangle -o main-built.min.js",
     "test": "mocha",
     "precommit": "pretty-quick --staged",
     "postcommit": "git update-index -g",
@@ -82,7 +82,8 @@
     "mocha": "^1.19.0",
     "multiline": "^0.3.4",
     "pretty-quick": "^2.0.1",
-    "supertest": "^0.13.0"
+    "supertest": "^0.13.0",
+    "terser": "^4.8.0"
   },
   "description": "placeholder",
   "bugs": {

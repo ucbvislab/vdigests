@@ -75,7 +75,7 @@ block content
 block morejs
   if (prod)
     != js("lib/require")
-    != js("main-built")
+    != js("main-built.min")
   else
     != js("lib/require", {"data-main": "/js/editing-interface/main.js"})
 
