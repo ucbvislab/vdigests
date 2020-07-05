@@ -85,6 +85,7 @@ function initServer() {
       paths: ['public/css', 'public/js', 'public/img'],
       helperContext: app.locals,
       servePath: 'vdstatic',
+      compress: false, // connect-assets doesn't support es6+, I think? we'll compress with terser in the build process
     })
   );
   app.use(compress());
