@@ -83,6 +83,7 @@ define([
       // add init data if it exists
       if (thisModel.toAddDigest) {
         thisModel.useJSONData(thisModel.toAddDigest);
+        // TODO: block the rest of the UI if this postInit throws an error
         thisModel.toAddDigest = null;
       }
 

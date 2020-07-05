@@ -312,6 +312,11 @@ define([
 
     autosaveVDigest: async function () {
       const thisView = this;
+      if (thisView.model.toAddDigest) {
+        // if there was a parsing error, don't autosave
+        // TODO: find a better way to detect this error
+        return;
+      }
       const payloadStr = thisView.makeVDigestJsonStr();
       if (payloadStr === thisView.lastAttemptedSavePayloadStr) {
         return;
