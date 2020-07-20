@@ -1,6 +1,10 @@
 /*global define YT*/
+
+let allPlayers = [];
+
 define(['jquery'], function ($) {
   var player = {
+    allPlayers,
     inputVideo: function (
       container,
       ytid,
@@ -75,6 +79,7 @@ define(['jquery'], function ($) {
       } else {
         vplayerObj[container.id] = pobj;
       }
+      allPlayers.push(pobj);
     },
   };
 

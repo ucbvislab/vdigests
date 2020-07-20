@@ -10,6 +10,7 @@ define([
   'editing-interface/models/chapter-model',
   'editing-interface/models/section-model',
   'editing-interface/utils/utils',
+  'editing-interface/utils/player',
   'toastr',
   'micromodal',
 ], function (
@@ -23,6 +24,7 @@ define([
   ChapterModel,
   SectionModel,
   Utils,
+  Player,
   toastr,
   micromodal
 ) {
@@ -239,6 +241,9 @@ define([
     previewVDigest: function () {
       var locSplit = window.location.hash.split('/');
       window.location.hash = 'preview/' + locSplit.slice(1).join('/');
+      Player.allPlayers.forEach((ytplayer) => {
+        ytplayer.stopVideo();
+      });
     },
 
     unpublishVDigest: async function () {
@@ -298,6 +303,9 @@ define([
     toEditVDigest: function () {
       var locSplit = window.location.hash.split('/');
       window.location.hash = 'edit/' + locSplit.slice(1).join('/');
+      Player.allPlayers.forEach((ytplayer) => {
+        ytplayer.stopVideo();
+      });
     },
 
     makeVDigestJsonStr: function () {
