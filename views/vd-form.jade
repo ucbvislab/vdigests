@@ -17,15 +17,15 @@
         .radio#use-manual
           label
             input(type='radio', name='trantype' value='manual')
-            | Use manually uploaded YouTube captions
+            | Use existing YouTube captions (manually uploaded)
         .radio#use-asr
           label
             input(type='radio', name='trantype', value='asr')
-            | Use auto-generated YouTube captions 
+            | Use existing YouTube captions (automatic subtitling)
         .radio
           label
             input(type='radio', name='trantype', value='upload')
-            | Upload your own VTT or SRT file. (You can create this using <a href="https://www.descript.com" target="_blank">Descript</a> - see this <a href="https://help.descript.com/hc/en-us/articles/360042211032-Exporting-a-transcript-as-a-document-or-captions-subtitles" target="_blank">how-to</a>)
+            | Upload your own VTT or SRT captions file. Create one using an automatic tool (e.g., <a href="https://www.descript.com" target="_blank">Descript</a>; <a href="https://help.descript.com/hc/en-us/articles/360042211032-Exporting-a-transcript-as-a-document-or-captions-subtitles" target="_blank">how-to</a>) or manual tool (e.g., <a href="https://www.vtt-creator.com/editor" target="_blank">VTT creator</a>).
       .uploadtrangroup
         h3 Upload captions VTT or SRT
       .form-group.uploadtrangroup
