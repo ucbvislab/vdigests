@@ -14,9 +14,7 @@ var methodOverride = require('method-override');
 var sslRedirect = require('heroku-ssl-redirect');
 const sequelize = require('./models/sequelize');
 // load models
-require('./models/User');
-require('./models/VDigest');
-require('./models/Ownership');
+require('./models');
 
 sequelize.sync();
 
