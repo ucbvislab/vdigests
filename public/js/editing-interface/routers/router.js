@@ -99,9 +99,10 @@ define([
         } else if (vtype1 === 'view' || vtype2 === 'view') {
           var vtitle = pname[pname.length - 1];
           // vd viewing interface TODO the transcript is not needed
-          var IDLEN = 7;
           $(document.body).addClass(consts.pubClass);
-          thisRoute.viewRoute(vtitle.substr(vtitle.length - IDLEN));
+          const parts = vtitle.split('-');
+          const vdid = parts[parts.length - 1];
+          thisRoute.viewRoute(vdid);
           $('#loading-image').show();
         } else {
           toastr.error(

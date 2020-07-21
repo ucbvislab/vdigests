@@ -1,14 +1,7 @@
 var _ = require('underscore');
-var passport = require('passport');
-var InstagramStrategy = require('passport-instagram').Strategy;
-var LocalStrategy = require('passport-local').Strategy;
-var FacebookStrategy = require('passport-facebook').Strategy;
-var TwitterStrategy = require('passport-twitter').Strategy;
-var GitHubStrategy = require('passport-github').Strategy;
-var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-var LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
-var OAuthStrategy = require('passport-oauth').OAuthStrategy; // Tumblr
-var OAuth2Strategy = require('passport-oauth').OAuth2Strategy; // Venmo, Foursquare
+const bcrypt = require('bcrypt-nodejs');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
 var User = require('../models/User');
 var secrets = require('./secrets');
 
@@ -16,31 +9,49 @@ passport.serializeUser(function (user, done) {
   done(null, user.id);
 });
 
-passport.deserializeUser(function (id, done) {
-  User.findById(id, function (err, user) {
-    done(err, user);
-  });
+passport.deserializeUser(async function (id, done) {
+  try {
+    const user = await User.findByPk(id);
+    done(null, user);
+  } catch (err) {
+    done(err, null);
+  }
 });
 
 // Sign in using Email and Password.
 
+async function comparePassword(candidatePassword, userPassword) {
+  return new Promise((resolve, reject) => {
+    bcrypt.compare(candidatePassword, userPassword, function (err, isMatch) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(isMatch);
+      }
+    });
+  });
+}
+
 passport.use(
-  new LocalStrategy({ usernameField: 'email' }, function (
+  new LocalStrategy({ usernameField: 'email' }, async function (
     email,
     password,
     done
   ) {
-    User.findOne({ email: email }, function (err, user) {
-      if (!user)
+    try {
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
         return done(null, false, { message: 'Email ' + email + ' not found' });
-      user.comparePassword(password, function (err, isMatch) {
-        if (isMatch) {
-          return done(null, user);
-        } else {
-          return done(null, false, { message: 'Invalid email or password.' });
-        }
-      });
-    });
+      }
+      const isMatch = await comparePassword(password, user.password);
+      if (isMatch) {
+        return done(null, user);
+      } else {
+        return done(null, false, { message: 'Invalid email or password.' });
+      }
+    } catch (err) {
+      return done(err);
+    }
   })
 );
 

@@ -13,6 +13,7 @@ var mkdirp = require('mkdirp'),
     videos: path.join(ffdataPath, 'videos'),
     audio: path.join(ffdataPath, 'audio'),
     screenshots: path.join(ffdataPath, 'vdscreenshots'),
+    ssTrans: path.join(ffdataPath, 'sstrans'),
     rawTrans: path.join(ffdataPath, 'rawtrans'),
     tmp: path.join(ffdataPath, 'tmp'),
   };

@@ -214,7 +214,7 @@ define([
         };
         _.each(chobj.sections, function (sec) {
           var outsec = {
-            summary: sec.summary[0],
+            summary: Array.isArray(sec.summary) ? sec.summary[0] : sec.summary,
             startWord: null,
             image_time: sec.thumbnail && sec.thumbnail.time,
             image_data: sec.thumbnail && sec.thumbnail.data,

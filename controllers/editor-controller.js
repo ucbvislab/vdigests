@@ -10,10 +10,11 @@ const multiparty = require('multiparty');
 const url = require('url');
 const { exec } = require('child_process');
 const User = require('../models/User');
+const { VDigest, DEFAULT_DIGEST } = require('../models/VDigest');
+const Ownership = require('../models/Ownership');
 const slug = require('slug');
 const querystring = require('querystring');
 const path = require('path');
-const VDigest = require('../models/VDigest');
 const settings = require('../config/settings');
 const spaths = settings.paths;
 const { returnError } = require('../utils/errors');
@@ -35,6 +36,22 @@ var returnErrorJson = function (res, data, code) {
   res.write(JSON.stringify(data));
   res.end();
 };
+
+function makeVDigestDataCacheObject({
+  digest,
+  alignTrans,
+  ytid,
+  videoLength,
+  pubdisplay,
+}) {
+  return JSON.stringify({
+    digest,
+    transcript: alignTrans,
+    ytid,
+    videoLength,
+    pubdisplay,
+  });
+}
 
 const VALID_TRANSCRIPT_TYPES = new Set(['asr', 'manual', 'upload']);
 
@@ -294,43 +311,36 @@ function getAlignmentForSrt(srtText) {
 
 async function createVideoDigest(
   res,
-  { userId, ytid, tfname, videoLength, title, alignTrans }
+  { userId, ytid, tfname, videoLength, title, alignTrans, next }
 ) {
-  const vd = new VDigest({
-    ytid,
-    rawTransName: tfname,
-    videoName: ytid,
-    videoLength,
-    digest: { title },
-    alignTrans,
-    state: 1,
-  });
-
   try {
-    await vd.validate();
-    await vd.save();
+    const vd = await VDigest.create({
+      ytid,
+      rawTransName: tfname,
+      videoName: ytid,
+      videoLength,
+      title,
+      digest: { ...DEFAULT_DIGEST, title },
+      alignTrans,
+      state: 1,
+      uploadUser: userId,
+    });
+    // add ownership
+    await vd.addUser(userId);
+
+    const payload = { intrmid: vd.id, title };
+
+    res.writeHead(200, { 'content-type': 'application/json' });
+    res.write(JSON.stringify(payload));
+    res.end();
   } catch (err) {
+    console.error(err);
     returnError(
       res,
       'problem saving video digest to the database -- please try again',
       next
     );
   }
-
-  // add video digest to this user's account
-  User.findById(userId, async function (err, user) {
-    if (err) return next(err);
-    if (user.vdigests.indexOf(vd.id) === -1) {
-      user.vdigests.push(vd.id);
-      await user.save();
-    }
-
-    const payload = { intrmid: vd._id, title };
-
-    res.writeHead(200, { 'content-type': 'application/json' });
-    res.write(JSON.stringify(payload));
-    res.end();
-  });
 }
 
 async function getTranscriptAndCreateDigest({
@@ -474,30 +484,44 @@ exports.getEditor = function (req, res) {
 /**
  * Returns the readyness/processing status of the video digest
  */
-exports.getStatus = function (req, res) {
-  var uparsed = url.parse(req.url),
-    did = uparsed.query && querystring.parse(uparsed.query).id;
+exports.getStatus = async function (req, res) {
+  const uparsed = url.parse(req.url);
+  const did = uparsed.query && querystring.parse(uparsed.query).id;
 
-  VDigest.findById(did, function (err, vd) {
-    var vstatus = 0;
-    var msg = '';
-    console.log(vd.state);
-    if (err || !vd) {
-      msg = 'unable to load the video digest';
-    } else if (vd.isProcessing()) {
-      vstatus = 3;
-      msg = 'video digest is processing';
-    } else if (vd.isReady()) {
-      vstatus = 1;
-      msg = 'video digest is ready for editing';
-    }
-    res.writeHead(200, { 'content-type': 'application/json' });
-    res.end(JSON.stringify({ status: vstatus, message: msg }));
-  });
+  let msg = '';
+  let vd;
+  try {
+    vd = await VDigest.findByPk(did);
+  } catch (err) {
+    msg = 'unable to load the video digest';
+  }
+  if (!vd) {
+    msg = 'unable to load the video digest';
+  } else if (vd.isProcessing) {
+    vstatus = 3;
+    msg = 'video digest is processing';
+  } else if (vd.isReady) {
+    vstatus = 1;
+    msg = 'video digest is ready for editing';
+  }
+
+  res.writeHead(200, { 'content-type': 'application/json' });
+  res.end(JSON.stringify({ status: vstatus, message: msg }));
 };
 
-function getCanUserEdit(user, vdid) {
-  return Boolean(user && user.vdigests.indexOf(vdid) !== -1);
+async function getCanUserEdit(user, vdid) {
+  if (!user || !vdid) {
+    return false;
+  }
+  try {
+    const ownership = await Ownership.findOne({
+      where: { UserId: user.id, VDigestId: vdid },
+    });
+    return Boolean(ownership);
+  } catch (err) {
+    console.error('Error while fetching ownership', err);
+    return false;
+  }
 }
 
 /**
@@ -506,7 +530,7 @@ function getCanUserEdit(user, vdid) {
 exports.getDigestData = async function (req, res, next) {
   console.log('Getting digest data...');
   const vdid = req.params.vdid;
-  const userCanEdit = getCanUserEdit(req.user, vdid);
+  const userCanEdit = await getCanUserEdit(req.user, vdid);
   const task = req.query.task;
 
   if (task !== 'edit' && task !== 'view') {
@@ -519,52 +543,61 @@ exports.getDigestData = async function (req, res, next) {
   }
 
   const cachedData = cache.get(vdid);
+  if (cachedData) {
+    console.log('Cache hit');
+  } else {
+    console.log('Cache miss');
+  }
 
   if (
     cachedData &&
-    ((task === 'view' && cachedData.pubdisplay) ||
+    ((task === 'view' && JSON.parse(cachedData).pubdisplay) ||
       (task === 'edit' && userCanEdit))
   ) {
     console.log('using vdid cache for: ' + vdid);
+    console.log(JSON.parse(cachedData).digest.chapters[0].sections);
     res.writeHead(200, { 'content-type': 'application/json' });
     return res.end(cachedData);
   }
 
-  VDigest.findById(vdid, function (err, vd) {
-    if (err || !vd) {
-      returnError(res, 'unable to load the specified video digest data', next);
-    } else if (task === 'view' && !vd.pubdisplay) {
-      returnError(res, 'video digest is not published', next);
-    } else if (task === 'edit' && !userCanEdit) {
-      returnError(res, 'user does not have access to digest', next);
-    } else if (vd.isProcessing()) {
-      returnError(res, 'the video digest is currently processing', next);
-    } else if (!vd.isReady()) {
-      returnError(
-        res,
-        'the transcript did not upload correctly: please create the video digest from scratch',
-        next
-      );
-    } else {
-      res.writeHead(200, { 'content-type': 'application/json' });
-      var jsonStrResp = JSON.stringify({
-        digest: vd.digest,
-        transcript: vd.alignTrans,
-        ytid: vd.ytid,
-        videoLength: vd.videoLength,
-      });
-      res.end(jsonStrResp);
-      cache.put(vdid, jsonStrResp, 10000000);
-    }
-  });
+  console.log('Not using cached data...');
+
+  let vd;
+  try {
+    vd = await VDigest.findByPk(vdid);
+  } catch (err) {
+    returnError(res, 'unable to load the specified video digest data', next);
+    return;
+  }
+  if (!vd) {
+    returnError(res, 'unable to load the specified video digest data', next);
+    return;
+  } else if (task === 'view' && !vd.pubdisplay) {
+    returnError(res, 'video digest is not published', next);
+  } else if (task === 'edit' && !userCanEdit) {
+    returnError(res, 'user does not have access to digest', next);
+  } else if (vd.isProcessing) {
+    returnError(res, 'the video digest is currently processing', next);
+  } else if (!vd.isReady) {
+    returnError(
+      res,
+      'the transcript did not upload correctly: please create the video digest from scratch',
+      next
+    );
+  } else {
+    res.writeHead(200, { 'content-type': 'application/json' });
+    const jsonStrResp = makeVDigestDataCacheObject(vd);
+    cache.put(vdid, jsonStrResp, 10000000);
+    res.end(jsonStrResp);
+  }
 };
 
 /**
  * Post to the digest data /digestdata/:vid
  */
-exports.postPublishDigest = function (req, res, next) {
+exports.postPublishDigest = async function (req, res, next) {
   var vdid = req.params.vdid;
-  if (!getCanUserEdit(req.user, vdid)) {
+  if (!(await getCanUserEdit(req.user, vdid))) {
     returnError(res, 'you do not have the access to publish this digest', next);
     return;
   }
@@ -572,23 +605,31 @@ exports.postPublishDigest = function (req, res, next) {
   const publish = Boolean(req.body.publish);
   const unlisted = Boolean(req.body.unlisted);
 
-  VDigest.findById(vdid, function (err, vd) {
-    if (err || !vd) {
-      returnError(res, 'unable to save the video digest data', next);
-      return;
-    }
-    let changed = false;
+  let vd;
+  try {
+    vd = await VDigest.findByPk(vdid);
+  } catch (err) {
+    returnError(res, 'unable to save the video digest data', next);
+    return;
+  }
+  if (!vd) {
+    returnError(res, 'unable to save the video digest data', next);
+    return;
+  }
+  try {
     if (publish) {
       vd.pubdisplay = !unlisted;
       if (!vd.puburl) {
         vd.puburl = slug(vd.digest.title + ' ' + vd.id);
       }
-      vd.save();
+      await vd.save();
     } else {
       vd.pubdisplay = false;
       vd.puburl = null;
-      vd.save();
+      await vd.save();
     }
+    // clear the cache
+    cache.del(vdid);
     res.writeHead(200, { 'content-type': 'application/json' });
     res.end(
       JSON.stringify({
@@ -597,60 +638,55 @@ exports.postPublishDigest = function (req, res, next) {
         puburl: vd.puburl,
       })
     );
-  });
+  } catch (err) {
+    returnError(res, 'unable to save the video digest data', next);
+    return;
+  }
 };
 
 /**
  * Post to the digest data /digestdata/:vid
  */
-exports.postDigestData = function (req, res, next) {
+exports.postDigestData = async function (req, res, next) {
   var vdid = req.params.vdid;
 
-  VDigest.findById(vdid, function (err, vd) {
-    if (err || !vd) {
-      returnError(res, 'unable to save the video digest data', next);
-      return;
-    }
+  let vd;
+  try {
+    vd = await VDigest.findByPk(vdid);
+  } catch (err) {
+    returnError(res, 'unable to save the video digest data', next);
+    return;
+  }
+  if (!vd) {
+    returnError(res, 'unable to save the video digest data', next);
+    return;
+  }
 
-    // TODO remove audioName check used for VD experiment
-    if (
-      (!req.user || req.user.vdigests.indexOf(vdid) === -1) &&
-      vd.audioName != 'Fpz-stC1uh8'
-    ) {
-      returnError(
-        res,
-        'you do not have the access to change this digest',
-        next
-      );
-      return;
-    }
+  if (!(await getCanUserEdit(req.user, vdid))) {
+    returnError(res, 'you do not have the access to change this digest', next);
+    return;
+  }
 
-    vd.digest = req.body.object;
-    vd.save(function (err) {
-      // TODO check that the the user can save the data
-      if (err) {
-        returnError(res, 'unable to save the video digest data', next);
-        return;
-      }
+  vd.title = req.body.object.title;
+  vd.digest = req.body.object;
+  try {
+    await vd.save();
+  } catch (err) {
+    returnError(res, 'unable to save the video digest data', next);
+    return;
+  }
 
-      // update memory cache
-      var jsonStrResp = JSON.stringify({
-        digest: vd.digest,
-        transcript: vd.alignTrans,
-        ytid: vd.ytid,
-        videoLength: vd.videoLength,
-      });
-      cache.put(vdid, jsonStrResp, 10000000);
+  // update memory cache
+  const jsonStrResp = makeVDigestDataCacheObject(vd);
+  cache.put(vdid, jsonStrResp, 10000000);
 
-      res.writeHead(200, { 'content-type': 'application/json' });
-      res.end(
-        JSON.stringify({
-          status: 'success',
-          message: 'saved the video digest data',
-        })
-      );
-    });
-  });
+  res.writeHead(200, { 'content-type': 'application/json' });
+  res.end(
+    JSON.stringify({
+      status: 'success',
+      message: 'saved the video digest data',
+    })
+  );
 };
 
 // multipart process for loading a new video
@@ -790,83 +826,86 @@ exports.postNewVD = function (req, res, next) {
   return;
 };
 
-exports.getAutoSeg = function (req, res, next) {
+exports.getAutoSeg = async function (req, res, next) {
   // get the transcript
-  VDigest.findById(req.params.vdid, async function (err, vdigest) {
-    if (err || !vdigest) {
-      return returnErrorJson(res, err);
+  let vd;
+  try {
+    vd = await VDigest.findByPk(req.params.vdid);
+  } catch (err) {
+    return returnErrorJson(res, err);
+  }
+  if (!vd) {
+    return returnErrorJson(res, err);
+  }
+  if (!vdigest.rawTransName) {
+    var transText = vdigest.alignTrans.words
+      .map(function (wrd) {
+        return wrd.word;
+      })
+      .join(' ')
+      .replace(' {p}', '');
+    vdigest.rawTransName = Math.random().toString(36).substr(6) + '.txt';
+    var outfile = path.join(spaths.rawTrans, vdigest.rawTransName);
+    try {
+      await fs.writeFile(outfile, transText);
+    } catch (err) {
+      return returnErrorJson(res, err, 500);
     }
+  }
+  doSysCall();
 
-    if (!vdigest.rawTransName) {
-      var transText = vdigest.alignTrans.words
-        .map(function (wrd) {
-          return wrd.word;
-        })
-        .join(' ')
-        .replace(' {p}', '');
-      vdigest.rawTransName = Math.random().toString(36).substr(6) + '.txt';
-      var outfile = path.join(spaths.rawTrans, vdigest.rawTransName);
-      try {
-        await fs.writeFile(outfile, transText);
-      } catch (err) {
-        return returnErrorJson(res, err, 500);
-      }
+  function doSysCall() {
+    var rtxtfile = vdigest.getSSFile();
+    var segSysCall =
+      'python adv_seg.py eval ' + spaths.segConfigFile + ' ' + rtxtfile;
+    // execute system call
+    if (!vdigest.sentSepTransName) {
+      console.log('trying to generate separated transcript');
+      var scmd = 'python add_sentences.py ' + vdigest.id;
+      console.log(scmd);
+
+      exec(scmd, { cwd: spaths.utils }, function (err, stdout, stderr) {
+        console.log('error: ' + err);
+        console.log('error: ' + stderr);
+        if (err || !vdigest.sentSepTransName) {
+          return returnErrorJson(
+            res,
+            { msg: 'error processing transcript - please try again later' },
+            500
+          );
+        } else {
+          doSysCall();
+        }
+      });
+    } else {
+      console.log(segSysCall);
+      var segProc = exec(segSysCall, { cwd: spaths.analysis }, function (
+        error,
+        stdout,
+        stderr
+      ) {
+        console.log('finished segmentation');
+        console.log('error: ' + error);
+        console.log('stderror: ' + stderr);
+        console.log('stdout: ' + stdout);
+        // get sentence breaks from stdout
+        if (error || stderr) {
+          return returnErrorJson(res, {
+            msg: 'Segmentation error -- please try again: ' + stderr,
+          });
+        }
+        try {
+          var sps = stdout.split('\n');
+          var sentBreaks = sps[sps.length - 4];
+          return returnJson(res, { breaks: sentBreaks });
+        } catch (e) {
+          return returnErrorJson(res, {
+            msg: 'Segmentation error -- please try again',
+          });
+        }
+        // read results from system call or return error
+        // return the word/sentence numbers
+      });
     }
-    doSysCall();
-
-    function doSysCall() {
-      var rtxtfile = vdigest.getSSFile();
-      var segSysCall =
-        'python adv_seg.py eval ' + spaths.segConfigFile + ' ' + rtxtfile;
-      // execute system call
-      if (!vdigest.sentSepTransName) {
-        console.log('trying to generate separated transcript');
-        var scmd = 'python add_sentences.py ' + vdigest.id;
-        console.log(scmd);
-
-        exec(scmd, { cwd: spaths.utils }, function (err, stdout, stderr) {
-          console.log('error: ' + err);
-          console.log('error: ' + stderr);
-          if (err || !vdigest.sentSepTransName) {
-            return returnErrorJson(
-              res,
-              { msg: 'error processing transcript - please try again later' },
-              500
-            );
-          } else {
-            doSysCall();
-          }
-        });
-      } else {
-        console.log(segSysCall);
-        var segProc = exec(segSysCall, { cwd: spaths.analysis }, function (
-          error,
-          stdout,
-          stderr
-        ) {
-          console.log('finished segmentation');
-          console.log('error: ' + error);
-          console.log('stderror: ' + stderr);
-          console.log('stdout: ' + stdout);
-          // get sentence breaks from stdout
-          if (error || stderr) {
-            return returnErrorJson(res, {
-              msg: 'Segmentation error -- please try again: ' + stderr,
-            });
-          }
-          try {
-            var sps = stdout.split('\n');
-            var sentBreaks = sps[sps.length - 4];
-            return returnJson(res, { breaks: sentBreaks });
-          } catch (e) {
-            return returnErrorJson(res, {
-              msg: 'Segmentation error -- please try again',
-            });
-          }
-          // read results from system call or return error
-          // return the word/sentence numbers
-        });
-      }
-    }
-  });
+  }
 };

@@ -2,8 +2,8 @@
 
 // TODO figure out upload User
 var fs = require('fs');
-var User = require('../models/User');
-var VDigest = require('../models/VDigest');
+const User = require('../models/User');
+const { VDigest } = require('../models/VDigest');
 var execSync = require('execSync');
 var spaths = require('../config/settings').paths;
 var path = require('path');

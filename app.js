@@ -12,14 +12,20 @@ var errorHandler = require('errorhandler');
 var csrf = require('lusca').csrf();
 var methodOverride = require('method-override');
 var sslRedirect = require('heroku-ssl-redirect');
+const sequelize = require('./models/sequelize');
+// load models
+require('./models/User');
+require('./models/VDigest');
+require('./models/Ownership');
+
+sequelize.sync();
 
 var fs = require('fs');
 var https = require('https');
 
-var MongoStore = require('connect-mongo')(session);
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
 var flash = require('express-flash');
 var path = require('path');
-var mongoose = require('mongoose');
 var passport = require('passport');
 var expressValidator = require('express-validator');
 var connectAssets = require('connect-assets');
@@ -190,51 +196,38 @@ function initServer() {
     passportConf.isAuthenticated,
     userController.postDeleteAccount
   );
-  app.get(
-    '/' + extraPath + 'account/unlink/:provider',
-    passportConf.isAuthenticated,
-    userController.getOauthUnlink
-  );
 
   app.use(errorHandler());
 }
 
+const sessionStore = new SequelizeStore({
+  db: sequelize,
+});
+
+app.use(
+  session({
+    secret: secrets.sessionSecret,
+    store: sessionStore,
+    resave: false,
+    proxy: true,
+  })
+);
+
+sessionStore.sync();
+sequelize.sync();
+
 /**
- * Mongoose configuration.
+ * Start Express server.
  */
 
-mongoose.connect(secrets.db);
+initServer();
 
-var MongoClient = require('mongodb').MongoClient;
-// Connect to the db
-MongoClient.connect(secrets.db, function (err, db) {
-  if (err) throw err;
-
-  var sessionStore = new MongoStore({
-    client: db,
-    auto_reconnect: true,
-  });
-
-  app.use(
-    session({
-      secret: secrets.sessionSecret,
-      store: sessionStore,
-    })
+app.listen(app.get('port'), function () {
+  console.log(
+    ' ✔ Express server listening on port %d in %s mode',
+    app.get('port'),
+    app.get('env')
   );
-
-  /**
-   * Start Express server.
-   */
-
-  initServer();
-
-  app.listen(app.get('port'), function () {
-    console.log(
-      ' ✔ Express server listening on port %d in %s mode',
-      app.get('port'),
-      app.get('env')
-    );
-  });
 });
 
 module.exports = app;

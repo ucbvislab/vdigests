@@ -4,8 +4,8 @@
 
 /*global require exports*/
 
-var path = require('path'),
-  spaths = require('../config/settings').paths;
+const path = require('path');
+const spaths = require('../config/settings').paths;
 
 exports.getVideoFile = function (vid) {
   return path.join(spaths.videos, vid + '.mp4');
