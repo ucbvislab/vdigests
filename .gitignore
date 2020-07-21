@@ -9,6 +9,7 @@ builtAssets
 vsbenv
 public/js/main-built*
 public/js/editing-interface/editing-interface/main-built*
+*.sqlite
 
 *~
 .tern-port
