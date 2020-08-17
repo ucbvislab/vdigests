@@ -126,6 +126,13 @@ define([
 
       thisView.listenTo(thisModel, 'change:title', function (mdl, val) {
         if (!thisView.typing) {
+          val = val.trim();
+          // in case we saved <br> from the old version of the code that
+          // stored `innerHTML` instead of `textContent`
+          const br = '<br>';
+          while (val.endsWith(br)) {
+            val = val.substring(0, val.length - br.length).trim();
+          }
           thisView.$el.find('.' + consts.chapHeaderClass).html(val);
         }
       });
