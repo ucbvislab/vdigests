@@ -43,7 +43,7 @@ define([
       'keyup .chapter-header': function (evt) {
         var thisView = this;
         thisView.typing = true;
-        thisView.model.set('title', evt.currentTarget.innerHTML);
+        thisView.model.set('title', evt.currentTarget.textContent);
 
         // USE STATS
         window.vdstats.nSubtitleEdits.push(new Date().getTime());

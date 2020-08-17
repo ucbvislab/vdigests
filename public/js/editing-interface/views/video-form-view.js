@@ -78,7 +78,7 @@ define([
           $useAsr.hide();
         }
         const $useManual = thisView.$el.find(`#${consts.useManualId}`);
-        if (resobj.subopts.manual)  {
+        if (resobj.subopts.manual) {
           $useManual.show();
         } else {
           $useManual.hide();
@@ -92,7 +92,7 @@ define([
         thisView.$el.addClass(consts.thirdFormClass);
         return;
       }
-    
+
       toastr.error('Unable to process request: try again');
     },
 
