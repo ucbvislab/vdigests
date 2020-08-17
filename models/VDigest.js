@@ -45,7 +45,6 @@ const VDigest = sequelize.define('VDigest', {
   },
   puburl: {
     type: DataTypes.STRING,
-    unique: true,
   },
   audioName: {
     type: DataTypes.STRING,

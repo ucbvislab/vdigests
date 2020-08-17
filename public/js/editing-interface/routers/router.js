@@ -96,17 +96,15 @@ define([
           }
           pvt.hideAllViews();
           thisRoute.videoFormView.$el.show();
-        } else if (vtype1 === 'view' || vtype2 === 'view') {
-          var vtitle = pname[pname.length - 1];
+        } else if (pname[0] === 'view') {
           // vd viewing interface TODO the transcript is not needed
           $(document.body).addClass(consts.pubClass);
-          const parts = vtitle.split('-');
-          const vdid = parts[parts.length - 1];
+          const vdid = pname[1];
           thisRoute.viewRoute(vdid);
           $('#loading-image').show();
         } else {
           toastr.error(
-            'incorrect URL format, should be /view/title or /editor#edit/id or /editor#preview/id'
+            'incorrect URL format, should be /view/id/title or /editor#edit/id or /editor#preview/id'
           );
         }
       },

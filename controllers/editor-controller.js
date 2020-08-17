@@ -620,7 +620,7 @@ exports.postPublishDigest = async function (req, res, next) {
     if (publish) {
       vd.pubdisplay = !unlisted;
       if (!vd.puburl) {
-        vd.puburl = slug(vd.digest.title + ' ' + vd.id);
+        vd.puburl = slug(vd.digest.title);
       }
       await vd.save();
     } else {

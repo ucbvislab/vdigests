@@ -7,7 +7,7 @@ const { VDigest } = require('../models/VDigest');
 exports.getVDList = async function (req, res) {
   const vds = await VDigest.findAll({
     where: { pubdisplay: true },
-    attributes: ['puburl', 'title'],
+    attributes: ['id', 'puburl', 'title'],
     order: [['createdAt', 'DESC']],
     limit: 20,
   });

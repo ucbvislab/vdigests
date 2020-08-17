@@ -273,8 +273,9 @@ define([
       await this.saveVDigest();
 
       try {
+        const vdid = window.dataname;
         const resp = await $.ajax({
-          url: '/digestpublish/' + window.dataname,
+          url: '/digestpublish/' + vdid,
           data: JSON.stringify({
             publish: true,
             unlisted,
@@ -285,7 +286,7 @@ define([
         });
         toastr.success('published!');
         if (resp && resp.puburl) {
-          window.open(`/view/${resp.puburl}`, '_blank');
+          window.open(`/view/${vdid}/${resp.puburl}`, '_blank');
         }
       } catch (resp) {
         toastr.error(
