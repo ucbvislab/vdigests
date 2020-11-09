@@ -97,11 +97,11 @@ body.published .toolbar {
 
 .loading-gif {
   margin-left: 10px;
-  display: none;
+  display: none !important;
 }
 
 .loading .loading-gif {
-  display: inline-block;
+  display: inline-block !important;
 }
 
 #upload-video-stuff {
